@@ -1,0 +1,9 @@
+// websockets
+
+websockets are a powerful bidirectional, real-time communication protocol over a single TCP connection
+websockets use _DUPLEX_ protocol for communication.
+it happens over the same HTTP ports (80, 443), and is used to initiate the connection, then upgraded to websocket
+
+websockets work by making a connection between client and server.
+In order to start the connection, client sends a GET request with an upgrade header
+This is known as a websocket handshake, if the server is capable and allows it a 101 responese is recieved

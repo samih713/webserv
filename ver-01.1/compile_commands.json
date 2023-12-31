@@ -1,0 +1,19 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Werror",
+      "-Wextra",
+      "-std=c++98",
+      "-I./includes",
+      "-c",
+      "-o",
+      "objs/Server.o",
+      "srcs/Server.cpp"
+    ],
+    "directory": "/home/eva001/42/webserv/ver-01.1",
+    "file": "/home/eva001/42/webserv/ver-01.1/srcs/Server.cpp",
+    "output": "/home/eva001/42/webserv/ver-01.1/objs/Server.o"
+  }
+]

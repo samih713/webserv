@@ -1,0 +1,95 @@
+k MESSAGE SYNTAX AND ROUTING
+
+The HTTP protocol is defined in 6 RFC entries 7230-7235
+
+/* the 6 entries in the RFC detail the following
+* 1.  "Message Syntax and Routing" (this document)
+* 2.  "Semantics and Content" [RFC7231]
+* 3.  "Conditional Requests" [RFC7232]
+* 4.  "Range Requests" [RFC7233]
+* 5.  "Caching" [RFC7234]
+* 6.  "Authentication" [RFC7235]
+*/
+
+
+---- [TAGS] -----
+(UNDERSTAND) : the ultimate goal
+(REMEMBER) : good to remember aids understanding
+(TODO) : incorporate this in project
+-----------------
+
+(UNDERSTAND) HTTP (stateless ? in order to simplifiy server design, each request is considered an independant transaction. the server doesnt maintain `states` or memory of who the request belongs to or where it is in the chain, which gives rise to extra mechanisims cookies, sessions or tokens ... etc)
+It governs how browsers (clients) and servers communicate, hence it acts on the application level protocol for systems.
+
+This RFC entry gives an
+	-> overview of the architecture
+	-> defines (REMEMBER) Uniform Resource Identifier (URI)
+	-> HTTP/1.1 message syntax and parsing (TODO)
+	-> security concerns for implementations
+
+HTTP is a generic interface protocol, designed to hide details of how a service is implemented by presenting a uniform interface to clients.
+A consequence of this flexibility, is that it only defines the syntax of communication, the intent (request, post ...) of the communication, and the
+expected behaviour of recipients.
+
+HTTP syntax is defined in (REMEMBER) ABNF Augmented Backus-Naur Form, defined in [RFC5234] (TODO)
+
+## CLIENT/SERVER MESSAGING
+HTTP is __stateless__ request/response protocol that operates by exchanging messages across a __reliable__ connection.
+HTTP client is a program that establishes a connection for the purpose of sending requests.
+(REMEMBER) HTTP server is a program that accepts connections in order to service HTTP requests by sending responses
+
+(REMEMBER) Uniform Resource Identifier [RFC3986] a string of characters that identify a resource on the internet
+	- Scheme: the protocol used to access the resource
+	- Authority: domain name or IP address and optional port number
+	- Path: /dir/resource.html specific path to the resource on the server
+	- Query: optional key-value pair that provide additional information to be sent to server
+	- Fragment: subsection of the resource
+URL's are a specific type of URI's
+
+(REMEMBER) Most HTTP communications consist of a retrieval request (GET) for some resource identified by a URI
+
+(UNDERSTAND) A clilent sends an HTTP request to a server,
+
+a [REQUEST MESSAGE]
+[HEADER]  begining with a request line => method, URI, protocol version
+		  followed by header fields => request modifiers, client info, representation metadata
+		  empty line => to indicate the end of the header section
+		 
+[PAYLOAD] message body
+
+(TODO)	a SERVER responds with one or more HTTP responses
+	status line => protocol version, a success or error code, textual reason phrase
+	possibly header fields => server information, resource metadata, representation metadata
+	empty line => to indicate of header
+
+	message body => PAYLOAD
+
+An example communication
+////////////////////////////////////////////////////////////////////////////
+Client request:
+
+     GET /hello.txt HTTP/1.1
+     User-Agent: curl/7.16.3 libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3
+     Host: www.example.com
+     Accept-Language: en, mi
+
+////////////////////////////////////////////////////////////////////////////
+Server response:
+
+     HTTP/1.1 200 OK
+     Date: Mon, 27 Jul 2009 12:28:53 GMT
+     Server: Apache
+     Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT
+     ETag: "34aa387-d-1568eb00"
+     Accept-Ranges: bytes
+     Content-Length: 51
+     Vary: Accept-Encoding
+     Content-Type: text/plain
+
+     Hello World! My payload includes a trailing CRLF
+
+////////////////////////////////////////////////////////////////////////////
+
+[Implementation diversity]: HTTP design was based on diverse User-Agent range they could be anything, household appliances, update scripts, cli programs. And the same applies for `origin-servers` they are not just large websites, home automation units, configurable networking components. robots, news feeds, traffic cameras ... etc.
+
+
