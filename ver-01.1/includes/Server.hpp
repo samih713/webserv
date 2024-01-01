@@ -1,9 +1,8 @@
+#include <vector>
+
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-// group up in errors struct or enum something
-#include <vector>
-#define SOCKET_ERR "failed to initiate listener"
 
 // simple singleton implementation
 class Server
@@ -18,12 +17,13 @@ class Server
         // this function needs to be static, as there won't be an instance of a Server
         // when its first created
         static Server &getInstance();
-        void           start(); // !! work on start
+        void           start();
+        static WS_CODE bind(int sockfd);
         ~Server();
 
     private:
         int              listener;
-        int              nConn;
+        int              status;
         std::vector<int> conn;
 };
 

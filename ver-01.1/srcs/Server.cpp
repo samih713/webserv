@@ -24,21 +24,8 @@ Server &Server::getInstance()
 Server::Server()
     : listener(
           socket(AF_INET, SOCK_STREAM, IPPROTO_TCP | SOCK_NONBLOCK)) // start the listener
-    , nConn(0)
-{
-    // On success, a file descriptor for the new socket is returned.  On error, -1 is
-    // returned, and errno is set
-    if (listener == -1)
-    {
-        std::stringstream errorMessage;
-        errorMessage << SOCKET_ERR << ": " << strerror(errno);
-        throw std::runtime_error(errorMessage.str());
-    }
-#ifdef __DEBUG // if needed
-    else
-        std::cout << "Listener was created successfully fd[" << listener << "]\n";
-#endif // __DEBUG
-}
+    , status(WS_OK)
+{}
 
 Server::~Server()
 {
@@ -53,21 +40,36 @@ Server &Server::operator=(const __attribute__((unused)) Server &other)
     return *this;
 }
 
-// member functions
+
 void Server::start()
 {
+    int backlog = 0;
+    int status = 0;
+
+    // bind the socket
     while (true)
     {
-        // int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-        // struct timeval *timeout);
-        //
-        // void FD_CLR(int fd, fd_set *set);
-        // int  FD_ISSET(int fd, fd_set *set);
-        // void FD_SET(int fd, fd_set *set);
-        // void FD_ZERO(fd_set * set);
+        if (status) // an error has occured
+        {
+            // If a connection request arrives when the queue is full
+            std::stringstream errorMessage;
+            errorMessage << SOCKET_ERR << ": " << strerror(errno);
+            throw std::runtime_error(errorMessage.str());
+        }
 
-        // !! work on select
-        // if (select(nConn, ))
-        std::cout << "server is live boy!" << std::endl;
+        // accept a connection on a socket
+        struct sockaddr_storage clientAddr;
+        socklen_t               clientAddrSize = sizeof(clientAddr);
+        int                     clientSocket =
+            accept(listener, (struct sockaddr *)&clientAddr, &clientAddrSize);
+        if (clientSocket == -1)
+        {
+            std::stringstream errorMessage;
+            errorMessage << SOCKET_ERR << ": " << strerror(errno);
+            throw std::runtime_error(errorMessage.str());
+        }
+
+        // handle the connection
+        handleConnection(clientSocket);
     }
 }
