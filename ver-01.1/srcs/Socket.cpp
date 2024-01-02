@@ -1,5 +1,7 @@
 #include "Socket.hpp"
 #include <cerrno>
+#include <netinet/in.h>
+#include <netinet/ip.h> /* superset of previous */
 #include <sstream>
 #include <string.h>
 #include <sys/socket.h>
@@ -35,6 +37,18 @@ Socket::~Socket()
 
 
 // member functions
+
+WS_CODE Socket::bind(int family, int port, int address)
+{
+    // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+    struct sockaddr_in addr;
+    addr.sin_addr.s_addr = htonl(address);
+    addr.sin_family = family;
+    addr.sin_port = port;
+    if (::bind(socket_descriptor, (struct sockaddr *)&addr, sizeof(addr)))
+        return WS_BIND_FAIL;
+    return WS_OK;
+}
 
 /**
  * Listens for a connection on a socket and marks the socket referred to by
