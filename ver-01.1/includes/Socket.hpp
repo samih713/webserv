@@ -1,6 +1,11 @@
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
 
+// TODO
+// [ ] error checking functions for domain, type, protocol ... etc
+// [ ] custom exception class for error handling
+// [ ] better error messages
+
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
