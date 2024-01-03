@@ -1,5 +1,5 @@
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 
+CXXFLAGS:= -Wall -Werror -Wextra -std=c++98
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 RM:= rm -rf
@@ -7,7 +7,7 @@ RM:= rm -rf
 INCLUDES:= -I./includes
 
 SRCS_DIR:= srcs
-SRCS:= Socket.cpp Server.cpp 
+SRCS:= Socket.cpp TCPSocket.cpp Server.cpp 
 
 # tester mains
 TEST_SOCK:= $(SRCS_DIR)/SOCKET_main.cpp
