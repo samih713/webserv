@@ -1,6 +1,12 @@
+#include <cerrno>
+#include <cstring>
+#include <exception>
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
+#include <sstream>
+#include <string>
 #include <sys/socket.h>
+#include <unistd.h>
 
 // TODO // [P]artially implemented, needs [I]mprovement, [X] done
 //
@@ -39,25 +45,45 @@ class Socket
 {
 
     public:
-        // constructors
-        Socket(int domain, int type, int protocol = 0, int flags = SOCK_NONBLOCK);
-        Socket(int         domain,
-               int         type,
-               const char *protocol_name,
-               int         flags = SOCK_NONBLOCK);
+        /* [DESTRUCTOR] */
+        virtual ~Socket();
 
-        // destructor
-        ~Socket(); // close vs shutdown
+        /* [INTERFACE] */
 
-        // member functions (API)
-        WS_CODE bind(int port);
-        // WS_CODE connect();
-        WS_CODE listen(int backlog);
-        // WS_CODE accept();
-        // WS_CODE send(const char *msg);
-        // WS_CODE recv(const char *buff);
-        // WS_CODE getpeer(struct sockaddr &address);
-        // WS_CODE shutdown(int option);
+        void bind(int port);
+        // void connect();
+        void listen(int backlog);
+        // void accept();
+        // void send(const char *msg);
+        // void recv(const char *buff);
+        // void getpeer(struct sockaddr &address);
+        // void shutdown(int option);
+
+        /* [ERROR HANDLING] */
+
+        struct Exception : public std::exception
+        {
+            private:
+                std::string error_message;
+
+            public:
+                explicit Exception(const std::string &error_message)
+                    : error_message(error_message){};
+                ~Exception() throw(){};
+
+                /* [COMPOSE MESSAGE] */
+                static std::string compose_msg(const std::string &message)
+                {
+                    std::stringstream _msg;
+                    _msg << message << (errno ? std::strerror(errno) : "");
+                    return _msg.str();
+                }
+                const char *what() const throw()
+                {
+                    return error_message.c_str();
+                }
+        };
+        ;
 
     private:
         static const int invalid_file_descriptor = -1;
