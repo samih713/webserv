@@ -44,6 +44,14 @@ typedef int file_descriptor;
 class Socket
 {
 
+    protected: // protected constructors only in derived classes
+        /*  [CONSTRUCTORS] */
+
+        Socket(int domain, int type, int protocol, int flags);
+        // maybe not necessary
+        Socket(int domain, int type, const char *protocol_name, int flags);
+
+
     public:
         /* [DESTRUCTOR] */
         virtual ~Socket();

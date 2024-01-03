@@ -1,3 +1,4 @@
+#include <Socket.hpp>
 #include <vector>
 
 #ifndef SERVER_HPP
@@ -9,20 +10,22 @@ class Server
 {
 
     protected:
-        Server();
-        Server(const Server &);
-        Server &operator=(const Server &);
+        Server(){};
+        Server(const Server &){};
+        Server &operator=(const Server &)
+        {
+            return *this;
+        };
 
     public:
         // this function needs to be static, as there won't be an instance of a Server
         // when its first created
         static Server &getInstance();
-        void           start();
-        static WS_CODE bind(int sockfd);
+        // void           start();
         ~Server();
 
     private:
-        int              listener;
+        // Socket           listener;
         int              status;
         std::vector<int> conn;
 };

@@ -1,15 +1,15 @@
-#include "Socket.hpp"
+#include "TCPSocket.hpp"
 #include <exception>
 #include <iostream>
 #include <netinet/in.h>
 
-
+// Socket tester main add test cases here to test the behaviour of the
+// class
 int main()
 {
-
     try
     {
-        Socket a(PF_INET, SOCK_STREAM, "UDP");
+        TCPSocket a;
     }
     catch (std::exception &e)
     {
