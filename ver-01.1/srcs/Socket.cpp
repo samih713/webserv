@@ -121,6 +121,7 @@ WS_CODE Socket::bind(int port)
     // this has to be created based on the type of socket
     struct sockaddr_in addr;
 
+    // zero out the sockaddr struct
     memset(&addr, 0, sizeof(addr));
     // same for these filled they are determined based on the family type
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
