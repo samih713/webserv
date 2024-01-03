@@ -9,15 +9,16 @@
 // [ ] better error messages
 // [ ] make a unit-tester main
 // [ ] add shutdown functionality (block recv, block send, close())
+// [ ] improve error messages
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
 // error messages
 #define ERR_NULL_MSG "Null ptr!!" // make more verbose
-#define ERR_STRT_MSG "Socket creation failed"
-#define ERR_BIND_MSG "Socket binding failed"
-#define ERR_LIST_MSG "Socket binding failed"
+#define ERR_STRT_MSG "Socket: creation failed"
+#define ERR_BIND_MSG "Socket: binding failed"
+#define ERR_LIST_MSG "Socket: listen failed"
 
 // error codes
 enum WS_CODE
