@@ -2,32 +2,35 @@
 #include <netinet/ip.h> /* superset of previous */
 #include <sys/socket.h>
 
-// TODO
+// TODO // [P]artially implemented, needs [I]mprovement, [X] done
+//
+// [ ] Derived TCP class to lock domain, type .. combinations
 // [ ] split-up function implementations into their own files
-// [ ] error checking functions for domain, type, protocol ... etc
-// [ ] custom exception class for error handling
-// [ ] better error messages
-// [ ] make a unit-tester main
 // [ ] add shutdown functionality (block recv, block send, close())
-// [ ] improve error messages
+// [P] make a unit-tester main
+// [X] error checking functions for domain, type, protocol ... etc
+// [X] better error messages, and error handling,custom exception class
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
+// DEBUG BUILD
+#ifdef __DEBUG__
+#include <cassert>
+#include <iostream>
+#define DEBUGASSERT(x) assert(x)
+#else
+#define DEBUGASSERT(x)                                                                   \
+    do                                                                                   \
+    {                                                                                    \
+    } while (0)
+#endif // __DEBUG__
+// DEBUG BUILD
 
-// error messages
-#define ERR_NULL_MSG "Null ptr!!" // make more verbose
-#define ERR_STRT_MSG "Socket: creation failed"
-#define ERR_BIND_MSG "Socket: binding failed"
-#define ERR_LIST_MSG "Socket: listen failed"
-
-// error codes
-enum WS_CODE
-{
-    WS_OK = 0,
-    WS_LISTEN_FAIL,
-    WS_BIND_FAIL,
-    WS_TOTAL
-};
+// [ERROR MESSAGES]
+static std::string ERR_NULL("Socket: null ptr error");
+static std::string ERR_CREAT("Socket: creation failed");
+static std::string ERR_BIND("Socket: binding failed");
+static std::string ERR_LIST("Socket: listen failed");
 
 // socket_descriptor type
 typedef int file_descriptor;
