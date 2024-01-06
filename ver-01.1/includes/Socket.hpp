@@ -35,7 +35,10 @@
 static std::string ERR_NULL("Socket: null ptr error");
 static std::string ERR_CREAT("Socket: creation failed");
 static std::string ERR_BIND("Socket: binding failed");
+static std::string ERR_NBIND("Socket: not bound to a port");
 static std::string ERR_LIST("Socket: listen failed");
+static std::string ERR_NLIST("Socket: not listeing");
+static std::string ERR_ACCP("Socket: accept failed");
 
 // socket_descriptor type
 typedef int file_descriptor;
@@ -82,7 +85,8 @@ class Socket
                 static std::string compose_msg(const std::string &message)
                 {
                     std::stringstream _msg;
-                    _msg << message << (errno ? std::strerror(errno) : "");
+                    _msg << message
+                         << (errno ? ": " + std::string(std::strerror(errno)) : "");
                     return _msg.str();
                 }
                 const char *what() const throw()
