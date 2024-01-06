@@ -85,7 +85,9 @@ file_descriptor Socket::get_fd() const
     return socket_descriptor;
 }
 
-    int status = ::bind(socket_descriptor, (struct sockaddr *)&addr, sizeof(addr));
+void Socket::bind() const
+{
+    int status = ::bind(socket_descriptor, (struct sockaddr *)&address, sizeof(address));
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_BIND));
     is_bound = true;
@@ -95,7 +97,7 @@ file_descriptor Socket::get_fd() const
 #endif // __DEBUG__
 }
 
-void Socket::listen(int backlog)
+void Socket::listen(int backlog) const
 {
     if (!is_bound)
         throw Socket::Exception(Exception::compose_msg(ERR_NBIND));
@@ -104,4 +106,11 @@ void Socket::listen(int backlog)
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_LIST));
     is_listening = true;
+
+#ifdef __DEBUG__
+    std::cerr << "Socket listen was successful, [" << socket_descriptor
+              << "] is now ready to accept max backlog of [" << backlog
+              << "] connections\n";
+#endif // __DEBUG__
+}
 }
