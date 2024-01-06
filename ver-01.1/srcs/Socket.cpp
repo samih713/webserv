@@ -19,9 +19,10 @@ Socket::Socket(int family, int type, int protocol, int flags)
     // On success, a file descriptor for the new socket is returned.
     if (socket_descriptor == invalid_file_descriptor)
         throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
+
 #ifdef __DEBUG__
     else
-        std::cout << "Socket was created successfully fd[" << socket_descriptor << "]\n";
+        std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
 #endif // __DEBUG__
 }
 
@@ -46,7 +47,7 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
         throw Socket::Exception(Exception::compose_msg(ERR_NULL));
 
 #ifdef __DEBUG__
-    std::cout << "protocol official name is [" << protocol->p_name << "]\n";
+    std::cerr << "protocol official name is [" << protocol->p_name << "]\n";
 #endif // __DEBUG__
 
     socket_descriptor = socket(family, type | flags, protocol->p_proto);
@@ -57,7 +58,7 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
 
 #ifdef __DEBUG__
     else
-        std::cout << "Socket was created successfully fd[" << socket_descriptor << "]\n";
+        std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
 #endif // __DEBUG__
 }
 
@@ -65,16 +66,15 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
 
 Socket::~Socket()
 {
+#ifdef __DEBUG__
+    std::cerr << "socket fd[" << socket_descriptor << "] closed!!\n";
+#endif // __DEBUG__
     if (socket_descriptor != invalid_file_descriptor)
     {
         close(socket_descriptor);
         // invalidate the filedescriptor
         socket_descriptor = invalid_file_descriptor;
     }
-#ifdef __DEBUG__
-    else
-        std::cerr << "socket fd[" << socket_descriptor << "] closed!!\n";
-#endif // __DEBUG__
 }
 
 
