@@ -24,6 +24,9 @@ Socket::Socket(int family, int type, int protocol, int flags)
     else
         std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
 #endif // __DEBUG__
+
+    // zero out the sockaddr struct
+    memset(&address, 0, sizeof(address));
 }
 
 /* Call protocol by name */
@@ -60,6 +63,9 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
     else
         std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
 #endif // __DEBUG__
+
+    // zero out the sockaddr struct
+    memset(&address, 0, sizeof(address));
 }
 
 /* [DESTRUCTOR] */
