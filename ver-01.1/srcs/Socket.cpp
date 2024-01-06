@@ -113,4 +113,35 @@ void Socket::listen(int backlog) const
               << "] connections\n";
 #endif // __DEBUG__
 }
+
+
+file_descriptor Socket::accept()
+{
+    // check if socket is listening
+    if (!is_listening)
+        throw Socket::Exception(Exception::compose_msg(ERR_NLIST));
+    // This structure is filled in with the address of the peer socket,
+    // as known to the communications layer.
+    struct sockaddr peer_info; // does this need to be stored?
+    socklen_t       peer_length = sizeof(peer_info);
+    // The accept() system call is used with connection-based socket types (SOCK_STREAM,
+    // SOCK_SEQPACKET).
+    // it extracts the first pending connection request in the backlog que form listen.
+    // creates a new connected socket, and returns a new file descriptor
+    file_descriptor connected_socket;
+    connected_socket = ::accept(socket_descriptor, &peer_info, &peer_length);
+    if (connected_socket == invalid_file_descriptor)
+    {
+        // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
+        if (errno != EAGAIN && errno != EWOULDBLOCK)
+            throw Socket::Exception(Exception::compose_msg(ERR_ACCP));
+#ifdef __DEBUG__
+        else
+            std::cerr << "Socket has no incoming connections \n";
+#endif // __DEBUG__
+    }
+#ifdef __DEBUG__
+    std::cerr << "Socket accepted a connection from \n";
+#endif // __DEBUG__
+    return connected_socket;
 }
