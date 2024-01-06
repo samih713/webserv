@@ -49,10 +49,11 @@ class Socket
     protected: // protected constructors only in derived classes
         /*  [CONSTRUCTORS] */
 
-        Socket(int domain, int type, int protocol, int flags);
+        Socket(int family, int type, int protocol, int flags);
         // maybe not necessary
-        Socket(int domain, int type, const char *protocol_name, int flags);
-
+        Socket(int family, int type, const char *protocol_name, int flags);
+        // only used by inherited class
+        struct sockaddr address; // type casted and set based on type of socket
 
     public:
         /* [DESTRUCTOR] */
@@ -60,14 +61,12 @@ class Socket
 
         /* [INTERFACE] */
 
-        void bind(int port);
-        // void connect();
-        void listen(int backlog);
-        // void accept();
-        // void send(const char *msg);
-        // void recv(const char *buff);
-        // void getpeer(struct sockaddr &address);
+        void bind() const; // item36: never re-define an inherited non-virtual function
+        void listen(int backlog) const;
+        file_descriptor accept();
+        file_descriptor get_fd() const;
         // void shutdown(int option);
+        // void connect(); // is something you do on a client
 
         /* [ERROR HANDLING] */
 
@@ -100,8 +99,9 @@ class Socket
         static const int invalid_file_descriptor = -1;
         file_descriptor  socket_descriptor;
 
-        int family; // domain of communicatoin
-        int type;   // type of socket
+        // state checks
+        mutable bool is_bound;
+        mutable bool is_listening;
 
         // deleted but can't cause is 98 maguy
         Socket(const Socket &){};
