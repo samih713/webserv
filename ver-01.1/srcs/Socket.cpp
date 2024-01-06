@@ -1,4 +1,5 @@
 #include "Socket.hpp"
+#include <cerrno>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
@@ -10,8 +11,8 @@
 
 Socket::Socket(int family, int type, int protocol, int flags)
     : socket_descriptor(invalid_file_descriptor)
-    , family(family)
-    , type(type)
+    , is_bound(false)
+    , is_listening(false)
 {
     socket_descriptor = socket(family, type | flags, protocol);
 
@@ -27,6 +28,8 @@ Socket::Socket(int family, int type, int protocol, int flags)
 /* Call protocol by name */
 Socket::Socket(int family, int type, const char *protocol_name, int flags)
     : socket_descriptor(invalid_file_descriptor)
+    , is_bound(false)
+    , is_listening(false)
 {
     if (!protocol_name)
         throw Socket::Exception(Exception::compose_msg(ERR_NULL));
@@ -92,12 +95,20 @@ void Socket::bind(int port)
     int status = ::bind(socket_descriptor, (struct sockaddr *)&addr, sizeof(addr));
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_BIND));
+    is_bound = true;
+#ifdef __DEBUG__
+    std::cerr << "Socket was bound successfully to port["
+              << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n";
+#endif // __DEBUG__
 }
 
 void Socket::listen(int backlog)
 {
+    if (!is_bound)
+        throw Socket::Exception(Exception::compose_msg(ERR_NBIND));
     // global namespace to avoid conflict
     int status = ::listen(socket_descriptor, backlog);
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_LIST));
+    is_listening = true;
 }
