@@ -11,6 +11,7 @@ SRCS:= Socket.cpp TCPSocket.cpp Server.cpp
 
 # tester mains
 TEST_SOCK:= $(SRCS_DIR)/SOCKET_main.cpp
+TEST_SERVER:= $(SRCS_DIR)/SERVER_main.cpp
 
 OBJS_DIR:= objs
 OBJS:= $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
@@ -38,14 +39,18 @@ $(OBJS_DIR):
 test_socket: $(TEST_SOCK) debug 
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SOCK) $(NAME) -o $@
 
+test_server: $(TEST_SOCK) debug 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SERVER) $(NAME) -o $@
+
 clean:
 	$(RM) $(OBJS_DIR)
 
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) test_socket
+	$(RM) test_server
 
 re: fclean all
 
-.PHONY: clean fclean all re test_socket
+.PHONY: clean fclean all re test_socket test_server
 
