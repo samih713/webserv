@@ -1,4 +1,4 @@
-#include <Socket.hpp>
+#include <TCPSocket.hpp>
 #include <vector>
 
 #ifndef SERVER_HPP
@@ -8,7 +8,6 @@
 // simple singleton implementation
 class Server
 {
-
     protected:
         Server(){};
         Server(const Server &){};
@@ -22,10 +21,16 @@ class Server
         // when its first created
         static Server &getInstance();
         // void           start();
-        ~Server();
+        ~Server(){};
+        // member functions
+        // void recv(const char *buff);
+        // void send(const char *msg);
+        // void getpeer(struct sockaddr &address);
+
+
+        TCPSocket listener;
 
     private:
-        // Socket           listener;
         int              status;
         std::vector<int> conn;
 };
