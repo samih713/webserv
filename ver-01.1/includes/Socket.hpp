@@ -10,12 +10,11 @@
 
 // TODO // [P]artially implemented, needs [I]mprovement, [X] done
 //
-// [ ] Derived TCP class to lock domain, type .. combinations
 // [ ] split-up function implementations into their own files
+// [I] make a unit-tester main
 // [ ] add shutdown functionality (block recv, block send, close())
-// [P] make a unit-tester main
-// [X] error checking functions for domain, type, protocol ... etc
-// [X] better error messages, and error handling,custom exception class
+// [ ] fix the get_fd functionality is it really necessary
+// [ ] set_port function in TCP makes it not a is-a relation-ship
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
