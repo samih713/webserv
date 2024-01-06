@@ -80,17 +80,10 @@ Socket::~Socket()
 
 /* [INTERFACE] */
 
-void Socket::bind(int port)
+file_descriptor Socket::get_fd() const
 {
-    // this has to be created based on the type of socket
-    struct sockaddr_in addr;
-
-    // zero out the sockaddr struct
-    memset(&addr, 0, sizeof(addr));
-    // same for these filled they are determined based on the family type
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_family = family;
-    addr.sin_port = htons(port);
+    return socket_descriptor;
+}
 
     int status = ::bind(socket_descriptor, (struct sockaddr *)&addr, sizeof(addr));
     if (status == -1)
