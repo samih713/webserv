@@ -9,7 +9,7 @@
 class Server
 {
     protected:
-        Server(){};
+        explicit Server(file_descriptor listener_port, int backlog);
         Server(const Server &){};
         Server &operator=(const Server &)
         {
@@ -19,7 +19,7 @@ class Server
     public:
         // this function needs to be static, as there won't be an instance of a Server
         // when its first created
-        static Server &getInstance();
+        static Server &getInstance(file_descriptor listener_port, int backlog);
         // void           start();
         ~Server(){};
         // member functions
@@ -28,11 +28,11 @@ class Server
         // void getpeer(struct sockaddr &address);
 
 
-        TCPSocket listener;
-
     private:
-        int              status;
-        std::vector<int> conn;
+        static file_descriptor       listener_port;
+        TCPSocket                    listener;
+        int                          status;
+        std::vector<file_descriptor> conn;
 };
 
 #endif // SERVER_HPP

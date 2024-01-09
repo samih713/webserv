@@ -1,6 +1,7 @@
-#include <iostream>
+#include <Server.hpp>
 
 int main()
 {
-    std::cout << "hello world!";
+    Server &webserv = Server::getInstance(80, 10);
+    (void)webserv;
 }

@@ -2,6 +2,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
+#include <iostream>
 TCPSocket::TCPSocket()
     : Socket(family, type, 0, SOCK_NONBLOCK)
 {
@@ -13,11 +14,14 @@ TCPSocket::TCPSocket()
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
+#ifdef __DEBUG__
+    std::cerr << "TCPSocket created successfully\n";
+#endif // __DEBUG__
 }
 
 void TCPSocket::set_port(int port) throw()
 {
-    std::memset(&address, 0, sizeof(address));
+    // std::memset(&address, 0, sizeof(address));
     struct sockaddr_in addr;
     addr.sin_port = htons(port);
     std::memcpy(&address, &addr, sizeof(addr));

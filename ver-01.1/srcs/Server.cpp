@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include <cerrno>
 #include <cstring>
+#include <list>
 #include <netinet/in.h>
 #include <sstream>
 #include <stdexcept>
@@ -13,21 +14,22 @@
 #include <iostream>
 #endif // __DEBUG
 
-Server &Server::getInstance()
+Server &Server::getInstance(file_descriptor listener_port, int backlog)
 {
     // avoid creating another one
-    static Server instance;
+    static Server instance(listener_port, backlog);
     return instance;
 }
 
-// // default constructor
-// Server::Server()
-//     : listener{
-//           Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, SOCK_NONBLOCK)) // start the
-//           listener
-//     , status(WS_OK)
-// {}
-//
+// default constructor
+Server::Server(int listener_port, int backlog)
+{
+    // setup the Server
+    listener.set_port(listener_port);
+    listener.bind();
+    listener.listen(backlog);
+}
+
 // Server::~Server()
 // {
 //     close(listener);
@@ -62,7 +64,8 @@ Server &Server::getInstance()
 //         struct sockaddr_storage clientAddr;
 //         socklen_t               clientAddrSize = sizeof(clientAddr);
 //         int                     clientSocket =
-//             accept(listener, (struct sockaddr *)&clientAddr, &clientAddrSize);
+//             accept(listener, (struct sockaddr *)&clientAddr,
+//             &clientAddrSize);
 //         if (clientSocket == -1)
 //         {
 //             std::stringstream errorMessage;
