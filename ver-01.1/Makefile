@@ -2,12 +2,18 @@ CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -std=c++98
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
+ifeq ($(shell uname), Linux)
+	CXXFLAGS += -D__LINUX__
+else ifeq ($(shell uname), Darwin)
+	CXXFLAGS += -D__MAC__
+endif
+
 RM:= rm -rf
 
 INCLUDES:= -I./includes
 
 SRCS_DIR:= srcs
-SRCS:= Socket.cpp TCPSocket.cpp Server.cpp 
+SRCS:= Socket.cpp TCPSocket.cpp Server.cpp
 
 # tester mains
 TEST_SOCK:= $(SRCS_DIR)/SOCKET_main.cpp
@@ -26,7 +32,7 @@ run: re
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
 
-$(NAME): $(OBJS) 
+$(NAME): $(OBJS)
 	ar rcs $(NAME) $(OBJS)
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
@@ -36,10 +42,10 @@ $(OBJS_DIR):
 	@mkdir -p objs
 
 # tests
-test_socket: $(TEST_SOCK) debug 
+test_socket: $(TEST_SOCK) debug
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SOCK) $(NAME) -o $@
 
-test_server: $(TEST_SOCK) debug 
+test_server: $(TEST_SOCK) debug
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SERVER) $(NAME) -o $@
 
 clean:
