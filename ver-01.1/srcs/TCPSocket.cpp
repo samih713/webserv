@@ -26,10 +26,11 @@ TCPSocket::TCPSocket()
 
 void TCPSocket::set_port(int port) throw()
 {
-    // std::memset(&address, 0, sizeof(address));
     struct sockaddr_in addr;
+
+	int port_offset = offsetof(struct sockaddr_in, sin_port);
     addr.sin_port = htons(port);
-    std::memcpy(&address, &addr, sizeof(addr));
+    std::memcpy(&address + port_offset, &addr, sizeof(addr.sin_port));
 }
 
 TCPSocket::~TCPSocket()
