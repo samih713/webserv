@@ -1,10 +1,15 @@
 #include "TCPSocket.hpp"
 #include <netinet/in.h>
 #include <sys/socket.h>
-
+#include <fcntl.h>
 #include <iostream>
+
 TCPSocket::TCPSocket()
+#if defined(__LINUX__)
     : Socket(family, type, 0, SOCK_NONBLOCK)
+#elif defined(__MAC__)
+    : Socket(family, type, 0, O_NONBLOCK)
+#endif
 {
     // zero out the sockaddr struct before copying
     std::memset(&address, 0, sizeof(address));

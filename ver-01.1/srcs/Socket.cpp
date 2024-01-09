@@ -5,7 +5,7 @@
 #include <netinet/ip.h> /* superset of previous */
 #include <sys/socket.h>
 #include <sys/types.h> /* See NOTES */
-
+#include <fcntl.h>
 
 /*  [CONSTRUCTORS] */
 
@@ -14,7 +14,12 @@ Socket::Socket(int family, int type, int protocol, int flags)
     , is_bound(false)
     , is_listening(false)
 {
+#if defined(__LINUX__)
     socket_descriptor = socket(family, type | flags, protocol);
+#elif defined(__MAC__)
+    socket_descriptor = socket(family, type , protocol);
+	fcntl(socket_descriptor, F_SETFL, flags);
+#endif //
 
     // On success, a file descriptor for the new socket is returned.
     if (socket_descriptor == invalid_file_descriptor)
