@@ -1,10 +1,5 @@
-#include "Server.hpp"
-#include <cerrno>
-#include <cstring>
-#include <list>
+#include "../includes/Server.hpp"
 #include <netinet/in.h>
-#include <sstream>
-#include <stdexcept>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -22,7 +17,9 @@ Server &Server::getInstance(file_descriptor listener_port, int backlog)
 }
 
 // default constructor
-Server::Server(int listener_port, int backlog)
+Server::Server(int _listener_port, int backlog)
+    : listener_port(_listener_port)
+    , status(0)
 {
     // setup the Server
     listener.set_port(listener_port);
@@ -30,25 +27,17 @@ Server::Server(int listener_port, int backlog)
     listener.listen(backlog);
 }
 
-// Server::~Server()
-// {
-//     close(listener);
-// }
-//
-// Server::Server(const __attribute__((unused)) Server &other)
-// {}
-//
-// Server &Server::operator=(const __attribute__((unused)) Server &other)
-// {
-//     return *this;
-// }
-//
-//
+Server::~Server()
+{
+    ::close(listener.socket_descriptor);
+}
+
+
 // void Server::start()
 // {
 //     int backlog = 0;
 //     int status = 0;
-//
+
 //     // bind the socket
 //     while (true)
 //     {
@@ -59,7 +48,7 @@ Server::Server(int listener_port, int backlog)
 //             errorMessage << SOCKET_ERR << ": " << strerror(errno);
 //             throw std::runtime_error(errorMessage.str());
 //         }
-//
+
 //         // accept a connection on a socket
 //         struct sockaddr_storage clientAddr;
 //         socklen_t               clientAddrSize = sizeof(clientAddr);
@@ -72,7 +61,7 @@ Server::Server(int listener_port, int backlog)
 //             errorMessage << SOCKET_ERR << ": " << strerror(errno);
 //             throw std::runtime_error(errorMessage.str());
 //         }
-//
+
 //         // handle the connection
 //         handleConnection(clientSocket);
 //     }
