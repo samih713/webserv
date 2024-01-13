@@ -10,11 +10,11 @@
 
 // TODO // [P]artially implemented, needs [I]mprovement, [X] done
 //
-// [ ] split-up function implementations into their own files
 // [I] make a unit-tester main
 // [ ] add shutdown functionality (block recv, block send, close())
 // [ ] fix the get_fd functionality is it really necessary
 // [ ] set_port function in TCP makes it not a is-a relation-ship
+// [ ] split-up function implementations into their own files
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
@@ -95,9 +95,10 @@ class Socket
         };
         ;
 
+
+        file_descriptor socket_descriptor;
     private:
         static const int invalid_file_descriptor = -1;
-        file_descriptor  socket_descriptor;
 
         // state checks
         mutable bool is_bound;
