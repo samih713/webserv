@@ -20,6 +20,8 @@
 #define SOCK_FLAG SOCK_NONBLOCK
 #elif defined(__MAC__)
 #define SOCK_FLAG O_NONBLOCK
+#else
+#define SOCK_FLAG 
 #endif
 
 #ifndef SOCKET_HPP

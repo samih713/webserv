@@ -1,23 +1,24 @@
 #include "../includes/TCPSocket.hpp"
 #include "../includes/Server.hpp"
-#include <exception>
 #include <iostream>
 #include <netinet/in.h>
+#include <sys/select.h>
+
 
 // Socket tester main add test cases here to test the behaviour of the
 // class
 
-#include <sys/select.h>
 
-#if 0
+#if 1
 int main()
 {
 	TCPSocket b;
-	b.set_port(89);
+	b.set_port(-1);
+  b.bind();
 }
 #endif
 
-#if 1
+#if 0
 int main()
 {
     // make a listening socket

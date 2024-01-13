@@ -103,6 +103,7 @@ void Socket::bind() const
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_BIND));
     is_bound = true;
+
 #ifdef __DEBUG__
     std::cerr << "Socket was bound successfully to port["
               << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n";
