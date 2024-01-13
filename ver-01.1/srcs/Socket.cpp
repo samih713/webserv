@@ -1,4 +1,4 @@
-#include "Socket.hpp"
+#include "../includes/Socket.hpp"
 #include <cerrno>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -18,6 +18,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
     socket_descriptor = socket(family, type | flags, protocol);
 #elif defined(__MAC__)
     socket_descriptor = socket(family, type , protocol);
+	flags |= fcntl(socket_descriptor, F_GETFL, 0);
 	fcntl(socket_descriptor, F_SETFL, flags);
 #endif //
 
