@@ -1,4 +1,4 @@
-#include <Socket.hpp>
+#include "Socket.hpp"
 #include <sys/socket.h>
 
 // is-a inheritance relationship, every TCPSocket is a Socket
@@ -11,7 +11,7 @@ class TCPSocket : public Socket
 
     public:
         TCPSocket();
-        void set_port(int port) throw();
+        void set_port(uint port) throw();
         ~TCPSocket();
 
     private:

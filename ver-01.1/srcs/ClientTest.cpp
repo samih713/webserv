@@ -29,7 +29,7 @@ int main()
     // Connect to the server
     if (connect(sockfd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0)
     {
-        std::cerr << "Connection Failed. errno: " << errno << std::endl;
+        std::cerr << "Connection Failed. errno: " << strerror(errno) << std::endl;
         exit(EXIT_FAILURE);
     }
 
