@@ -1,5 +1,5 @@
-#include "TCPSocket.hpp"
-#include <Server.hpp>
+#include "../includes/TCPSocket.hpp"
+#include "../includes/Server.hpp"
 #include <exception>
 #include <iostream>
 #include <netinet/in.h>
@@ -9,21 +9,27 @@
 
 #include <sys/select.h>
 
+#if 0
+int main()
+{
+	TCPSocket b;
+	b.set_port(89);
+}
+#endif
+
 #if 1
 int main()
 {
     // make a listening socket
     TCPSocket a;
-    Socket   *b = &a;
     // prep it to accept connections on port 8080
     a.set_port(8080); // oh-o !!!
-    b->bind();
+    a.bind();
 
     // set it to listen with backlog 25
-    b->listen(5);
-
+	a.listen(25);
     fd_set read_fds;
-    int    fdmax = b->get_fd();
+    int    fdmax = a.get_fd();
 
     while (true)
     {
@@ -31,7 +37,7 @@ int main()
         std::cout << "---------- Server is up and waiting!!! ----------------"
                   << std::endl;
         FD_ZERO(&read_fds);
-        FD_SET(b->get_fd(), &read_fds);
+        FD_SET(a.get_fd(), &read_fds);
 
         if (select(fdmax + 1, &read_fds, NULL, NULL, NULL) == -1)
         {
@@ -39,10 +45,10 @@ int main()
             continue;
         }
 
-        if (FD_ISSET(b->get_fd(), &read_fds))
+        if (FD_ISSET(a.get_fd(), &read_fds))
         {
             // accept if a connection happens
-            file_descriptor peer = b->accept();
+            file_descriptor peer = a.accept();
             std::cout << "peer is connected on port " << peer << "\n";
 
             // receive data from the connected peer
