@@ -1,5 +1,6 @@
-#include "../includes/TCPSocket.hpp"
 #include "../includes/Server.hpp"
+#include "../includes/TCPSocket.hpp"
+#include <climits>
 #include <iostream>
 #include <netinet/in.h>
 #include <sys/select.h>
@@ -9,15 +10,7 @@
 // class
 
 
-#if 1
-int main()
-{
-	TCPSocket b;
-	b.set_port(-1);
-  b.bind();
-}
-#endif
-
+// simple server
 #if 0
 int main()
 {
@@ -76,3 +69,41 @@ int main()
     }
 }
 #endif // TCPSocket
+
+
+// set_port
+#if 1
+
+// Define the X macro for test cases
+#define TEST_CASES                                                                       \
+    X(0)                                                                                 \
+    X(-1)                                                                                \
+    X(-INT_MAX)                                                                          \
+    X(INT_MAX)                                                                           \
+    X(INT_MIN)                                                                           \
+    X('a')                                                                               \
+    X(8080)                                                                              \
+    X(99)
+
+int main()
+{
+#define X(test_case)                                                                     \
+    do                                                                                   \
+    {                                                                                    \
+        std::cout << "---- Case[" << test_case << "] -----\n";                           \
+        TCPSocket socket;                                                                \
+		try { \
+			socket.set_port(test_case);                                                      \
+			socket.bind();                                                                   \
+		} \
+		catch (Socket::Exception &se) { \
+			std::cerr << "Error in port number"; \
+		} \
+    } while (false);
+    TEST_CASES
+#undef X // Clean up the macro definition
+
+    return 0;
+}
+
+#endif

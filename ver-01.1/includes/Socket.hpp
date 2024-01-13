@@ -16,16 +16,52 @@
 // [ ] set_port function in TCP makes it not a is-a relation-ship
 // [ ] split-up function implementations into their own files
 
-#if defined(__LINUX__)
-#define SOCK_FLAG SOCK_NONBLOCK
-#elif defined(__MAC__)
-#define SOCK_FLAG O_NONBLOCK
-#else
-#define SOCK_FLAG 
-#endif
-
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
+
+/* --------------------------------- colors --------------------------------- */
+#define SET_COLOR(color) (std::cout << (color))
+#define RE_COLOR (std::cout << RE)
+
+#define RE "\001\033[0;39m\002" // reset
+#define L "\001\033[1;92m\002"  // green light
+#define Y "\001\033[1;93m\002"  // yellow
+#define M "\001\033[1;95m\002"  // magenta
+#define R "\001\033[1;91m\002"  // red
+#define B "\001\033[1;94m\002"  // blue
+#define C "\001\033[1;96m\002"  // cyan
+#define W "\001\033[1;97m\002"  // white
+#define D "\001\033[1;30m\002"  // gray
+#define O "\001\033[1;33m\002"  // orange
+
+/* ------------------------------- DEBUG MACRO ------------------------------ */
+#ifndef __DEBUG__
+#define DEBUG_MSG(message, color)
+#else
+#define DEBUG_MSG(message, color)                                                   \
+  do                                                                                \
+    {                                                                               \
+      std::cerr << (color);                                                         \
+      std::cerr << (message);                                                       \
+      std::cerr << std::endl;                                                       \
+      std::cerr << RE;                                                              \
+      std::cerr.flush ();                                                           \
+    }                                                                               \
+  while (0)
+#endif // __DEBUG__
+
+
+// SOCK_FLAG
+// prefer the compiler over pre-processor
+#if defined(__LINUX__)
+static const int SOCK_FLAG = SOCK_NONBLOCK;
+#elif defined(__MAC__)
+#include <fcntl.h>
+static const int SOCK_FLAG = O_NONBLOCK;
+#else
+static const int SOCK_FLAG = 0;
+#endif
+
 // DEBUG BUILD
 #ifdef __DEBUG__
 #include <cassert>
@@ -105,6 +141,7 @@ class Socket
 
 
         file_descriptor socket_descriptor;
+
     private:
         static const int invalid_file_descriptor = -1;
 

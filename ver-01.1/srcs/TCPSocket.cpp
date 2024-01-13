@@ -33,8 +33,9 @@ TCPSocket::~TCPSocket()
 #endif // __DEBUG__
 }
 
-void TCPSocket::set_port(int port) throw()
+void TCPSocket::set_port(int port) const
 {
-    DEBUGASSERT(port >= 0 && port <= 65535); // could be an exception
+	if (port >= 0 && port <= 65535)
+		throw Socket::Exception("Invalid Socket descriptor\n");
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
