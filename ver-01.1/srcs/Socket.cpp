@@ -1,11 +1,11 @@
 #include "../includes/Socket.hpp"
 #include <cerrno>
+#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
 #include <sys/socket.h>
 #include <sys/types.h> /* See NOTES */
-#include <fcntl.h>
 
 /*  [CONSTRUCTORS] */
 
@@ -17,9 +17,9 @@ Socket::Socket(int family, int type, int protocol, int flags)
 #if defined(__LINUX__)
     socket_descriptor = socket(family, type | flags, protocol);
 #elif defined(__MAC__)
-    socket_descriptor = socket(family, type , protocol);
-	flags |= fcntl(socket_descriptor, F_GETFL, 0);
-	fcntl(socket_descriptor, F_SETFL, flags);
+    socket_descriptor = socket(family, type, protocol);
+    flags |= fcntl(socket_descriptor, F_GETFL, 0);
+    fcntl(socket_descriptor, F_SETFL, flags);
 #endif //
 
     // On success, a file descriptor for the new socket is returned.
@@ -132,10 +132,12 @@ file_descriptor Socket::accept()
     // check if socket is listening
     if (!is_listening)
         throw Socket::Exception(Exception::compose_msg(ERR_NLIST));
+  
     // This structure is filled in with the address of the peer socket,
     // as known to the communications layer.
     struct sockaddr peer_info; // does this need to be stored?
     socklen_t       peer_length = sizeof(peer_info);
+
     // The accept() system call is used with connection-based socket types (SOCK_STREAM,
     // SOCK_SEQPACKET).
     // it extracts the first pending connection request in the backlog que form listen.
@@ -147,6 +149,7 @@ file_descriptor Socket::accept()
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
         if (errno != EAGAIN && errno != EWOULDBLOCK)
             throw Socket::Exception(Exception::compose_msg(ERR_ACCP));
+
 #ifdef __DEBUG__
         else
             std::cerr << "Socket has no incoming connections \n";
@@ -155,5 +158,6 @@ file_descriptor Socket::accept()
 #ifdef __DEBUG__
     std::cerr << "Socket accepted a connection from \n";
 #endif // __DEBUG__
+
     return connected_socket;
 }

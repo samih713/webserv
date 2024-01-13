@@ -5,8 +5,8 @@
 #ifndef TCPSOCKET_HPP
 #define TCPSOCKET_HPP
 
-// a non-blocking SOCK_STREAM, TCP(IP4) socket bound to port
-class TCPSocket : public Socket
+// a non-blocking SOCK_STREAM, TCP(IP4) socket 
+class TCPSocket: public Socket
 {
 
     public:

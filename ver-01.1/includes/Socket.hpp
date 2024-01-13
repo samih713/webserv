@@ -16,6 +16,12 @@
 // [ ] set_port function in TCP makes it not a is-a relation-ship
 // [ ] split-up function implementations into their own files
 
+#if defined(__LINUX__)
+#define SOCK_FLAG SOCK_NONBLOCK
+#elif defined(__MAC__)
+#define SOCK_FLAG O_NONBLOCK
+#endif
+
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 // DEBUG BUILD

@@ -7,12 +7,10 @@
 #include <iostream>
 #endif // __DEBUG__
 
+/*  [CONSTRUCTORS] */
+
 TCPSocket::TCPSocket()
-#if defined(__LINUX__)
-    : Socket(family, type, 0, SOCK_NONBLOCK)
-#elif defined(__MAC__)
-    : Socket(family, type, 0, O_NONBLOCK)
-#endif
+   : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
 
@@ -20,21 +18,22 @@ TCPSocket::TCPSocket()
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
-  
+
 #ifdef __DEBUG__
     std::cerr << "TCPSocket created successfully\n";
 #endif // __DEBUG__
-
 }
 
-void TCPSocket::set_port(uint port) throw()
-{
-	((struct sockaddr_in *)(&address))->sin_port = htons(port);
-}
+/* [DESTRUCTOR] */
 
 TCPSocket::~TCPSocket()
 {
 #ifdef __DEBUG__
     std::cerr << "TCPSocket closed!!\n";
 #endif // __DEBUG__
+}
+
+void TCPSocket::set_port(uint port) throw()
+{
+    ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
