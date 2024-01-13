@@ -1,8 +1,11 @@
-#include "TCPSocket.hpp"
+#include "../includes/TCPSocket.hpp"
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include <fcntl.h>
+
+#ifdef __DEBUG__
 #include <iostream>
+#endif // __DEBUG__
 
 TCPSocket::TCPSocket()
 #if defined(__LINUX__)
@@ -11,26 +14,22 @@ TCPSocket::TCPSocket()
     : Socket(family, type, 0, O_NONBLOCK)
 #endif
 {
-    // zero out the sockaddr struct before copying
-    std::memset(&address, 0, sizeof(address));
     struct sockaddr_in addr;
 
     // prep up the struct
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
+  
 #ifdef __DEBUG__
     std::cerr << "TCPSocket created successfully\n";
 #endif // __DEBUG__
+
 }
 
-void TCPSocket::set_port(int port) throw()
+void TCPSocket::set_port(uint port) throw()
 {
-    struct sockaddr_in addr;
-
-	int port_offset = offsetof(struct sockaddr_in, sin_port);
-    addr.sin_port = htons(port);
-    std::memcpy(&address + port_offset, &addr, sizeof(addr.sin_port));
+	((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
 
 TCPSocket::~TCPSocket()
