@@ -97,7 +97,7 @@ int main()
 			socket.bind();                                                                   \
 		} \
 		catch (Socket::Exception &se) { \
-			std::cerr << "Error in port number"; \
+			std::cerr << "Error in port number\n"; \
 		} \
     } while (false);
     TEST_CASES

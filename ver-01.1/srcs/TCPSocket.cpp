@@ -10,7 +10,7 @@
 /*  [CONSTRUCTORS] */
 
 TCPSocket::TCPSocket()
-   : Socket(family, type, 0, SOCK_FLAG)
+    : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
 
@@ -35,7 +35,7 @@ TCPSocket::~TCPSocket()
 
 void TCPSocket::set_port(int port) const
 {
-	if (port >= 0 && port <= 65535)
-		throw Socket::Exception("Invalid Socket descriptor\n");
+    if (port >= 0 && port <= 65535)
+        throw Socket::Exception("Invalid Socket descriptor\n");
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
