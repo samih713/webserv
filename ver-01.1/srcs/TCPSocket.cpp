@@ -19,23 +19,19 @@ TCPSocket::TCPSocket()
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
 
-#ifdef __DEBUG__
-    std::cerr << "TCPSocket created successfully\n";
-#endif // __DEBUG__
+    DEBUG_MSG("TCPSocket created successfully", G);
 }
 
 /* [DESTRUCTOR] */
 
 TCPSocket::~TCPSocket()
 {
-#ifdef __DEBUG__
-    std::cerr << "TCPSocket closed!!\n";
-#endif // __DEBUG__
+    DEBUG_MSG("TCPSocket closed!!\n", R);
 }
 
 void TCPSocket::set_port(int port) const
 {
-    if (port >= 0 && port <= 65535)
+    if (port < 0 || port > 65535)
         throw Socket::Exception("Invalid Socket descriptor\n");
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
