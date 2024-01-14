@@ -26,10 +26,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
     if (socket_descriptor == invalid_file_descriptor)
         throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
 
-#ifdef __DEBUG__
-    else
-        std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
-#endif // __DEBUG__
+    DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
 
     // zero out the sockaddr struct
     memset(&address, 0, sizeof(address));
@@ -55,9 +52,7 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
     if (!protocol)
         throw Socket::Exception(Exception::compose_msg(ERR_NULL));
 
-#ifdef __DEBUG__
-    std::cerr << "protocol official name is [" << protocol->p_name << "]\n";
-#endif // __DEBUG__
+    DEBUG_MSG("protocol official name is [" << protocol->p_name << "]", Y);
 
     socket_descriptor = socket(family, type | flags, protocol->p_proto);
 
@@ -65,10 +60,7 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
     if (socket_descriptor == invalid_file_descriptor)
         throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
 
-#ifdef __DEBUG__
-    else
-        std::cerr << "Socket was created successfully fd[" << socket_descriptor << "]\n";
-#endif // __DEBUG__
+    DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
 
     // zero out the sockaddr struct
     memset(&address, 0, sizeof(address));
@@ -78,9 +70,8 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
 
 Socket::~Socket()
 {
-#ifdef __DEBUG__
-    std::cerr << "socket fd[" << socket_descriptor << "] closed!!\n";
-#endif // __DEBUG__
+    DEBUG_MSG("socket fd[" << socket_descriptor << "] closed!!", R);
+
     if (socket_descriptor != invalid_file_descriptor)
     {
         close(socket_descriptor);
@@ -104,10 +95,9 @@ void Socket::bind() const
         throw Socket::Exception(Exception::compose_msg(ERR_BIND));
     is_bound = true;
 
-#ifdef __DEBUG__
-    std::cerr << "Socket was bound successfully to port["
-              << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n";
-#endif // __DEBUG__
+    DEBUG_MSG("Socket was bound successfully to port["
+                  << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n",
+              B);
 }
 
 void Socket::listen(int backlog) const
@@ -120,11 +110,10 @@ void Socket::listen(int backlog) const
         throw Socket::Exception(Exception::compose_msg(ERR_LIST));
     is_listening = true;
 
-#ifdef __DEBUG__
-    std::cerr << "Socket listen was successful, [" << socket_descriptor
-              << "] is now ready to accept max backlog of [" << backlog
-              << "] connections\n";
-#endif // __DEBUG__
+    DEBUG_MSG("Socket listen was successful, ["
+                  << socket_descriptor << "] is now ready to accept max backlog of ["
+                  << backlog << "] connections\n",
+              M);
 }
 
 
@@ -133,7 +122,7 @@ file_descriptor Socket::accept()
     // check if socket is listening
     if (!is_listening)
         throw Socket::Exception(Exception::compose_msg(ERR_NLIST));
-  
+
     // This structure is filled in with the address of the peer socket,
     // as known to the communications layer.
     struct sockaddr peer_info; // does this need to be stored?
@@ -151,14 +140,10 @@ file_descriptor Socket::accept()
         if (errno != EAGAIN && errno != EWOULDBLOCK)
             throw Socket::Exception(Exception::compose_msg(ERR_ACCP));
 
-#ifdef __DEBUG__
-        else
-            std::cerr << "Socket has no incoming connections \n";
-#endif // __DEBUG__
+        DEBUG_MSG("Socket has no incoming connections", D);
     }
-#ifdef __DEBUG__
-    std::cerr << "Socket accepted a connection from \n";
-#endif // __DEBUG__
+
+    DEBUG_MSG("Socket accepted a connection from", W);
 
     return connected_socket;
 }
