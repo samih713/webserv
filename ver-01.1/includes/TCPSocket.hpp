@@ -11,7 +11,6 @@ class TCPSocket: public Socket
 
     public:
         TCPSocket();
-        void set_port(int port)const;
         ~TCPSocket();
 
     private:

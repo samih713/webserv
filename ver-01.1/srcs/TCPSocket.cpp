@@ -19,19 +19,14 @@ TCPSocket::TCPSocket()
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
 
-    DEBUG_MSG("TCPSocket created successfully", G);
+    DEBUG_MSG("TCPSocket created successfully", C);
 }
 
 /* [DESTRUCTOR] */
 
 TCPSocket::~TCPSocket()
 {
-    DEBUG_MSG("TCPSocket closed!!\n", R);
+    DEBUG_MSG("TCPSocket closed!!", R);
 }
 
-void TCPSocket::set_port(int port) const
-{
-    if (port < 0 || port > 65535)
-        throw Socket::Exception("Invalid Socket descriptor\n");
-    ((struct sockaddr_in *)(&address))->sin_port = htons(port);
-}
+

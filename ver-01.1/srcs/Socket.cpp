@@ -29,7 +29,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
     DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
 
     // zero out the sockaddr struct
-    memset(&address, 0, sizeof(address));
+    std::memset(&address, 0, sizeof(address));
 }
 
 /* Call protocol by name */
@@ -63,7 +63,7 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
     DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
 
     // zero out the sockaddr struct
-    memset(&address, 0, sizeof(address));
+    std::memset(&address, 0, sizeof(address));
 }
 
 /* [DESTRUCTOR] */
@@ -83,7 +83,15 @@ Socket::~Socket()
 
 /* [INTERFACE] */
 
-file_descriptor Socket::get_fd() const
+// throws execpetions
+void Socket::set_port(int port)
+{
+    if (port < 0 || port > 65535)
+        throw Socket::Exception("Invalid Socket descriptor\n");
+    ((struct sockaddr_in *)(&address))->sin_port = htons(port);
+}
+
+file_descriptor const Socket::get_fd() const throw()
 {
     return socket_descriptor;
 }

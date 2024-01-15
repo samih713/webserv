@@ -13,8 +13,8 @@
 // [I] make a unit-tester main
 // [ ] add shutdown functionality (block recv, block send, close())
 // [ ] fix the get_fd functionality is it really necessary
-// [ ] set_port function in TCP makes it not a is-a relation-ship
 // [ ] split-up function implementations into their own files
+// [ ] make a seperate error header
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
@@ -86,6 +86,7 @@ static std::string ERR_ACCP("Socket: accept failed");
 // socket_descriptor type
 typedef int file_descriptor;
 
+
 class Socket
 {
 
@@ -100,14 +101,16 @@ class Socket
 
     public:
         /* [DESTRUCTOR] */
+
         virtual ~Socket();
 
         /* [INTERFACE] */
 
-        void bind() const; // item36: never re-define an inherited non-virtual function
+        void set_port(int port);
+        file_descriptor const get_fd() const throw();
+        void bind() const;
         void listen(int backlog) const;
         file_descriptor accept();
-        file_descriptor get_fd() const;
         // void shutdown(int option);
         // void connect(); // is something you do on a client
 
