@@ -3,9 +3,9 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <netinet/ip.h> /* superset of previous */
+#include <netinet/ip.h> 
 #include <sys/socket.h>
-#include <sys/types.h> /* See NOTES */
+#include <sys/types.h> 
 
 /*  [CONSTRUCTORS] */
 
@@ -88,10 +88,12 @@ void Socket::set_port(int port)
 {
     if (port < 0 || port > 65535)
         throw Socket::Exception("Invalid Socket descriptor\n");
+
+    // set the port number in address struct
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
 
-file_descriptor const Socket::get_fd() const throw()
+file_descriptor Socket::get_fd() const throw()
 {
     return socket_descriptor;
 }
@@ -112,8 +114,9 @@ void Socket::listen(int backlog) const
 {
     if (!is_bound)
         throw Socket::Exception(Exception::compose_msg(ERR_NBIND));
-    // global namespace to avoid conflict
+
     int status = ::listen(socket_descriptor, backlog);
+
     if (status == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_LIST));
     is_listening = true;

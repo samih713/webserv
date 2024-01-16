@@ -107,7 +107,7 @@ class Socket
         /* [INTERFACE] */
 
         void set_port(int port);
-        file_descriptor const get_fd() const throw();
+        file_descriptor get_fd() const throw();
         void bind() const;
         void listen(int backlog) const;
         file_descriptor accept();

@@ -1,7 +1,13 @@
 #include "../includes/Server.hpp"
+#include <iostream>
 
 int main()
 {
-    Server &webserv = Server::getInstance(80, 10);
-    (void)webserv;
+    try
+    {
+        Server &webserv = Server::getInstance(8080, 10);
+        webserv.start();
+    }
+    catch (const Socket::Exception &e)
+    {std::cerr << e.what();}
 }

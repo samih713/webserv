@@ -1,21 +1,18 @@
 #include "TCPSocket.hpp"
+#include <string>
 #include <vector>
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
 
+static const std::string wait_message("Server is now waiting for connections...\n");
+
 // simple singleton implementation
 class Server
 {
     protected:
         Server(file_descriptor _listener_port, int _backlog);
-        // deleted
-        Server(const Server &){};
-        Server &operator=(const Server &)
-        {
-            return *this;
-        };
 
     public:
         // this function needs to be static, as there won't be an instance of a Server
@@ -30,10 +27,17 @@ class Server
 
 
     private:
-        TCPSocket       listener;
-        file_descriptor listener_port;
-        int             status;
-        // std::vector<file_descriptor> conn;
+        TCPSocket                    listener;
+        int                          listenerPort;
+        int                          status;
+        std::vector<file_descriptor> connections;
+
+        // deleted
+        Server(const Server &){};
+        Server &operator=(const Server &)
+        {
+            return *this;
+        };
 };
 
 #endif // SERVER_HPP

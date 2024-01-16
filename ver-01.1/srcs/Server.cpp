@@ -1,28 +1,40 @@
 #include "../includes/Server.hpp"
+#include <chrono>
+#include <cstddef>
+#include <cstring>
+#include <future>
 #include <netinet/in.h>
+#include <stdexcept>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <thread>
 #include <unistd.h>
 
-#ifdef __DEBUG
-#include <iostream>
-#endif // __DEBUG
+// TODO // [P]artially implemented, needs [I]mprovement, [X] done
+//
+// [ ] Handle Socket exceptions here?
+// [ ] Implement select
 
-Server &Server::getInstance(file_descriptor listener_port, int backlog)
+
+#ifdef __DEBUG__
+#include <iostream>
+#endif // __DEBUG__
+
+Server &Server::getInstance(int listenerPort, int backlog)
 {
     // avoid creating another one
-    static Server instance(listener_port, backlog);
+    static Server instance(listenerPort, backlog);
     return instance;
 }
 
 // default constructor
-Server::Server(int _listener_port, int backlog)
-    : listener_port(_listener_port)
+Server::Server(int listenerPort, int backlog)
+    : listenerPort(listenerPort)
     , status(0)
 {
     // setup the Server
-    listener.set_port(listener_port);
+    listener.set_port(listenerPort);
     listener.bind();
     listener.listen(backlog);
 }
@@ -33,36 +45,56 @@ Server::~Server()
 }
 
 
-// void Server::start()
-// {
-//     int backlog = 0;
-//     int status = 0;
+void Server::start()
+{
 
-//     // bind the socket
-//     while (true)
-//     {
-//         if (status) // an error has occured
-//         {
-//             // If a connection request arrives when the queue is full
-//             std::stringstream errorMessage;
-//             errorMessage << SOCKET_ERR << ": " << strerror(errno);
-//             throw std::runtime_error(errorMessage.str());
-//         }
+    // wait duration before displaying a wait message, needs lpthread and 11
+    // only for testing
+    auto _duration(std::chrono::seconds(5));
 
-//         // accept a connection on a socket
-//         struct sockaddr_storage clientAddr;
-//         socklen_t               clientAddrSize = sizeof(clientAddr);
-//         int                     clientSocket =
-//             accept(listener, (struct sockaddr *)&clientAddr,
-//             &clientAddrSize);
-//         if (clientSocket == -1)
-//         {
-//             std::stringstream errorMessage;
-//             errorMessage << SOCKET_ERR << ": " << strerror(errno);
-//             throw std::runtime_error(errorMessage.str());
-//         }
+    // making 2 fd_sets because select is destructive?
+    fd_set current_sockets;
+    fd_set ready_sockets;
 
-//         // handle the connection
-//         handleConnection(clientSocket);
-//     }
-// }
+    // zero out the current_sockets
+    FD_ZERO(&current_sockets);
+
+    // adds the listener socket to the set of current sockets
+    FD_SET(listener.get_fd(), &current_sockets);
+
+    while (true)
+    {
+        DEBUG_MSG(wait_message, R);
+
+        ready_sockets = current_sockets;
+
+        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0)
+            throw std::runtime_error(strerror(errno));
+
+        for (int i = 0; i < FD_SETSIZE; i++)
+        {
+            if (FD_ISSET(i, &ready_sockets))
+            {
+                // if its our listener, then we got a new connection
+                if (i == listener.get_fd())
+                {
+                    // we accept the new connection
+                    file_descriptor client_socket = listener.accept();
+                    // add the new socket to the watched list of currenct sockets
+                    FD_SET(client_socket, &current_sockets);
+                }
+                // its an exisiting connections that is ready for reading
+                else
+                {
+                  // handle the connection
+                  DEBUG_MSG( "reading from connection", M);
+                  // remove it from there once its done
+                  FD_CLR(i, &current_sockets); 
+                }
+            }
+        }
+    
+        // forced sleep
+        std::this_thread::sleep_for(_duration);
+    }
+}
