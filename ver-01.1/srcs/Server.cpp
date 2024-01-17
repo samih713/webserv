@@ -16,11 +16,6 @@
 // [ ] Handle Socket exceptions here?
 // [ ] Implement select
 
-
-#ifdef __DEBUG__
-#include <iostream>
-#endif // __DEBUG__
-
 Server &Server::getInstance(int listenerPort, int backlog)
 {
     // avoid creating another one
