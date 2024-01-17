@@ -1,5 +1,5 @@
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++11 -lpthread
+CXXFLAGS:= -Wall -Werror -Wextra -std=c++11
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
