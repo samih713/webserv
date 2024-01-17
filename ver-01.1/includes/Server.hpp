@@ -12,7 +12,7 @@ static const std::string wait_message("Server is now waiting for connections...\
 class Server
 {
     protected:
-        Server(file_descriptor _listener_port, int _backlog);
+        Server(file_descriptor listenerport, int backlog);
 
     public:
         // this function needs to be static, as there won't be an instance of a Server
@@ -27,17 +27,13 @@ class Server
 
 
     private:
-        TCPSocket                    listener;
-        int                          listenerPort;
-        int                          status;
-        std::vector<file_descriptor> connections;
+        TCPSocket                    _listener;
+        int                          _listenerPort;
+        std::vector<file_descriptor> _connections;
 
         // deleted
-        Server(const Server &){};
-        Server &operator=(const Server &)
-        {
-            return *this;
-        };
+        Server(const Server &) {};
+        Server &operator=(const Server &) { return *this; };
 };
 
 #endif // SERVER_HPP
