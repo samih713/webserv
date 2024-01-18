@@ -3,7 +3,7 @@ name: Compilation Check
 on:
   push:
     branches:
-      - server/ver-01.1
+      - config-parser
 
 jobs:
   build:
