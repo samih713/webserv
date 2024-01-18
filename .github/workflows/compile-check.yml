@@ -19,6 +19,4 @@ jobs:
         compiler: gcc
 
     - name: Build project
-      run: |
-        cd ver-01.1
-        make
+      run: make
