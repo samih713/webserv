@@ -3,9 +3,9 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <netinet/ip.h> 
+#include <netinet/ip.h>
 #include <sys/socket.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 
 /*  [CONSTRUCTORS] */
 
@@ -93,7 +93,7 @@ void Socket::set_port(int port)
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
 
-file_descriptor Socket::get_fd() const throw()
+fd Socket::get_fd() const throw()
 {
     return socket_descriptor;
 }
@@ -128,7 +128,7 @@ void Socket::listen(int backlog) const
 }
 
 
-file_descriptor Socket::accept()
+fd Socket::accept()
 {
     // check if socket is listening
     if (!is_listening)
@@ -143,7 +143,7 @@ file_descriptor Socket::accept()
     // SOCK_SEQPACKET).
     // it extracts the first pending connection request in the backlog que form listen.
     // creates a new connected socket, and returns a new file descriptor
-    file_descriptor connected_socket;
+    fd connected_socket;
     connected_socket = ::accept(socket_descriptor, &peer_info, &peer_length);
     if (connected_socket == invalid_file_descriptor)
     {

@@ -5,6 +5,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+// TODO // [P]artially implemented, needs [I]mprovement, [X] done
+//
+//? [ ] Handle Socket exceptions here?
 
 static const std::string wait_message("Server is now waiting for connections...\n");
 
@@ -12,12 +15,12 @@ static const std::string wait_message("Server is now waiting for connections...\
 class Server
 {
     protected:
-        Server(file_descriptor listenerport, int backlog);
+        Server(fd listener_port, int backlog);
 
     public:
-        // this function needs to be static, as there won't be an instance of a Server
+        // this function needs to be static, there won't be an instance of a Server
         // when its first created
-        static Server &getInstance(file_descriptor listener_port, int backlog);
+        static Server &getInstance(fd listener_port, int backlog);
         void           start();
         ~Server();
         // member functions
@@ -27,13 +30,17 @@ class Server
 
 
     private:
-        TCPSocket                    _listener;
-        int                          _listenerPort;
-        std::vector<file_descriptor> _connections;
+        TCPSocket       _listener;
+        fd              _listenerFD;
+        int             _listener_port;
+        std::vector<fd> _connections;
 
         // deleted
-        Server(const Server &) {};
-        Server &operator=(const Server &) { return *this; };
+        Server(const Server &){};
+        Server &operator=(const Server &)
+        {
+            return *this;
+        };
 };
 
 #endif // SERVER_HPP
