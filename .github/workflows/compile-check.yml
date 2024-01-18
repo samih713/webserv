@@ -33,7 +33,7 @@ jobs:
     - name: Set up C++ environment
       uses: aminya/setup-cpp@v1
       with:
-        compiler: cc
+        compiler: gcc
 
     - name: Build project
       run: make
