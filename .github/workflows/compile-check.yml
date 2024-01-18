@@ -6,10 +6,9 @@ on:
       - config-parser
 
 jobs:
-  build:
+  build-linux:
     runs-on:
       - ubuntu-latest
-      - macos-10.15
 
     steps:
     - name: Checkout repository
@@ -22,3 +21,20 @@ jobs:
 
     - name: Build project
       run: make
+
+  build-Mac:
+    runs-on:
+      - macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up C++ environment
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: cc
+
+    - name: Build project
+      run: make
+    
