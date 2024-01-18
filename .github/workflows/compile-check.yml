@@ -1,0 +1,24 @@
+name: Compilation Check
+
+on:
+  push:
+    branches:
+      - server/ver01.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up C++ environment
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: gcc
+
+    - name: Build project
+      run: |
+        cd ver-01.1
+        make
