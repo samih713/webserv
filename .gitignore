@@ -1,4 +1,11 @@
 .vscode/
-*/objs/
+*/objects/
 */.cache/
 *.o
+libserver.a
+libparser.a
+webserver
+test_parser
+test_server
+test_socket
+client
