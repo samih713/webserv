@@ -7,7 +7,7 @@ YELLOW:= \033[1;33m
 RESET:= \033[0m
 
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++11
+CXXFLAGS:= -Wall -Werror -Wextra -std=c++11 -MMD -MP
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
@@ -17,6 +17,7 @@ else ifeq ($(shell uname), Darwin)
 endif
 
 RM:= rm -rf
+
 
 INCLUDES:= -I./ -Isocket/
 
@@ -29,22 +30,23 @@ TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 
 OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
-OBJS_BASENAMES:= $(addprefix $(OBJS_DIR)/,$(notdir $(OBJS)))
+
+DEP:= $(OBJS:%.o=%.d)
 
 NAME:= libserver.a
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@ar rcs $(NAME) $(OBJS_BASENAMES)
+	@ar rcs $(NAME) $(OBJS)
 	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
-$(OBJS_DIR)/%.o: %.cpp  | $(OBJS_DIR)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $^ -o $(OBJS_DIR)/$(notdir $@)
+$(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects
+	@mkdir -p objects objects/socket
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
@@ -74,6 +76,8 @@ fclean: clean
 	@$(RM) $(NAME)
 	@$(RM) test_socket test_server client
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables."
+
+-include $(DEP)
 
 re: fclean all
 
