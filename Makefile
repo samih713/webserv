@@ -1,5 +1,13 @@
+###	COLORS ####
+BLUE:= \033[1;34m
+GREEN:= \033[1;32m
+MAGENTA:= \033[1;35m
+RED:= \033[1;31m
+YELLOW:= \033[1;33m
+RESET:= \033[0m
+
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++11
+CXXFLAGS:= -Wall -Werror -Wextra
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
@@ -12,51 +20,58 @@ RM:= rm -rf
 
 INCLUDES:= -I./includes
 
-SRCS_DIR:= srcs
-SRCS:= Socket.cpp TCPSocket.cpp Server.cpp
-
-# tester mains
-TEST_SOCK:= $(SRCS_DIR)/SOCKET_main.cpp
-TEST_SERVER:= $(SRCS_DIR)/SERVER_main.cpp
-
-OBJS_DIR:= objs
+SRCS:= main.cpp
+OBJS_DIR:= objects
 OBJS:= $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
 
-NAME:= libwebserv.a
+LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser
+
+NAME:= webserv
 
 all: $(NAME)
 
 run: re
 	./$(NAME)
 
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: all
+$(NAME): parser server $(OBJS)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
+	@echo "$(GREEN)[ COMPILE ]$(RESET) $(NAME) is ready."
 
-$(NAME): $(OBJS)
-	ar rcs $(NAME) $(OBJS)
-
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $^ -o $@
+$(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
 	@mkdir -p objs
 
-# tests
-test_socket: $(TEST_SOCK) debug
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SOCK) $(NAME) -o $@
+debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: all
+	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
-test_server: $(TEST_SOCK) debug
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SERVER) $(NAME) -o $@
+# @make -sC tester/ # need to add tests for parser and server
+tests:
+	@make tests -sC parser/
+	@make tests -sC server/
+	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
+
+parser:
+	@make -sC parser/
+
+server:
+	@make -sC server/
 
 clean:
-	$(RM) $(OBJS_DIR)
+	@$(RM) $(OBJS_DIR) *.o
+	@make clean -sC parser/ > /dev/null 2>&1
+	@make clean -sC server/ > /dev/null 2>&1
+	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
-	$(RM) $(NAME)
-	$(RM) test_socket
-	$(RM) test_server
+	@$(RM) $(NAME)
+	@make fclean -sC parser/ > /dev/null 2>&1
+	@make fclean -sC server/ > /dev/null 2>&1
+	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries."
 
 re: fclean all
 
-.PHONY: clean fclean all re test_socket test_server
-
+.PHONY: clean fclean all re tests server parser debug run
