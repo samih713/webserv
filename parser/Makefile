@@ -38,7 +38,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $^ -o $(OBJS_DIR)/$(notdir $@)
@@ -59,12 +59,12 @@ tests: test_parser
 	@echo ""
 
 clean:
-	$(RM) $(OBJS_DIR)
+	@$(RM) $(OBJS_DIR)
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
-	$(RM) $(NAME)
-	$(RM) test_parser
+	@$(RM) $(NAME)
+	@$(RM) test_parser
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables."
 
 re: fclean all

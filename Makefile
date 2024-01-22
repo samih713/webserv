@@ -35,14 +35,14 @@ run: re
 
 $(NAME): parser server $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
-	@echo "$(GREEN)[ COMPILE ]$(RESET) $(NAME) is ready."
+	@echo "$(GREEN)[ COMPILE ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objs
+	@mkdir -p objects
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all

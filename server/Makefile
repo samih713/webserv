@@ -37,7 +37,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS_BASENAMES)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp  | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $^ -o $(OBJS_DIR)/$(notdir $@)
