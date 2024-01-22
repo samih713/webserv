@@ -4,7 +4,7 @@
 *.o
 libserver.a
 libparser.a
-webserver
+webserv
 test_parser
 test_server
 test_socket
