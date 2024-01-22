@@ -1,9 +1,9 @@
-name: Compilation Check
+name: Clean-Up Compilation Check
 
 on:
   push:
     branches:
-      - config-parser
+      - clean-up
 
 jobs:
   build-linux:
@@ -37,4 +37,3 @@ jobs:
 
     - name: Build project
       run: make
-    
