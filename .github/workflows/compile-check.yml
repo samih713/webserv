@@ -1,13 +1,14 @@
-name: Compilation Check
+name: Clean-Up Compilation Check
 
 on:
   push:
     branches:
-      - server/ver-01.1
+      - clean-up
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-linux:
+    runs-on:
+      - ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -19,6 +20,20 @@ jobs:
         compiler: gcc
 
     - name: Build project
-      run: |
-        cd ver-01.1
-        make
+      run: make
+
+  build-Mac:
+    runs-on:
+      - macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up C++ environment
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: gcc
+
+    - name: Build project
+      run: make
