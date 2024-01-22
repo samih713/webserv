@@ -3,7 +3,7 @@ name: Clean-Up Compilation Check
 on:
   push:
     branches:
-      - clean-up
+      - server/*
 
 jobs:
   build-linux:
