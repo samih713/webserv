@@ -1,0 +1,46 @@
+------- [GENERAL] -----------
+
+[1] It is preferable to use the compiler instead of the preprocessor.
+use static/const instead of defines because:
+	1 - They are easier to debug.
+	2 - They occupy less memory.
+
+------- [OOP] -----------
+
+[1] Liskov substitution principle
+If D is a derived class of B (sub-class of B) then objects of D maybe replaced with B without breaking the program
+
+Upholding the Liskov Substitution Principle (LSP) is important for several key reasons: 
+
+*** MAINTAINS POLYMORPHISM ***
+
+Correctness: The primary reason is to ensure that a derived class can stand in for its base class without altering the correctness and expected behavior of the program.
+This is fundamental to polymorphism, allowing objects of different classes to be treated interchangeably.
+
+Flexibility: By adhering to LSP, you can write more flexible and reusable code. Functions and systems that operate on base class references can seamlessly work with any subclass, leading to code that's easier to extend and maintain.
+
+*** IMPROVES CODE QUALITY AND INTEGRITY ***
+
+Reliability: Upholding LSP means that changes in the derived classes won't introduce unexpected bugs or behaviors in the parts of the code that use the base class. This makes the system more reliable and robust.
+
+Understandability: When LSP is upheld, other developers can have clear expectations of the class hierarchy and how different classes relate and behave. This makes the code easier to understand, use, and debug.
+Facilitates Refactoring and Extension:
+
+Easier Refactoring: Adhering to LSP makes it easier to refactor and improve the system without worrying about breaking existing functionality. You can introduce new subclasses or modify existing ones with the confidence that the overall system behavior remains consistent.
+
+Easier Extension: If you want to extend the system by adding new subclasses or behaviors, LSP ensures that these extensions will integrate smoothly without requiring changes to the existing client code.
+Reduces Tight Coupling:
+
+Decoupling: LSP encourages a design where classes are less tightly coupled and more independent in their behavior. This decoupling means that changes in one part of the system are less likely to require changes in other parts, reducing the ripple effect of modifications.
+Supports Good Design Principles:
+
+Support for Other Principles: LSP is not just an isolated principle but supports and is supported by other key principles of object-oriented design like the Open/Closed Principle (classes should be open for extension but closed for modification) and the Single Responsibility Principle (a class should have only one reason to change). Together, these principles lead to a more robust, maintainable, and scalable system.
+
+[2] Avoid name hiding
+Function overrides (use "using foo;" in inherited class to also inherit overrided functions)
+
+- Names in derived classes hide names in base classes. Under public
+inheritance, THIS IS NEVER DESIRABLE.
+
+-To make hidden names visible again, employ using declarations or
+forwarding functions.
