@@ -31,7 +31,7 @@ static const int SOCK_FLAG = 0;
 #endif
 
 // socket_descriptor type
-typedef int file_descriptor;
+typedef int fd;
 
 class Socket
 {
@@ -52,10 +52,10 @@ class Socket
         /* [INTERFACE] */
 
         void set_port(int port);
-        file_descriptor get_fd() const throw();
+        fd   get_fd() const throw();
         void bind() const;
         void listen(int backlog) const;
-        file_descriptor accept();
+        fd   accept();
         // void shutdown(int option);
         // void connect(); // is something you do on a client
 
@@ -85,7 +85,7 @@ class Socket
                 }
         };
 
-        file_descriptor socket_descriptor;
+        fd socket_descriptor;
 
     private:
         static const int invalid_file_descriptor = -1;

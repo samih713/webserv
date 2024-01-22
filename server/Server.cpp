@@ -9,12 +9,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <thread>
-#include <unistd.h>
-
-// TODO // [P]artially implemented, needs [I]mprovement, [X] done
-//
-// [ ] Handle Socket exceptions here?
-// [ ] Implement select
 
 Server &Server::getInstance(int listenerPort, int backlog)
 {
@@ -24,11 +18,12 @@ Server &Server::getInstance(int listenerPort, int backlog)
 }
 
 // default constructor
-Server::Server(file_descriptor listenerPort, int backlog)
-    : _listenerPort(listenerPort)
+Server::Server(fd listenerPort, int backlog)
+    : _listenerFD(_listener.get_fd())
+    , _listener_port(listenerPort)
 {
     // setup the Server
-    _listener.set_port(_listenerPort);
+    _listener.set_port(_listener_port);
     _listener.bind();
     _listener.listen(backlog);
 }
@@ -41,10 +36,9 @@ Server::~Server()
 
 void Server::start()
 {
-
-    // wait duration before displaying a wait message, needs lpthread and 11
+    // wait duration before displaying a wait message, needs 11
     // only for testing
-    auto _duration(std::chrono::seconds(5));
+    auto dur(std::chrono::seconds(2));
 
     // making 2 fd_sets because select is destructive?
     fd_set current_sockets;
@@ -54,7 +48,7 @@ void Server::start()
     FD_ZERO(&current_sockets);
 
     // adds the listener socket to the set of current sockets
-    FD_SET(_listener.get_fd(), &current_sockets);
+    FD_SET(_listenerFD, &current_sockets);
 
     while (true)
     {
@@ -70,25 +64,25 @@ void Server::start()
             if (FD_ISSET(i, &ready_sockets))
             {
                 // if its our listener, then we got a new connection
-                if (i == _listener.get_fd())
+                if (i == _listenerFD)
                 {
                     // we accept the new connection
-                    file_descriptor client_socket = _listener.accept();
+                    fd client_socket = _listener.accept();
                     // add the new socket to the watched list of currenct sockets
                     FD_SET(client_socket, &current_sockets);
                 }
                 // its an exisiting connections that is ready for reading
                 else
                 {
-                  // handle the connection
-                  DEBUG_MSG( "reading from connection", M);
-                  // remove it from there once its done
-                  FD_CLR(i, &current_sockets); 
+                    // handle the connection
+                    DEBUG_MSG("reading from connection", M);
+                    // remove it from there once its done
+                    FD_CLR(i, &current_sockets);
                 }
             }
         }
-    
+
         // forced sleep
-        std::this_thread::sleep_for(_duration);
+        std::this_thread::sleep_for(dur);
     }
 }
