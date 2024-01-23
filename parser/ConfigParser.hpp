@@ -1,16 +1,17 @@
 #ifndef CONFIG_PARSER_HPP
 #define CONFIG_PARSER_HPP
 
-#include <string>
+#include "../includes/error.hpp"
+#include <fstream>
 
 class ConfigParser {
 public:
-    ConfigParser(std::string file);
     ~ConfigParser();
+
+    static void parseConfigFile(std::string file);
 
 private:
     ConfigParser();
-
 };
 
-#endif
+#endif // CONFIG_PARSER_HPP

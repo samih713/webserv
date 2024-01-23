@@ -50,4 +50,4 @@ static std::string ERR_NLIST("Socket: not listeing");
 static std::string ERR_ACCP("Socket: accept failed");
 
 
-#endif
+#endif // ERROR_HPP

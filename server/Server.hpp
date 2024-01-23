@@ -1,5 +1,4 @@
 #include "TCPSocket.hpp"
-#include <string>
 #include <vector>
 
 #ifndef SERVER_HPP
@@ -37,10 +36,7 @@ class Server
 
         // deleted
         Server(const Server &){};
-        Server &operator=(const Server &)
-        {
-            return *this;
-        };
+        Server &operator=(const Server &) { return *this; };
 };
 
 #endif // SERVER_HPP

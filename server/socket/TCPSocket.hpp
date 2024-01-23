@@ -1,5 +1,4 @@
 #include "Socket.hpp"
-#include <sys/socket.h>
 
 // is-a inheritance relationship, every TCPSocket is a Socket
 #ifndef TCPSOCKET_HPP
