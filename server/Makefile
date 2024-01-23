@@ -7,7 +7,7 @@ YELLOW:= \033[1;33m
 RESET:= \033[0m
 
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++11 -MMD -MP
+CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
