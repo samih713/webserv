@@ -1,5 +1,8 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(std::string file) {
-    (void) file;
+ConfigParser::ConfigParser() {}
+
+ConfigParser::~ConfigParser() {}
+
+void ConfigParser::parseConfigFile(std::string file) {
 }
