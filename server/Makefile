@@ -54,14 +54,17 @@ debug: all
 # tests
 client: debug
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SOCKET) $(NAME) -o $@
+	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: $(TEST_SOCKET) client
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SERVER) $(NAME) -o $@
+	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
 tests: test_socket test_server
