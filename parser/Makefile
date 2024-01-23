@@ -18,7 +18,7 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./
+INCLUDES:= -I./ -I../includes/
 
 SRCS:= ConfigParser.cpp
 
@@ -42,7 +42,7 @@ $(NAME): $(OBJS)
 	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $^ -o $(OBJS_DIR)/$(notdir $@)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
@@ -54,6 +54,7 @@ debug: all
 
 test_parser: $(TEST_PARSER) debug
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_PARSER) $(NAME) -o $@
+	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
 
 tests: test_parser
