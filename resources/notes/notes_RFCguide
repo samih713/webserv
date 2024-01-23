@@ -4,11 +4,13 @@ Networking Basics:
 3 RFC 793 - Transmission Control Protocol (TCP): Basic Understanding
 
 HTTP Core:
+0 RFC 9112 - HTTP requests and their syntax: Direct Implementation
 1 RFC 7230 - Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing: Direct Implementation
 2 RFC 7231 - Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content: Direct Implementation
 
 CGI (Common Gateway Interface):
 1 RFC 3875 - The Common Gateway Interface (CGI) Version 1.1: Direct Implementation
+2 Tutorialspoint  (https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm)
 
 Advanced HTTP Features:
 1 RFC 7232 - HTTP/1.1: Conditional Requests: Extra Understanding
