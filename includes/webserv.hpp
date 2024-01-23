@@ -1,6 +1,10 @@
 #ifndef WEBSERV_HPP
 #define WEBSERV_HPP
 
+
+/* --------------------------------- MACROS --------------------------------- */
+#define to_str(name) #name
+
 /* -------------------------------- INCLUDES -------------------------------- */
 #include <iostream>
 #include <string>
