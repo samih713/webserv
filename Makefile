@@ -7,7 +7,7 @@ YELLOW:= \033[1;33m
 RESET:= \033[0m
 
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra
+CXXFLAGS:= -Wall -Werror -Wextra -MMD -MP
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
@@ -21,8 +21,11 @@ RM:= rm -rf
 INCLUDES:= -I./includes
 
 SRCS:= main.cpp
+
 OBJS_DIR:= objects
 OBJS:= $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
+
+DEP:= $(OBJS:%.o=%.d)
 
 LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser
 
@@ -70,7 +73,7 @@ fclean: clean
 	@$(RM) $(NAME)
 	@make fclean -sC parser/ > /dev/null 2>&1
 	@make fclean -sC server/ > /dev/null 2>&1
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries."
+-include $(DEP)
 
 re: fclean all
 

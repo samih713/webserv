@@ -7,7 +7,7 @@ YELLOW:= \033[1;33m
 RESET:= \033[0m
 
 CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98
+CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
 DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
 
 ifeq ($(shell uname), Linux)
@@ -22,13 +22,14 @@ INCLUDES:= -I./
 
 SRCS:= ConfigParser.cpp
 
+OBJS_DIR:= objects
+OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
+
 # tester mains
 TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
-OBJS_DIR:= objects
-OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
-OBJS_BASENAMES:= $(addprefix $(OBJS_DIR)/,$(notdir $(OBJS)))
+DEP:= $(OBJS:%.o=%.d)
 
 CONFIG_FILES:= config_sample.conf
 
@@ -65,7 +66,7 @@ clean:
 fclean: clean
 	@$(RM) $(NAME)
 	@$(RM) test_parser
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables."
+-include $(DEP)
 
 re: fclean all
 

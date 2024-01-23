@@ -23,13 +23,13 @@ INCLUDES:= -I./ -Isocket/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp # can add more server source files here
 
+OBJS_DIR:= objects
+OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
+
 # tester mains
 TEST_DIR:= tester
 TEST_SOCKET:= $(TEST_DIR)/SOCKET_main.cpp
 TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
-
-OBJS_DIR:= objects
-OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 DEP:= $(OBJS:%.o=%.d)
 
