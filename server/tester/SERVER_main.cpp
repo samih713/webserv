@@ -6,7 +6,7 @@ int main()
     try
     {
         Server &webserv = Server::getInstance(8080, 10);
-        webserv.start();
+        webserv.start(SELECT);
     }
     catch (const Socket::Exception &e)
     {std::cerr << e.what();}
