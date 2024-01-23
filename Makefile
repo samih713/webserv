@@ -38,7 +38,7 @@ run: re
 
 $(NAME): parser server $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
-	@echo "$(GREEN)[ COMPILE ]$(RESET) $(NAME) is ready.\n"
+	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -73,6 +73,8 @@ fclean: clean
 	@$(RM) $(NAME)
 	@make fclean -sC parser/ > /dev/null 2>&1
 	@make fclean -sC server/ > /dev/null 2>&1
+	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries.\n"
+
 -include $(DEP)
 
 re: fclean all

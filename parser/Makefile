@@ -60,12 +60,14 @@ tests: test_parser
 	@echo ""
 
 clean:
-	@$(RM) $(OBJS_DIR)
+	@$(RM) $(OBJS_DIR) *.d
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
 	@$(RM) $(NAME)
 	@$(RM) test_parser
+	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
+
 -include $(DEP)
 
 re: fclean all

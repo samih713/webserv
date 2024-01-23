@@ -18,8 +18,7 @@ endif
 
 RM:= rm -rf
 
-
-INCLUDES:= -I./ -Isocket/
+INCLUDES:= -I./ -Isocket/ -I../includes/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp # can add more server source files here
 
@@ -69,13 +68,13 @@ tests: test_socket test_server
 	@echo ""
 
 clean:
-	@$(RM) $(OBJS_DIR)
+	@$(RM) $(OBJS_DIR) *.d
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
 	@$(RM) $(NAME)
 	@$(RM) test_socket test_server client
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables."
+	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 
