@@ -4,10 +4,9 @@
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
 #include <sstream>
-#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "../../includes/error.hpp"
+#include "../../includes/webserv.hpp"
 
 // TODO // [P]artially implemented, needs [I]mprovement, [X] done
 //

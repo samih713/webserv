@@ -39,15 +39,4 @@
 # define DEBUGASSERT(x) do {} while (0)
 # endif // __DEBUG__
 
-/* ----------------------------- ERROR MESSAGES ----------------------------- */
-# include <string>
-static std::string ERR_NULL("Socket: null ptr error");
-static std::string ERR_CREAT("Socket: creation failed");
-static std::string ERR_BIND("Socket: binding failed");
-static std::string ERR_NBIND("Socket: not bound to a port");
-static std::string ERR_LIST("Socket: listen failed");
-static std::string ERR_NLIST("Socket: not listeing");
-static std::string ERR_ACCP("Socket: accept failed");
-
-
 #endif // ERROR_HPP
