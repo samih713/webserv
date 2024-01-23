@@ -9,3 +9,4 @@ test_parser
 test_server
 test_socket
 client
+*.d
