@@ -12,6 +12,7 @@ public:
 
 private:
     ConfigParser();
+    static void readFile(const std::string& filepath, std::string& output);
 };
 
 #endif // CONFIG_PARSER_HPP

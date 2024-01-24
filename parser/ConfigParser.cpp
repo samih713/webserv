@@ -4,17 +4,26 @@ ConfigParser::ConfigParser() {}
 
 ConfigParser::~ConfigParser() {}
 
-void ConfigParser::parseJSON(std::string file) {
-    std::cout << "Parsing config file: " << file << std::endl;
+void ConfigParser::readFile(const std::string& filepath, std::string& output) {
+    std::cout << "Reading config file: " << filepath << std::endl;
 
-    std::ifstream inputFileStream(file.c_str());
+    std::ifstream inputFileStream(filepath.c_str());
     if (inputFileStream.fail()) {
         std::cerr << ERR_OPEN << std::endl;
         exit(1);
     }
     std::string line;
     while (std::getline(inputFileStream, line)) {
-        std::cout << line << std::endl;
+        line.erase(remove_if(line.begin(), line.end(), isspace), line.end());
+        if (line.empty())
+            continue;
+        output.append(line);
     }
     inputFileStream.close();
+}
+
+void ConfigParser::parseJSON(const std::string file) {
+    std::string json;
+    readFile(file, json);
+    std::cout << json;
 }
