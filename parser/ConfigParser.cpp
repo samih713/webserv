@@ -7,7 +7,7 @@ ConfigParser::~ConfigParser() {}
 void ConfigParser::parseJSON(std::string file) {
     std::cout << "Parsing config file: " << file << std::endl;
 
-    std::ifstream inputFileStream(file);
+    std::ifstream inputFileStream(file.c_str());
     if (inputFileStream.fail()) {
         std::cerr << ERR_OPEN << std::endl;
         exit(1);
