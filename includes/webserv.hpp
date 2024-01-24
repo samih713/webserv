@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <algorithm>
 #include "debug.hpp"
 
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
