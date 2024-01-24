@@ -1,3 +1,6 @@
+#include "../ConfigParser.hpp"
+
 int main(void) {
-	return 0;
+    ConfigParser::parseConfigFile("test_config.json");
+    return 0;
 }
