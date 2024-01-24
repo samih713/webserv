@@ -1,0 +1,52 @@
+{
+  "servers": [
+    {
+      "host": "127.0.0.1",
+      "port": 8080,
+      "server_names": ["example.com", "www.example.com"],
+      "default_server": true,
+      "error_pages": {
+        "404": "/error404.html",
+        "500": "/error500.html"
+      },
+      "client_body_limit": "10M",
+      "routes": [
+        {
+          "path": "/api",
+          "methods": ["GET", "POST"],
+          "redirect": "/newapi",
+          "directory_listing": false,
+          "default_file": "index.html",
+          "cgi_executable": "/usr/bin/php-cgi",
+          "cgi_path_info": true,
+          "upload_enabled": true,
+          "upload_directory": "/tmp/uploads"
+        },
+        {
+          "path": "/static",
+          "file_root": "/var/www/static",
+          "methods": ["GET"],
+          "default_file": "index.html",
+          "directory_listing": true
+        },
+        {
+          "path": "/images",
+          "file_root": "/var/www/images",
+          "methods": ["GET"]
+        }
+      ]
+    },
+    {
+      "host": "localhost",
+      "port": 9090,
+      "routes": [
+        {
+          "path": "/app",
+          "methods": ["GET", "POST"],
+          "file_root": "/var/www/app",
+          "cgi_executable": "/usr/bin/python3-cgi"
+        }
+      ]
+    }
+  ]
+}
