@@ -8,7 +8,7 @@ class ConfigParser {
 public:
     ~ConfigParser();
 
-    static void parseConfigFile(std::string file);
+    static void parseJSON(std::string file);
 
 private:
     ConfigParser();

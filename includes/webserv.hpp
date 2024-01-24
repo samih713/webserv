@@ -19,4 +19,6 @@ static std::string ERR_LIST("Socket: listen failed");
 static std::string ERR_NLIST("Socket: not listeing");
 static std::string ERR_ACCP("Socket: accept failed");
 
+static std::string ERR_OPEN("Parser: cannot open file");
+
 #endif // WEBSERV_HPP
