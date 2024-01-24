@@ -1,5 +1,4 @@
 #include "TCPSocket.hpp"
-#include <unordered_map>
 #include <vector>
 
 #ifndef SERVER_HPP
