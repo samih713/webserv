@@ -1,14 +1,11 @@
 #include "Server.hpp"
-#include <chrono>
 #include <cstddef>
 #include <cstring>
-#include <future>
 #include <netinet/in.h>
 #include <stdexcept>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <thread>
 
 Server &Server::getInstance(int listenerPort, int backlog)
 {
