@@ -31,7 +31,7 @@ TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
 DEP:= $(OBJS:%.o=%.d)
 
-CONFIG_FILES:= config_sample.conf
+CONFIG_FILES:= config_sample.json
 
 NAME:= libparser.a
 
@@ -56,6 +56,8 @@ test_parser: $(TEST_PARSER) debug
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_PARSER) $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
+	@echo "$(BLUE)[ TEST ]$(RESET) Running ./$@.\n"
+	@./test_parser $(CONFIG_FILES)
 
 tests: test_parser
 	@echo ""
