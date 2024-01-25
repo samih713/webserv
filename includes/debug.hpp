@@ -21,7 +21,6 @@
 # define DEBUG_MSG(message, color)
 # else
 # include <cassert>
-# include <iostream>
 # define DEBUG_MSG(message, color)                                             \
     do {                                                                       \
         std::cerr << (color);                                                  \
