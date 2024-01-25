@@ -4,6 +4,12 @@ ConfigParser::ConfigParser() {}
 
 ConfigParser::~ConfigParser() {}
 
+void ConfigParser::parseJSON(const std::string file) {
+    std::string json;
+    readFile(file, json);
+    std::cout << json;
+}
+
 void ConfigParser::readFile(const std::string& filepath, std::string& output) {
     std::cout << "Reading config file: " << filepath << std::endl;
 
@@ -20,10 +26,4 @@ void ConfigParser::readFile(const std::string& filepath, std::string& output) {
         output.append(line);
     }
     inputFileStream.close();
-}
-
-void ConfigParser::parseJSON(const std::string file) {
-    std::string json;
-    readFile(file, json);
-    std::cout << json;
 }
