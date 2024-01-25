@@ -3,16 +3,18 @@
 
 #include "../includes/webserv.hpp"
 #include <fstream>
+#include <map>
 
-class ConfigParser {
-public:
-    ~ConfigParser();
+namespace ConfigParser {
+    using text_itr = std::string::iterator;
+    union JSON_value {
+        int integer;
+        double double_value;
+        std::map<std::string, JSON_value>* json;
+    };
 
-    static void parseJSON(std::string file);
-
-private:
-    ConfigParser();
-    static void readFile(const std::string& filepath, std::string& output);
+    void parseJSON(std::string file);
+    void readFile(const std::string& filepath, std::string& output);
 };
 
 #endif // CONFIG_PARSER_HPP

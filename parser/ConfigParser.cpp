@@ -1,13 +1,9 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser() {}
-
-ConfigParser::~ConfigParser() {}
-
 void ConfigParser::parseJSON(const std::string file) {
     std::string json;
     readFile(file, json);
-    std::cout << json;
+    std::cout << json << std::endl;
 }
 
 void ConfigParser::readFile(const std::string& filepath, std::string& output) {
@@ -27,3 +23,4 @@ void ConfigParser::readFile(const std::string& filepath, std::string& output) {
     }
     inputFileStream.close();
 }
+
