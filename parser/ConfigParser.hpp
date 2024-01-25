@@ -6,7 +6,6 @@
 #include <map>
 
 namespace ConfigParser {
-    using text_itr = std::string::iterator;
     union JSON_value {
         int integer;
         double double_value;
