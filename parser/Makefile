@@ -8,7 +8,8 @@ RESET:= \033[0m
 
 CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__
+SANITIZE:= -fsanitize=address
 
 ifeq ($(shell uname), Linux)
 	CXXFLAGS += -D__LINUX__
@@ -52,14 +53,17 @@ debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
+sanitize: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
+sanitize: all
+	@echo "$(MAGENTA)[ SANITIZE ]$(RESET) $(NAME) is ready for sanitizing."
+
 valgrind: CXXFLAGS += $(DEBUGFLAGS)
-valgrind: CXXFLAGS -= -fsanitize=address
 valgrind: all
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./test_parser $(CONFIG_FILES)
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
 test_parser: $(TEST_PARSER) debug
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_PARSER) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_PARSER) $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
 
