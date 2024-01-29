@@ -6,14 +6,14 @@
 #include <map>
 
 namespace ConfigParser {
-    union JSON_value {
+    union JsonValue {
         int integer;
         double double_value;
-        std::map<std::string, JSON_value>* json;
+        std::map<std::string, JsonValue>* json;
     };
 
-    void parseJSON(std::string file);
-    void readFile(const std::string& filepath, std::string& output);
+    void parseJSON(const std::string file);
+    void readFile(const std::string& filepath, std::string& content);
 };
 
 #endif // CONFIG_PARSER_HPP

@@ -6,7 +6,7 @@ void ConfigParser::parseJSON(const std::string file) {
     std::cout << json << std::endl;
 }
 
-void ConfigParser::readFile(const std::string& filepath, std::string& output) {
+void ConfigParser::readFile(const std::string& filepath, std::string& content) {
     std::cout << "Reading config file: " << filepath << std::endl;
 
     std::ifstream inputFileStream(filepath.c_str());
@@ -16,10 +16,10 @@ void ConfigParser::readFile(const std::string& filepath, std::string& output) {
     }
     std::string line;
     while (std::getline(inputFileStream, line)) {
-        line.erase(remove_if(line.begin(), line.end(), isspace), line.end());
+        line.erase(remove_if(line.begin(), line.end(), isspace), line.end()); // remove all spaces/tabs/newlines/carriage returns
         if (line.empty())
             continue;
-        output.append(line);
+        content.append(line);
     }
     inputFileStream.close();
 }
