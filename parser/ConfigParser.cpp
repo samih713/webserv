@@ -5,7 +5,13 @@ using namespace ConfigParser;
 void ConfigParser::parseJSON(const std::string file) {
     std::string json;
     readFile(file, json);
-    std::cout << json << std::endl;
+
+    stringIterator itr = json.begin();
+    KeyValuePair test = parseKeyValuePair(json, ++itr);
+
+    std::cout << "Key: " << test.first << "$" << std::endl;
+    if (test.second.string == NULL)
+        std::cout << "value: NULL$" << std::endl;
 }
 
 void ConfigParser::readFile(const std::string& filepath, std::string& content) {
@@ -41,8 +47,18 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
             throw std::runtime_error(ERR_JSON_PARSE);
         itr++;
     }
+
     JsonValue value;
-    if (std::string(itr, itr + 4) == "null") {
+    // value can be string, number, null, array or object
+    if ((*itr) == '\"' && isalpha(*(++itr))) {
+        tempItr = itr;
+        while (*itr != '\"')
+            ++itr;
+        value.string = new std::string(tempItr, itr);
+        if (*(++itr) != ',' && *itr != '}')
+            throw std::runtime_error(ERR_JSON_PARSE);
+    }
+    else if (std::string(itr, itr + 4) == "null") {
         value.string = NULL;
         itr += 4;
         if (*itr != ',' && *itr != '}')
