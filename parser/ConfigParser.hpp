@@ -9,6 +9,7 @@ namespace ConfigParser {
     union JsonValue {
         int integer;
         double double_value;
+        std::string* string; // pointer to string to avoid copying
         std::map<std::string, JsonValue>* json;
     };
 
