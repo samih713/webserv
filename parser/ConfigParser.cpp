@@ -1,5 +1,7 @@
 #include "ConfigParser.hpp"
 
+using namespace ConfigParser;
+
 void ConfigParser::parseJSON(const std::string file) {
     std::string json;
     readFile(file, json);
@@ -24,3 +26,29 @@ void ConfigParser::readFile(const std::string& filepath, std::string& content) {
     inputFileStream.close();
 }
 
+KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringIterator& itr) {
+    if (itr == content.end())
+        throw std::runtime_error(ERR_JSON_PARSE);
+
+    std::string key;
+    stringIterator tempItr;
+    if (*itr == '\"') {
+        tempItr = ++itr;
+        while (*itr != '\"')
+            ++itr;
+        key = std::string(tempItr, itr);
+        if (*(++itr) != ':')
+            throw std::runtime_error(ERR_JSON_PARSE);
+        itr++;
+    }
+    JsonValue value;
+    if (std::string(itr, itr + 4) == "null") {
+        value.string = NULL;
+        itr += 4;
+        if (*itr != ',' && *itr != '}')
+            throw std::runtime_error(ERR_JSON_PARSE);
+    }
+    else
+        throw std::runtime_error(ERR_JSON_PARSE);
+    return std::make_pair(key, value);
+}
