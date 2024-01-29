@@ -21,5 +21,6 @@ static std::string ERR_NLIST("Socket: not listeing");
 static std::string ERR_ACCP("Socket: accept failed");
 
 static std::string ERR_OPEN("Parser: cannot open file");
+static std::string ERR_JSON_PARSE("Parser: invalid JSON syntax");
 
 #endif // WEBSERV_HPP
