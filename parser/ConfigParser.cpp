@@ -46,8 +46,7 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
         itr++;
     }
 
-    JsonValue value;
-    // value can be string, number(int), null, array or object
+    JsonValue value; // value can be string, number(int), null, array or object
     if ((*itr) == '\"' && isalpha(*(++itr))) {
         tempItr = itr;
         while (*itr != '\"')
