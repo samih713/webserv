@@ -1,7 +1,6 @@
 {
 	"string": "Hello World!",
 	"int": 123,
-	"float": 123.456,
 	"boolean": true,
 	"null": null,
 	"array": [1, 2, 3, 4, 5],
