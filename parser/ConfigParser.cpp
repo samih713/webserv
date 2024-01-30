@@ -107,3 +107,16 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
         throw std::runtime_error(ERR_JSON_PARSE);
     return std::make_pair(key, value);
 }
+
+JsonValue ConfigParser::extractJSON(const std::string& content, stringIterator& itr) {
+    std::map<std::string, JsonValue>* _jsonMap = new std::map<std::string, JsonValue>;
+    if (_jsonMap == NULL)
+        throw std::runtime_error(ERR_MEMORY_ALLOC);
+
+    do {
+        KeyValuePair pair = parseKeyValuePair(content, itr);
+        _jsonMap->insert(pair);
+    } while (*itr == ',' && ++itr != content.end());
+
+    return (JsonValue){ .jsonMap = _jsonMap };
+}

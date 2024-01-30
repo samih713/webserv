@@ -21,6 +21,7 @@ namespace ConfigParser {
     JsonValue parseJSON(const std::string file);
     void readFile(const std::string& filepath, std::string& content);
     KeyValuePair parseKeyValuePair(const std::string& content, stringIterator& itr);
+    JsonValue extractJSON(const std::string& json, stringIterator& itr);
 };
 
 #endif // CONFIG_PARSER_HPP
