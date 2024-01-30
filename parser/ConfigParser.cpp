@@ -119,3 +119,33 @@ JsonValue ConfigParser::extractJSON(const std::string& content, stringIterator& 
 
     return (JsonValue){ .jsonMap = _jsonMap };
 }
+
+void ConfigParser::clearJSON(JsonValue& parsed) {
+    if (parsed.jsonMap == NULL)
+        return;
+
+    // deleting the allocated json values
+    for (std::map<std::string, JsonValue>::iterator it = parsed.jsonMap->begin(); 
+            it != parsed.jsonMap->end(); ++it)
+    {
+        if (it->second.string != NULL)
+            delete it->second.string;
+        // } else if (it->second.array != NULL) {
+        //     // Recursively clear arrays
+        //     for (std::vector<JsonValue>::iterator vecIt = it->second.array->begin();
+        //             vecIt != it->second.array->end(); ++vecIt)
+        //     {
+        //         clearJSON(*vecIt);
+        //     }
+        //     delete it->second.array;
+        // } else if (it->second.jsonMap != NULL) {
+        //     // Recursively clear nested JSON objects
+        //     clearJSON(it->second);
+        // }
+    }
+
+    // deleting the map
+    parsed.jsonMap->clear();
+    delete parsed.jsonMap;
+    parsed.jsonMap = NULL;
+}
