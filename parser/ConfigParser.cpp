@@ -55,15 +55,15 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
         if (*(++itr) != ',' && *itr != '}')
             throw std::runtime_error(ERR_JSON_PARSE);
     }
-    else if ((*itr == '-' && isdigit(*(++itr))) || isdigit(*itr)) {
+    else if (isdigit(*itr) || (*itr == '-' && isdigit(*(++itr)))) {
         tempItr = itr;
         while (isdigit(*itr)) {
             if (*itr == '.')
-                throw std::runtime_error(ERR_JSON_PARSE);
+                throw std::runtime_error(ERR_JSON_TYPE);
             ++itr;
         }
         value.number = std::atoi(std::string(tempItr, itr).c_str());
-        if (*itr != ',' && *itr != '}')
+        if (*itr != ',' && *itr != '}' && *itr != ']')
             throw std::runtime_error(ERR_JSON_PARSE);
     }
     else if (std::string(itr, itr + 4) == "null") {
