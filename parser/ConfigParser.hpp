@@ -15,7 +15,7 @@ namespace ConfigParser {
     typedef std::pair<std::string, JsonValue> KeyValuePair;
     typedef std::string::iterator stringIterator;
 
-    void parseJSON(const std::string file);
+    JsonValue parseJSON(const std::string file);
     void readFile(const std::string& filepath, std::string& content);
     KeyValuePair parseKeyValuePair(const std::string& content, stringIterator& itr);
 };

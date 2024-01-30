@@ -2,7 +2,7 @@
 
 using namespace ConfigParser;
 
-void ConfigParser::parseJSON(const std::string file) {
+JsonValue ConfigParser::parseJSON(const std::string file) {
     std::string json;
     readFile(file, json);
 
