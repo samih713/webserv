@@ -11,7 +11,8 @@ namespace ConfigParser {
         int number;
         bool boolean;
         std::string* string; // pointer to string to avoid copying
-        std::map<std::string, JsonValue>* json;
+        std::vector<JsonValue>* array;
+        std::map<std::string, JsonValue>* jsonMap;
     };
 
     typedef std::pair<std::string, JsonValue> KeyValuePair;
