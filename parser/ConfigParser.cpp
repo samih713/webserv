@@ -7,10 +7,9 @@ JsonValue ConfigParser::parseJSON(const std::string file) {
     readFile(file, json);
 
     stringIterator itr = json.begin();
-    KeyValuePair test = parseKeyValuePair(json, ++itr);
-
-    std::cout << "Key: " << test.first << "$" << std::endl;
-    std::cout << "Value: " << test.second.number << std::endl;
+    if (*itr != '{')
+        throw std::runtime_error(ERR_JSON_PARSE);
+    return extractJSON(json, ++itr);
 }
 
 void ConfigParser::readFile(const std::string& filepath, std::string& content) {
