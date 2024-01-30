@@ -9,6 +9,7 @@
 #include <string>
 #include <cstdlib>
 #include <algorithm>
+#include <vector>
 #include "debug.hpp"
 
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
