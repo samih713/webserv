@@ -17,13 +17,12 @@ void ConfigParser::readFile(const std::string& filepath, std::string& content) {
     std::cout << "Reading config file: " << filepath << std::endl;
 
     std::ifstream inputFileStream(filepath.c_str());
-    if (inputFileStream.fail()) {
-        std::cerr << ERR_OPEN << std::endl;
-        exit(1);
-    }
+    if (inputFileStream.fail())
+        throw std::runtime_error(ERR_OPEN);
+
     std::string line;
     while (std::getline(inputFileStream, line)) {
-        line.erase(remove_if(line.begin(), line.end(), isspace), line.end()); // remove all spaces/tabs/newlines/carriage returns
+        line.erase(remove_if(line.begin(), line.end(), isspace), line.end());
         if (line.empty())
             continue;
         content.append(line);
