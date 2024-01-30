@@ -72,6 +72,18 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
         if (*itr != ',' && *itr != '}')
             throw std::runtime_error(ERR_JSON_PARSE);
     }
+    else if (std::string(itr, itr + 5) == "false") {
+        value.boolean = false;
+        itr += 5;
+        if (*itr != ',' && *itr != '}')
+            throw std::runtime_error(ERR_JSON_PARSE);
+    }
+    else if (std::string(itr, itr + 4) == "true") {
+        value.boolean = true;
+        itr += 4;
+        if (*itr != ',' && *itr != '}')
+            throw std::runtime_error(ERR_JSON_PARSE);
+    }
     else
         throw std::runtime_error(ERR_JSON_PARSE);
     return std::make_pair(key, value);

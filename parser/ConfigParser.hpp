@@ -4,10 +4,12 @@
 #include "../includes/webserv.hpp"
 #include <fstream>
 #include <map>
+#include <cstring>
 
 namespace ConfigParser {
     union JsonValue {
         int number;
+        bool boolean;
         std::string* string; // pointer to string to avoid copying
         std::map<std::string, JsonValue>* json;
     };
