@@ -9,7 +9,8 @@ JsonValue ConfigParser::parseJSON(const std::string file) {
     stringIterator itr = json.begin();
     if (*itr != '{')
         throw std::runtime_error(ERR_JSON_PARSE);
-    return extractJSON(json, ++itr);
+    itr++;
+    return extractJSON(json, itr);
 }
 
 /**
@@ -55,6 +56,7 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
     if (itr == content.end())
         throw std::runtime_error(ERR_JSON_PARSE);
 
+    // parsing key
     std::string key;
     stringIterator tempItr;
     if (*itr == '\"') {
@@ -62,12 +64,13 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
         while (*itr != '\"')
             ++itr;
         key = std::string(tempItr, itr);
+    }
+
         if (*(++itr) != ':')
             throw std::runtime_error(ERR_JSON_PARSE);
         itr++;
-    }
 
-    JsonValue value; // value can be string, number(int), null, array or object
+    JsonValue value; // value can be string, number(int), boolean, null, array or object
     if ((*itr) == '\"' && isalpha(*(++itr))) {
         tempItr = itr;
         while (*itr != '\"')
