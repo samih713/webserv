@@ -12,6 +12,15 @@ JsonValue ConfigParser::parseJSON(const std::string file) {
     return extractJSON(json, ++itr);
 }
 
+/**
+ * @brief Read the JSON file, remove all ( \t\n\r) characters from each line
+ * and store the content in a string
+ * 
+ * @param filepath
+ * @param content string to store the content of the file
+ * 
+ * @throw std::runtime_error if the file cannot be opened
+*/
 void ConfigParser::readFile(const std::string& filepath, std::string& content) {
     std::cout << "Reading config file: " << filepath << std::endl;
 
@@ -27,6 +36,19 @@ void ConfigParser::readFile(const std::string& filepath, std::string& content) {
         content.append(line);
     }
     inputFileStream.close();
+}
+
+JsonValue ConfigParser::extractJSON(const std::string& content, stringIterator& itr) {
+    std::map<std::string, JsonValue>* _jsonMap = new std::map<std::string, JsonValue>;
+    if (_jsonMap == NULL)
+        throw std::runtime_error(ERR_MEMORY_ALLOC);
+
+    do {
+        KeyValuePair pair = parseKeyValuePair(content, itr);
+        _jsonMap->insert(pair);
+    } while (*itr == ',' && ++itr != content.end());
+
+    return (JsonValue){ .jsonMap = _jsonMap };
 }
 
 KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringIterator& itr) {
@@ -105,47 +127,4 @@ KeyValuePair ConfigParser::parseKeyValuePair(const std::string& content, stringI
     else
         throw std::runtime_error(ERR_JSON_PARSE);
     return std::make_pair(key, value);
-}
-
-JsonValue ConfigParser::extractJSON(const std::string& content, stringIterator& itr) {
-    std::map<std::string, JsonValue>* _jsonMap = new std::map<std::string, JsonValue>;
-    if (_jsonMap == NULL)
-        throw std::runtime_error(ERR_MEMORY_ALLOC);
-
-    do {
-        KeyValuePair pair = parseKeyValuePair(content, itr);
-        _jsonMap->insert(pair);
-    } while (*itr == ',' && ++itr != content.end());
-
-    return (JsonValue){ .jsonMap = _jsonMap };
-}
-
-void ConfigParser::clearJSON(JsonValue& parsed) {
-    if (parsed.jsonMap == NULL)
-        return;
-
-    // deleting the allocated json values
-    for (std::map<std::string, JsonValue>::iterator it = parsed.jsonMap->begin(); 
-            it != parsed.jsonMap->end(); ++it)
-    {
-        if (it->second.string != NULL)
-            delete it->second.string;
-        // } else if (it->second.array != NULL) {
-        //     // Recursively clear arrays
-        //     for (std::vector<JsonValue>::iterator vecIt = it->second.array->begin();
-        //             vecIt != it->second.array->end(); ++vecIt)
-        //     {
-        //         clearJSON(*vecIt);
-        //     }
-        //     delete it->second.array;
-        // } else if (it->second.jsonMap != NULL) {
-        //     // Recursively clear nested JSON objects
-        //     clearJSON(it->second);
-        // }
-    }
-
-    // deleting the map
-    parsed.jsonMap->clear();
-    delete parsed.jsonMap;
-    parsed.jsonMap = NULL;
 }
