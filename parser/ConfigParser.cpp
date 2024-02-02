@@ -31,16 +31,67 @@ JsonValue JsonParser::parseValue(void) {
 }
 
 JsonValue JsonParser::parseNull(void) {
+    // _itr moved from 'n' to after 'l'.
+    // ',' or '}' should be right after
+    _itr += 4;
+    if (*_itr != ',' && *_itr != '}')
+        throw std::runtime_error(ERR_JSON_PARSE);
+    JsonValue result;
+    result.setNull();
+    return result;
 }
 
 JsonValue JsonParser::parseString(void) {
+    // _itr moved from '\"' to after '\"'
+    // ',' or '}' or ':' or ']' should be right after
+    _itr++; // move from '\"'
+    stringIterator tempItr = _itr;
+    while (_itr != _content.end() && *_itr != '\"')
+        _itr++;
+    if (*_itr != '\"')
+        throw std::runtime_error(ERR_JSON_QUOTE);
+    std::string value(tempItr, _itr);
+    _itr++; // move from '\"'
+    if (*_itr != ',' && *_itr != '}' && *_itr != ']' && *_itr != ':')
+        throw std::runtime_error(ERR_JSON_PARSE);
+    JsonValue result;
+    result.setString(value);
+    return result;
 }
 
 JsonValue JsonParser::parseNumber(void) {
+    // _itr moved from digit to after digit
+    // ',' or '}' or ']' should be right after
+    stringIterator tempItr = _itr;
+    while (_itr != _content.end() && isdigit(*_itr)) {
+        if (*_itr == '.')
+            throw std::runtime_error(ERR_JSON_TYPE);
+        _itr++;
+    }
+    int number = std::atoi(std::string(tempItr, _itr).c_str());
+    if (_itr == _content.end() || (*_itr != ',' && *_itr != '}' && *_itr != ']'))
+        throw std::runtime_error(ERR_JSON_PARSE);
+    JsonValue result;
+    result.setNumber(number);
+    return result;
 }
 
 JsonValue JsonParser::parseBoolean(void) {
     // _itr moved from 't' or 'f' to after 'e'
+    // ',' or '}' should be right after
+    bool boolean;
+    if (std::string(_itr, _itr + 4) == "true")
+        boolean = true;
+    else if (std::string(_itr, _itr + 5) == "false")
+        boolean = false;
+    else
+        throw std::runtime_error(ERR_JSON_PARSE);
+    _itr += (boolean ? 4 : 5);
+    if (*_itr != ',' && *_itr != '}')
+        throw std::runtime_error(ERR_JSON_PARSE);
+    JsonValue result;
+    result.setBoolean(boolean);
+    return result;
 }
 
 JsonValue JsonParser::parseArray(void) {
