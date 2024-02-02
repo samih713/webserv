@@ -24,7 +24,6 @@ JsonParser::JsonParser(const std::string filepath) {
  * @return JsonValue The parsed JSON value
 */
 JsonValue JsonParser::parseJSON(void) {
-    _itr2 = _content.begin();
     std::cout << "Parsing JSON" << std::endl;
     return parseValue();
 }

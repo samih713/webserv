@@ -39,20 +39,16 @@ private:
     std::map<std::string, JsonValue> _object;
 };
 
-typedef std::string::iterator stringIterator;
-
 class JsonParser {
 public:
     JsonParser(const std::string filepath);
     ~JsonParser() {};
 
     JsonValue parseJSON(void);
-    void printJSON(JsonValue json);
 
 private:
     std::string _content;
-    stringIterator _itr;
-    stringIterator _itr2;
+    std::string::iterator _itr;
 
     JsonValue parseValue(void);
     JsonValue parseNull(void);
