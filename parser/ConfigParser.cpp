@@ -80,9 +80,6 @@ JsonValue JsonParser::parseNull(void) {
  * @return JsonValue The parsed string
 */
 JsonValue JsonParser::parseString(void) {
-    // _itr moved from '\"' to after '\"'
-    // ',' or '}' or ':' or ']' should be right after
-
     _itr++; // move from '\"'
     stringIterator tempItr = _itr;
     while (_itr != _content.end() && *_itr != '\"')
