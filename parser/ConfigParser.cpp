@@ -47,17 +47,20 @@ JsonValue JsonParser::parseValue(void) {
 JsonValue JsonParser::parseNull(void) {
     // _itr moved from 'n' to after 'l'.
     // ',' or '}' should be right after
-    _itr += 4;
+
+    _itr += 4; // move from 'n' to after 'l'
     if (*_itr != ',' && *_itr != '}')
         throw std::runtime_error(ERR_JSON_PARSE);
-    JsonValue result;
-    result.setNull();
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setNull();
+    return parsedValue;
 }
 
 JsonValue JsonParser::parseString(void) {
     // _itr moved from '\"' to after '\"'
     // ',' or '}' or ':' or ']' should be right after
+
     _itr++; // move from '\"'
     stringIterator tempItr = _itr;
     while (_itr != _content.end() && *_itr != '\"')
@@ -68,14 +71,16 @@ JsonValue JsonParser::parseString(void) {
     _itr++; // move from '\"'
     if (*_itr != ',' && *_itr != '}' && *_itr != ']' && *_itr != ':')
         throw std::runtime_error(ERR_JSON_PARSE);
-    JsonValue result;
-    result.setString(value);
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setString(value);
+    return parsedValue;
 }
 
 JsonValue JsonParser::parseNumber(void) {
     // _itr moved from digit to after digit
     // ',' or '}' or ']' should be right after
+
     stringIterator tempItr = _itr;
     while (_itr != _content.end() && isdigit(*_itr)) {
         if (*_itr == '.')
@@ -85,14 +90,16 @@ JsonValue JsonParser::parseNumber(void) {
     int number = std::atoi(std::string(tempItr, _itr).c_str());
     if (_itr == _content.end() || (*_itr != ',' && *_itr != '}' && *_itr != ']'))
         throw std::runtime_error(ERR_JSON_PARSE);
-    JsonValue result;
-    result.setNumber(number);
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setNumber(number);
+    return parsedValue;
 }
 
 JsonValue JsonParser::parseBoolean(void) {
     // _itr moved from 't' or 'f' to after 'e'
     // ',' or '}' should be right after
+
     bool boolean;
     if (std::string(_itr, _itr + 4) == "true")
         boolean = true;
@@ -103,14 +110,16 @@ JsonValue JsonParser::parseBoolean(void) {
     _itr += (boolean ? 4 : 5);
     if (*_itr != ',' && *_itr != '}')
         throw std::runtime_error(ERR_JSON_PARSE);
-    JsonValue result;
-    result.setBoolean(boolean);
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setBoolean(boolean);
+    return parsedValue;
 }
 
 JsonValue JsonParser::parseArray(void) {
     // _itr moved from '[' to after ']'
     // ',' or '}' should be right after
+
     _itr++; // move from '['
     if (*_itr != '\"' && !isdigit(*_itr) && *_itr != 'f' && *_itr != 't' && *_itr != 'n' && *_itr != '[' && *_itr != '{')
         throw std::runtime_error(ERR_JSON_PARSE);
@@ -125,32 +134,41 @@ JsonValue JsonParser::parseArray(void) {
     if (*_itr != ']' && (*(++_itr) != ',' || *_itr != '}'))
         throw std::runtime_error(ERR_JSON_PARSE);
     _itr++;
-    JsonValue result;
-    result.setArray(array);
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setArray(array);
+    return parsedValue;
 }
 
 JsonValue JsonParser::parseObject(void) {
     // _itr moved from '{' to after '}'
     // ',' or '}' or EOF should be right after
     _itr++; // move from '{'
-    std::map<std::string, JsonValue> value;
+
+    std::map<std::string, JsonValue> objectMap;
+
     while (_itr != _content.end() && *_itr != '}') {
         if (*_itr != '\"')
             throw std::runtime_error(ERR_JSON_PARSE);
+
         std::string key = parseString().asString();
         _itr++; // move from ':'
-        value[key] = parseValue();
+
+        objectMap[key] = parseValue();
+
         if (*_itr != ',' && *_itr != '}')
             throw std::runtime_error(ERR_JSON_PARSE);
+
         if (*_itr == ',')
-            _itr++;
+            _itr++; // move from ','
     }
+
     if (*(++_itr) != ',' && *_itr != ']' && _itr != _content.end()) {
         std::cout << *_itr << std::endl;
         throw std::runtime_error(ERR_JSON_PARSE);
     }
-    JsonValue result;
-    result.setObject(value);
-    return result;
+
+    JsonValue parsedValue;
+    parsedValue.setObject(objectMap);
+    return parsedValue;
 }
