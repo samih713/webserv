@@ -81,12 +81,16 @@ JsonValue JsonParser::parseNull(void) {
 */
 JsonValue JsonParser::parseString(void) {
     _itr++; // move from '\"'
+
     stringIterator tempItr = _itr;
+
     while (_itr != _content.end() && *_itr != '\"')
         _itr++;
     if (*_itr != '\"')
         throw std::runtime_error(ERR_JSON_QUOTE);
+
     std::string value(tempItr, _itr);
+
     _itr++; // move from '\"'
     if (*_itr != ',' && *_itr != '}' && *_itr != ']' && *_itr != ':')
         throw std::runtime_error(ERR_JSON_PARSE);
@@ -105,12 +109,15 @@ JsonValue JsonParser::parseString(void) {
 */
 JsonValue JsonParser::parseNumber(void) {
     stringIterator tempItr = _itr;
+
     while (_itr != _content.end() && isdigit(*_itr)) {
         if (*_itr == '.')
             throw std::runtime_error(ERR_JSON_TYPE);
         _itr++;
     }
+
     int number = std::atoi(std::string(tempItr, _itr).c_str());
+
     if (_itr == _content.end() || (*_itr != ',' && *_itr != '}' && *_itr != ']'))
         throw std::runtime_error(ERR_JSON_PARSE);
 
@@ -134,7 +141,9 @@ JsonValue JsonParser::parseBoolean(void) {
         boolean = false;
     else
         throw std::runtime_error(ERR_JSON_PARSE);
+
     _itr += (boolean ? 4 : 5);
+
     if (*_itr != ',' && *_itr != '}')
         throw std::runtime_error(ERR_JSON_PARSE);
 
@@ -152,19 +161,25 @@ JsonValue JsonParser::parseBoolean(void) {
 */
 JsonValue JsonParser::parseArray(void) {
     _itr++; // move from '['
+
     if (*_itr != '\"' && !isdigit(*_itr) && *_itr != 'f' && *_itr != 't' && *_itr != 'n' && *_itr != '[' && *_itr != '{')
         throw std::runtime_error(ERR_JSON_PARSE);
+
     std::vector<JsonValue> array;
+
     while (_itr != _content.end() && *_itr != ']') {
         array.push_back(parseValue());
+
         if (*_itr != ',' && *_itr != ']')
             throw std::runtime_error(ERR_JSON_PARSE);
+
         if (*_itr == ',')
             _itr++;
     }
+
     if (*_itr != ']' && (*(++_itr) != ',' || *_itr != '}'))
         throw std::runtime_error(ERR_JSON_PARSE);
-    _itr++;
+    _itr++; // move from ',' or '}' or ']'
 
     JsonValue parsedValue;
     parsedValue.setArray(array);
@@ -199,10 +214,8 @@ JsonValue JsonParser::parseObject(void) {
             _itr++; // move from ','
     }
 
-    if (*(++_itr) != ',' && *_itr != ']' && _itr != _content.end()) {
-        std::cout << *_itr << std::endl;
+    if (*(++_itr) != ',' && *_itr != ']' && _itr != _content.end())
         throw std::runtime_error(ERR_JSON_PARSE);
-    }
 
     JsonValue parsedValue;
     parsedValue.setObject(objectMap);
