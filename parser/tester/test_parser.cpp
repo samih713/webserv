@@ -7,8 +7,8 @@ int main(int argc, char **argv) {
     }
 
     try {
-        ConfigParser::JsonValue temp = ConfigParser::parseJSON(argv[1]);
-        ConfigParser::clearJSON(temp);
+        JsonParser parser(argv[1]);
+        JsonValue json = parser.parseJSON();
     } catch (std::exception& error) {
         std::cerr << error.what() << std::endl;
         exit(1);
