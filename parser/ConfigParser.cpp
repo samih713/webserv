@@ -18,12 +18,22 @@ JsonParser::JsonParser(const std::string filepath) {
     _itr = _content.begin();
 }
 
+/**
+ * @brief Parse the JSON string
+ * 
+ * @return JsonValue The parsed JSON value
+*/
 JsonValue JsonParser::parseJSON(void) {
     _itr2 = _content.begin();
     std::cout << "Parsing JSON" << std::endl;
     return parseValue();
 }
 
+/**
+ * @brief Parse a JSON value from the JSON string. Lots of recursion occurs here.
+ * 
+ * @return JsonValue The parsed JSON value
+*/
 JsonValue JsonParser::parseValue(void) {
     if (_itr == _content.end())
         throw std::runtime_error(ERR_JSON_PARSE);
@@ -44,11 +54,16 @@ JsonValue JsonParser::parseValue(void) {
         throw std::runtime_error(ERR_JSON_PARSE);
 }
 
+/**
+ * @brief Parse a null from the JSON string
+ * stringIterator _itr for nulls should start at 'n' and end at 'l'
+ * then the next character should be ',' or '}' or EOF
+ * 
+ * @return JsonValue The parsed null value
+*/
 JsonValue JsonParser::parseNull(void) {
-    // _itr moved from 'n' to after 'l'.
-    // ',' or '}' should be right after
-
     _itr += 4; // move from 'n' to after 'l'
+
     if (*_itr != ',' && *_itr != '}')
         throw std::runtime_error(ERR_JSON_PARSE);
 
@@ -57,6 +72,13 @@ JsonValue JsonParser::parseNull(void) {
     return parsedValue;
 }
 
+/**
+ * @brief Parse a string from the JSON string
+ * stringIterator _itr for strings should start at '\"' and end at '\"'
+ * then the next character should be ',' or '}' or ':' or ']' or EOF
+ * 
+ * @return JsonValue The parsed string
+*/
 JsonValue JsonParser::parseString(void) {
     // _itr moved from '\"' to after '\"'
     // ',' or '}' or ':' or ']' should be right after
@@ -77,10 +99,14 @@ JsonValue JsonParser::parseString(void) {
     return parsedValue;
 }
 
+/**
+ * @brief Parse a number from the JSON string
+ * stringIterator _itr for numbers should start at a digit and end at a non-digit
+ * then the next character should be ',' or '}' or ']' or EOF
+ * 
+ * @return JsonValue The parsed number
+*/
 JsonValue JsonParser::parseNumber(void) {
-    // _itr moved from digit to after digit
-    // ',' or '}' or ']' should be right after
-
     stringIterator tempItr = _itr;
     while (_itr != _content.end() && isdigit(*_itr)) {
         if (*_itr == '.')
@@ -96,10 +122,14 @@ JsonValue JsonParser::parseNumber(void) {
     return parsedValue;
 }
 
+/**
+ * @brief Parse a boolean from the JSON string
+ * stringIterator _itr for booleans should start at 't' or 'f' and end at 'e'
+ * then the next character should be ',' or '}' or ']' or EOF
+ * 
+ * @return JsonValue The parsed boolean
+*/
 JsonValue JsonParser::parseBoolean(void) {
-    // _itr moved from 't' or 'f' to after 'e'
-    // ',' or '}' should be right after
-
     bool boolean;
     if (std::string(_itr, _itr + 4) == "true")
         boolean = true;
@@ -116,10 +146,14 @@ JsonValue JsonParser::parseBoolean(void) {
     return parsedValue;
 }
 
+/**
+ * @brief Parse an array from the JSON string
+ * stringIterator _itr for arrays should start at '[' and end at ']'
+ * then the next character should be ',' or '}' or '[' or EOF
+ * 
+ * @return JsonValue The parsed array
+*/
 JsonValue JsonParser::parseArray(void) {
-    // _itr moved from '[' to after ']'
-    // ',' or '}' should be right after
-
     _itr++; // move from '['
     if (*_itr != '\"' && !isdigit(*_itr) && *_itr != 'f' && *_itr != 't' && *_itr != 'n' && *_itr != '[' && *_itr != '{')
         throw std::runtime_error(ERR_JSON_PARSE);
@@ -140,9 +174,14 @@ JsonValue JsonParser::parseArray(void) {
     return parsedValue;
 }
 
+/**
+ * @brief Parse an object from the JSON string
+ * stringIterator _itr for objects should start at '{' and end at '}'
+ * then the next character should be ',' or '}' or '[' or EOF
+ * 
+ * @return JsonValue The parsed object
+*/
 JsonValue JsonParser::parseObject(void) {
-    // _itr moved from '{' to after '}'
-    // ',' or '}' or EOF should be right after
     _itr++; // move from '{'
 
     std::map<std::string, JsonValue> objectMap;
