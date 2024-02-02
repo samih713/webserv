@@ -24,6 +24,7 @@ static std::string ERR_ACCP("Socket: accept failed");
 static std::string ERR_OPEN("Parser: cannot open file");
 static std::string ERR_JSON_PARSE("Parser: invalid JSON syntax");
 static std::string ERR_JSON_TYPE("Parser: invalid JSON type");
+static std::string ERR_JSON_QUOTE("Parser: unclosed quote");
 
 static std::string ERR_MEMORY_ALLOC("Memory: allocation failed");
 
