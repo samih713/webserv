@@ -28,6 +28,20 @@ JsonValue JsonParser::parseValue(void) {
     if (_itr == _content.end())
         throw std::runtime_error(ERR_JSON_PARSE);
 
+    if (*_itr == '\"')
+        return parseString();
+    else if (isdigit(*_itr))
+        return parseNumber();
+    else if (*_itr == 'f' || *_itr == 't')
+        return parseBoolean();
+    else if (std::string(_itr, _itr + 4) == "null")
+        return parseNull();
+    else if (*_itr == '[')
+        return parseArray();
+    else if (*_itr == '{')
+        return parseObject();
+    else
+        throw std::runtime_error(ERR_JSON_PARSE);
 }
 
 JsonValue JsonParser::parseNull(void) {
