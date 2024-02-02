@@ -57,6 +57,9 @@ private:
     JsonValue parseBoolean(void);
     JsonValue parseArray(void);
     JsonValue parseObject(void);
+    bool isEndOrDelimiter(void) {
+        return *_itr == ',' || *_itr == '}' || *_itr == ']' || _itr == _content.end();
+    }
 };
 
 #endif // CONFIG_PARSER_HPP
