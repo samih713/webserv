@@ -34,9 +34,6 @@ JsonValue JsonParser::parseJSON(void) {
  * @return JsonValue The parsed JSON value
 */
 JsonValue JsonParser::parseValue(void) {
-    if (_itr == _content.end())
-        throw std::runtime_error(ERR_JSON_PARSE);
-
     if (*_itr == '\"')
         return parseString();
     else if (isdigit(*_itr))
