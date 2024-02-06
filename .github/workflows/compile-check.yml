@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - server/*
+      - conf-parser
 
 jobs:
   build-linux:

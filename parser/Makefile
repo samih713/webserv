@@ -8,7 +8,8 @@ RESET:= \033[0m
 
 CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__
+SANITIZE:= -fsanitize=address
 
 ifeq ($(shell uname), Linux)
 	CXXFLAGS += -D__LINUX__
@@ -31,7 +32,8 @@ TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
 DEP:= $(OBJS:%.o=%.d)
 
-CONFIG_FILES:= config_sample.conf
+CONFIG_DIR:= json
+CONFIG_FILES:= $(CONFIG_DIR)/config_sample.json $(CONFIG_DIR)/simple.json
 
 NAME:= libparser.a
 
@@ -52,13 +54,25 @@ debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
+sanitize: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
+sanitize: all
+	@echo "$(MAGENTA)[ SANITIZE ]$(RESET) $(NAME) is ready for sanitizing."
+
+valgrind: CXXFLAGS += $(DEBUGFLAGS)
+valgrind: all
+	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./test_parser $(CONFIG_FILES)
+	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
+
 test_parser: $(TEST_PARSER) debug
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_PARSER) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_PARSER) $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
 
 tests: test_parser
-	@echo ""
+	@for config_file in $(CONFIG_FILES); do \
+		echo "\n$(BLUE)[ TEST ]$(RESET) Running ./test_parser $$config_file."; \
+		./test_parser $$config_file; \
+	done
 
 clean:
 	@$(RM) $(OBJS_DIR) *.d

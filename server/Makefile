@@ -8,7 +8,7 @@ RESET:= \033[0m
 
 CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
 
 ifeq ($(shell uname), Linux)
 	CXXFLAGS += -D__LINUX__
@@ -53,17 +53,17 @@ debug: all
 
 # tests
 client: debug
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SOCKET) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -fsanitize=address $(TEST_SERVER) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SERVER) $(NAME) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 

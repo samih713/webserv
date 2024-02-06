@@ -8,7 +8,7 @@ RESET:= \033[0m
 
 CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -MMD -MP
-DEBUGFLAGS:= -ggdb3 -fsanitize=address -D__DEBUG__
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
 
 ifeq ($(shell uname), Linux)
 	CXXFLAGS += -D__LINUX__
