@@ -1,5 +1,7 @@
 k MESSAGE SYNTAX AND ROUTING
 
+https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
+
 The HTTP protocol is defined in 6 RFC entries 7230-7235
 
 /* the 6 entries in the RFC detail the following
