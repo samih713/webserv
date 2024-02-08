@@ -1,6 +1,7 @@
 .vscode/
 */objects/
 */.cache/
+.cache/
 *.o
 libserver.a
 libparser.a
