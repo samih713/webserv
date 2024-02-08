@@ -34,7 +34,13 @@ int main()
     }
 
     // Send a message to the server
-    const char *message = "Hello from the client!";
+    const char *message = " \
+		GET /path/to/resource HTTP/1.1 \n \
+		Host: yourserver.com \n \
+		X-Custom-Header: Value \n \
+		Connection: close \n \
+		";
+
     if (send(sockfd, message, strlen(message), 0) < 0)
     {
         std::cerr << "Failed to send the message. errno: " << errno << std::endl;
