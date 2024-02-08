@@ -30,6 +30,20 @@ Server::~Server()
     ::close(_listener.socket_descriptor);
 }
 
+#define MAX_RECV_SIZE 1024
+
+static void handle_connection(fd recv_socket)
+{
+    char buffer[MAX_RECV_SIZE];
+
+    // 0 out the buffer
+    ::memset(&buffer, 0, MAX_RECV_SIZE);
+
+    if ((recv(recv_socket, &buffer, MAX_RECV_SIZE - 1, 0) == -1))
+        throw std::runtime_error(strerror(errno));
+    std::cout << buffer;
+}
+
 void Server::__select_strat()
 {
     fd_set current_sockets;
@@ -44,7 +58,7 @@ void Server::__select_strat()
 
         ready_sockets = current_sockets;
 
-        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0 && (errno=2))
+        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0 && (errno = 2))
             throw std::runtime_error(strerror(errno));
 
         for (int i = 0; i < FD_SETSIZE; i++)
@@ -58,23 +72,20 @@ void Server::__select_strat()
                 }
                 else
                 {
-                    // handle the connection
                     DEBUG_MSG("reading from connection", M);
+                    handle_connection(i);
                     FD_CLR(i, &current_sockets);
                 }
             }
         }
     }
 }
+
 void Server::start(enum polling_strat strategy)
 {
-	switch (strategy) {
-		case SELECT:
-			__select_strat();
-			break;
-		default:
-			break;
-	}
-
+    switch (strategy)
+    {
+        case SELECT: __select_strat(); break;
+        default: break;
+    }
 }
-
