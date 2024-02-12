@@ -1,4 +1,6 @@
 #include "Server.hpp"
+#include "../HTTP/Message.hpp"
+#include <cassert>
 #include <cstddef>
 #include <cstring>
 #include <netinet/in.h>
@@ -30,19 +32,24 @@ Server::~Server()
     ::close(_listener.socket_descriptor);
 }
 
-#define MAX_RECV_SIZE 1024
-
 static void handle_connection(fd recv_socket)
 {
-    char buffer[MAX_RECV_SIZE];
+	assert(false && "not implemented");
+    // char buffer[HTTP::MSG_SIZE];
 
-    // 0 out the buffer
-    ::memset(&buffer, 0, MAX_RECV_SIZE);
+    // // 0 out the buffer
+    // ::memset(&buffer, 0, HTTP::MSG_SIZE);
 
-    if ((recv(recv_socket, &buffer, MAX_RECV_SIZE - 1, 0) == -1))
-        throw std::runtime_error(strerror(errno));
-    std::cout << buffer;
+    // if ((recv(recv_socket, &buffer, HTTP::MSG_SIZE - 1, 0) == -1))
+    //     throw std::runtime_error(strerror(errno));
+    // HTTP::Context message(buffer);
+    // std::cout << message.get_message() << std::endl;
 }
+
+#if 1
+#undef FD_SETSIZE
+#define FD_SETSIZE 24
+#endif
 
 void Server::__select_strat()
 {
