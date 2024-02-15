@@ -1,5 +1,5 @@
 #include "Server.hpp"
-#include "../HTTP/Message.hpp"
+#include "Message.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -32,9 +32,9 @@ Server::~Server()
     ::close(_listener.socket_descriptor);
 }
 
-static void handle_connection(fd recv_socket)
+static void handle_connection(fd __attribute__((unused)) recv_socket)
 {
-	assert(false && "not implemented");
+    assert(false && "not implemented");
     // char buffer[HTTP::MSG_SIZE];
 
     // // 0 out the buffer
