@@ -24,9 +24,9 @@ namespace http
 class Request
 {
     public:
-        Request(const string &message);
+        Request(const string &rawRequest);
         ~Request();
-        Request(const Request &);
+        Request(const Request &other);
         void            parse();
         friend ostream &operator<<(ostream &os, const Request &r);
 
@@ -40,6 +40,11 @@ class Request
         // field-line   = field-name ":" OWS field-value OWS
         vector<pair<string, string> > fields;
         // clang-format on
+        // deleted
+        Request &operator=(const Request &other)
+        {
+            return *this;
+        };
 };
 
 

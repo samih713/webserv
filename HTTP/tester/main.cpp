@@ -4,7 +4,8 @@
 
 // TODO
 // [ ] URI syntax
-// [ ] solve linkage issue
+// [ ] Implement unit-testing (with a testing framework)
+// [ ] solve linkage issue (with data)
 // [ ] strict space parsing (only 1 space)
 // [ ] add a custom exception class and throw that exception with a messag
 // [x] set the stream to throw exception on fail

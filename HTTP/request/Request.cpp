@@ -18,7 +18,6 @@ Request::Request(const Request &other)
     , fields(other.fields)
 {}
 
-
 namespace webserv
 {
 namespace http
