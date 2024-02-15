@@ -1,31 +1,48 @@
-#include "../Request.hpp"
+#include "../request/Request.hpp"
 #include <iostream>
 #include <sstream>
 
 // TODO
+// [ ] URI syntax
 // [ ] solve linkage issue
+// [ ] strict space parsing (only 1 space)
+// [ ] add a custom exception class and throw that exception with a messag
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
 using namespace webserv;
 
-// sample message for testing
-static std::string sample_message = "PUT / HTTP/1.1\r\n"
-	"Host: localhost:8080\r\n"
-	"User-Agent: curl/7.68.0\r\n"
-	"Accept: */*\r\n"
-	"\r\n";
+// sample http request
+//
+static const std::string sample_message =
+    "GET /docs/tutorials/linux/shellscripts/howto.html HTTP/1.1\r\n"
+    "Host: Linode.com\r\n"
+    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
+    "Gecko/20091102 Firefox/3.5.5 \r\n"
+    "Accept: text/html,application/xhtml+xml, Accept-Language: en-us\r\n"
+    "Accept-Encoding: gzip,deflate\r\n"
+    "Accept-Charset: ISO-8859-1,utf-8\r\n"
+    "Cache-Control: no-cache\r\n"
+    "\r\n";
+
 
 int main()
 {
-#if 0 // parsing test
-	HTTP::Request r(sample_message);
-	r.parse();
+#if 1 // parsing test
+    http::Request r(sample_message);
+    try
+    {
+        r.parse();
+        std::cout << r;
+    }
+    catch (std::ios_base::failure &failure)
+    {
+        std::cerr << "Invalid http request" << std::endl;
+    }
 #endif // parsing test
 
-#if 1 // basic test
-	HTTP::METHOD m;
-	// HTTP::METHOD m = HTTP::GET;
+#if 0  // basic test
+	HTTP::METHOD m = HTTP::GET;
 	std::string path;
 	std::string version;
 
@@ -43,5 +60,5 @@ int main()
 		std::cout << "VERSION is : " << version << std::endl;
 	}
 #endif // basic test
-	return 0;
+    return 0;
 }
