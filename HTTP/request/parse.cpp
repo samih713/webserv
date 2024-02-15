@@ -66,7 +66,6 @@ void Request::parse()
         if (fieldName.find(' ') != string::npos ||
             fieldNameList.find(fieldName) == fieldNameListEnd)
         {
-            std::cerr << "[" << fieldName << "]" << std::endl;
             message.setstate(std::ios::failbit);
         }
 

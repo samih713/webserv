@@ -1,5 +1,4 @@
 #include "Request.hpp"
-#include "Message.hpp"
 #include "enum_utils.tpp"
 
 using namespace webserv::http;
