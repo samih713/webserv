@@ -18,7 +18,7 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -Isocket/ -I../includes/
+INCLUDES:= -I./ -Isocket/ -I../includes/ -I../HTTP/request
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp # can add more server source files here
 
