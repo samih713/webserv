@@ -19,11 +19,20 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -I../includes/
+INCLUDES:= -I./ -I../includes/ -Irequest/
 
-SRCS:= Request.cpp
+# REQUESTS
+REQUEST_DIR:= request
+REQUEST_LIST:= Request.cpp parse.cpp
+REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
+# RESPONSE
+RESPONSE_DIR:= 
+RESPONSE_LIST:= 
+RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
 
-OBJS_DIR:= objects
+SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
+
+OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -45,7 +54,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects
+	@mkdir -p objs objs/request
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
@@ -62,7 +71,7 @@ valgrind: all
 
 test_http: $(TEST_HTTP) debug
 	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
-	@mv *.d objects/
+	@mv *.d objs/
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
 
