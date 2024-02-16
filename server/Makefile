@@ -18,9 +18,9 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -Isocket/ -I../includes/ -I../HTTP/request
+INCLUDES:= -I./ -Isocket/ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/
 
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp # can add more server source files here
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
 
 OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))

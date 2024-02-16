@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "Message.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstring>
