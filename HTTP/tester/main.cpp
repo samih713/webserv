@@ -3,11 +3,11 @@
 #include <sstream>
 
 // TODO
-// [ ] URI syntax
+// [ ] Implement response
+// [ ] Implement logging
 // [ ] Implement unit-testing (with a testing framework)
 // [ ] solve linkage issue (with data)
 // [ ] strict space parsing (only 1 space)
-// [ ] add a custom exception class and throw that exception with a messag
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
@@ -24,6 +24,19 @@ static const std::string sample_message =
     "Accept-Encoding: gzip,deflate\r\n"
     "Accept-Charset: ISO-8859-1,utf-8\r\n"
     "Cache-Control: no-cache\r\n"
+    "\r\n"
+    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit\r\n"
+    "enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet.\r\n"
+    "Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem\r\n"
+    "est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud\r\n"
+    "officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat "
+    "reprehenderit\r\n"
+    "commodo officia dolor Lorem duis laboris cupidatat officia voluptate.\r\n"
+    "Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia "
+    "eiusmod.\r\n"
+    "Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim.\r\n"
+    "Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa "
+    "duis.\r\n"
     "\r\n";
 
 
