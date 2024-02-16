@@ -10,7 +10,9 @@
       "-I./",
       "-Isocket/",
       "-I../includes/",
-      "-I../HTTP/request",
+      "-I../HTTP/",
+      "-I../HTTP/request/",
+      "-I../HTTP/response/",
       "-c",
       "-o",
       "objects/Server.o",
@@ -19,22 +21,5 @@
     "directory": "/home/eva001/42/webserv/server",
     "file": "/home/eva001/42/webserv/server/Server.cpp",
     "output": "/home/eva001/42/webserv/server/objects/Server.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/c++",
-      "-Wall",
-      "-Werror",
-      "-Wextra",
-      "-D__LINUX__",
-      "-I./includes",
-      "-c",
-      "-o",
-      "objects/main.o",
-      "main.cpp"
-    ],
-    "directory": "/home/eva001/42/webserv",
-    "file": "/home/eva001/42/webserv/main.cpp",
-    "output": "/home/eva001/42/webserv/objects/main.o"
   }
 ]

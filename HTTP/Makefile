@@ -26,8 +26,8 @@ REQUEST_DIR:= request
 REQUEST_LIST:= Request.cpp parse.cpp
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
-RESPONSE_DIR:= 
-RESPONSE_LIST:= 
+RESPONSE_DIR:= response
+RESPONSE_LIST:= response.cpp
 RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
@@ -54,7 +54,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objs objs/request
+	@mkdir -p objs objs/request objs/response
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
