@@ -1,6 +1,7 @@
 #include "Message.hpp"
 #include "Request.hpp"
 #include "enum_utils.tpp"
+#include <ios>
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -50,14 +51,14 @@ namespace http
 
 void Request::parse()
 {
-    stringstream                            message(rawRequest);
-    string                                  fieldName;
-    string                                  fieldValue;
-    static map<string, int>::const_iterator fieldNameListEnd = fieldNameList.end();
+    stringstream message(rawRequest);
+    string       fieldName;
+    string       fieldValue;
 
+    static map<string, int>::const_iterator fieldNameListEnd = fieldNameList.end();
     message.exceptions(std::ios::failbit | std::ios::badbit);
     // Request Line
-    message >> enumFromString(method) >> request_target >> http_version;
+    message >> enumFromString(method) >> resource >> http_version;
     check_line_terminator(message, CRLF);
     // Headers
     while (true)
@@ -68,12 +69,13 @@ void Request::parse()
         {
             message.setstate(std::ios::failbit);
         }
-
         std::getline(message, fieldValue);
-        fields.push_back(std::make_pair(fieldName, fieldValue));
+        header_fields.push_back(std::make_pair(fieldName, fieldValue));
         if (peek_line_terminator(message, CRLF))
             break;
     }
+    // Body
+    std::getline(message, body, '\0');
 }
 }; // http
 }; // webserv

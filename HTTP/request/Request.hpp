@@ -29,22 +29,22 @@ class Request
         Request(const Request &other);
         void            parse();
         friend ostream &operator<<(ostream &os, const Request &r);
+        METHOD          get_method() const;
 
     private:
         const string rawRequest;
         // request-line   = method SP request-target SP HTTP-version
         METHOD method;
-        string request_target;
+        string resource;
         string http_version;
         // clang-format off
         // field-line   = field-name ":" OWS field-value OWS
-        vector<pair<string, string> > fields;
+        vector<pair<string, string> > header_fields;
+        vector<pair<string, string> > trailer_fields;
         // clang-format on
-        // deleted
-        Request &operator=(const Request &other)
-        {
-            return *this;
-        };
+        std::string body;
+        // deleted copy assigment
+        void operator=(const Request &);
 };
 
 
