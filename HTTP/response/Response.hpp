@@ -1,10 +1,11 @@
+#include "Message.hpp"
 #include "Request.hpp"
+#include "webserv.hpp"
+#include <sstream>
 #include <string>
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
-
-using std::string;
 
 namespace webserv
 {
@@ -14,16 +15,15 @@ namespace http
 class Response
 {
     public:
-        Response(const Request &r);
+        Response(STATUS_CODE status, vsp headers, string body);
         ~Response();
-        Response(const Response &);
-        STATUS_CODE generate_response();
+        Response(const Response &other);
+        const string generate_response(const Request &req);
 
     private:
-        static const string &SP;
-        const Request       &r;
-
-        STATUS_CODE set_status_line();
+        STATUS_CODE status;
+        vsp         headers;
+        string      body;
         // deleted copy assignment
         void operator=(const Response &);
 };

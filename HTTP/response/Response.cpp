@@ -1,48 +1,39 @@
 #include "Response.hpp"
 #include "Message.hpp"
 #include "Request.hpp"
+#include "ResponseBuilder.hpp"
 #include "debug.hpp"
 #include <sstream>
 
 using std::ostringstream;
 using namespace webserv::http;
 
-const string &Response::SP = " ";
-
-Response::Response(const Request &r)
-    : r(r)
-{}
+Response::Response(STATUS_CODE status, vsp headers, string body)
+    : status(status)
+    , headers(headers)
+    , body(body)
+{
+    DEBUG_MSG("Response called\n", Y);
+}
 
 Response::~Response()
 {}
 
 Response::Response(const Response &other)
-    : r(other.r)
-{
-    (void)other;
-}
+    : status(other.status)
+    , headers(other.headers)
+    , body(other.body)
+{}
 
-// work on this
-STATUS_CODE Response::set_status_line()
-{
-    ostringstream os;
-    METHOD        request_method = r.get_method();
-    os << "HTTP/1.1";
-    switch (request_method)
-    {
-        case (GET): os << SP << OK << SP << "OK"; break;
-        default: break;
-    }
-    return NOT_IMPLEMENTED;
-}
 
-STATUS_CODE Response::generate_response()
+const string Response::generate_response(const Request &req)
 {
+    (void)req;
+    // status = ResponseBuilder::set_status_code();
     DEBUGASSERT("Not yet implemented");
-    ostringstream os;
-
-    return NOT_IMPLEMENTED;
+    return string("");
 }
+
 // deleted copy assignment
 void Response::operator=(const Response &)
 {
