@@ -9,9 +9,27 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
+/* --------------------------------- USING ---------------------------------- */
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::istream;
+using std::map;
+using std::ostream;
+using std::pair;
+using std::string;
+using std::stringstream;
+using std::vector;
+
+
+/* -------------------------------- TYPEDEFS -------------------------------- */
+// clang-format off
+typedef vector<pair<string, string> > vps;
+// clang-format on
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 static std::string ERR_NULL("Socket: null ptr error");
 static std::string ERR_CREAT("Socket: creation failed");
