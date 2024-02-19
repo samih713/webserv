@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "Request.hpp"
 #include <cassert>
 #include <cstddef>
 #include <cstring>
@@ -7,6 +8,8 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+using std::string;
 
 Server &Server::getInstance(int listenerPort, int backlog)
 {
@@ -31,18 +34,27 @@ Server::~Server()
     ::close(_listener.socket_descriptor);
 }
 
-static void handle_connection(fd __attribute__((unused)) recv_socket)
+static void handle_connection(fd recv_socket)
 {
-    assert(false && "not implemented");
-    // char buffer[HTTP::MSG_SIZE];
+    // assert(false && "not implemented");
 
-    // // 0 out the buffer
-    // ::memset(&buffer, 0, HTTP::MSG_SIZE);
+    // sessions manager/connection manager
 
-    // if ((recv(recv_socket, &buffer, HTTP::MSG_SIZE - 1, 0) == -1))
-    //     throw std::runtime_error(strerror(errno));
-    // HTTP::Context message(buffer);
-    // std::cout << message.get_message() << std::endl;
+    // generate a request // simple parsing for now
+    // generate a response // simple building response
+    // connection manager // should disconnect ...
+    // I/O multiplexing // which client to
+    // cgi //
+    // class designed // i think we can start simple
+
+    char buffer[BUFFER_SIZE];
+    int  bytesReceived = recv(recv_socket, &buffer[0], BUFFER_SIZE, 0);
+
+    if (bytesReceived == -1)
+        throw std::runtime_error(strerror(errno));
+
+    string                 message(&buffer[0], &buffer[0] + bytesReceived);
+    webserv::http::Request request(message);
 }
 
 #if 1
