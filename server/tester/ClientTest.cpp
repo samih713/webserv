@@ -1,3 +1,4 @@
+#include "Message.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstring>
@@ -33,15 +34,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // Send a message to the server
-    const char *message = " \
-		GET /path/to/resource HTTP/1.1 \n \
-		Host: yourserver.com \n \
-		X-Custom-Header: Value \n \
-		Connection: close \n \
-		";
-
-    if (send(sockfd, message, strlen(message), 0) < 0)
+    if (send(sockfd, sample_request.c_str(), strlen(sample_request.c_str()), 0) < 0)
     {
         std::cerr << "Failed to send the message. errno: " << errno << std::endl;
         exit(EXIT_FAILURE);
