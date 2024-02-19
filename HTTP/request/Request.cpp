@@ -1,6 +1,8 @@
 #include "Request.hpp"
 #include "debug.hpp"
 #include "enum_utils.tpp"
+#include <ios>
+#include <stdexcept>
 
 using namespace webserv::http;
 
@@ -18,6 +20,22 @@ Request::Request(const Request &other)
     , http_version(other.http_version)
     , header_fields(other.header_fields)
 {}
+
+
+METHOD Request::get_method() const
+{
+    return method;
+}
+
+const vps &Request::get_headers() const
+{
+    return header_fields;
+}
+
+const string &Request::get_resource() const
+{
+    return resource;
+}
 
 namespace webserv
 {
@@ -38,16 +56,11 @@ std::ostream &operator<<(ostream &os, const Request &r)
     os << r.body << std::endl;
     return os;
 }
-
-METHOD Request::get_method() const
-{
-    return method;
-}
+}; // namespace http
+}; // namespace webserv
 
 // deleted copy assigment
 void Request::operator=(const Request &)
 {
     DEBUGASSERT("call to deleted 'Request' copy assignment");
 }
-}; // namespace http
-}; // namespace webserv
