@@ -30,6 +30,10 @@ TEST_DIR:= tester
 TEST_SOCKET:= $(TEST_DIR)/SOCKET_main.cpp
 TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 
+# http request/response directory
+LIBHTTPDIR:= ../HTTP/
+LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
+
 DEP:= $(OBJS:%.o=%.d)
 
 NAME:= libserver.a
@@ -51,6 +55,10 @@ debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
+#libs
+$(LIBHTTP):
+	@make -sC $(LIBHTTPDIR) 
+	
 # tests
 client: debug
 	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
@@ -62,8 +70,8 @@ test_socket: $(TEST_SOCKET) client
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
-test_server: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SERVER) $(NAME) -o $@
+test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
+	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
