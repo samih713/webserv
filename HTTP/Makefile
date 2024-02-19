@@ -19,7 +19,7 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -I../includes/ -Irequest/
+INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/
 
 # REQUESTS
 REQUEST_DIR:= request
@@ -27,7 +27,7 @@ REQUEST_LIST:= Request.cpp parse.cpp
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
 RESPONSE_DIR:= response
-RESPONSE_LIST:= response.cpp
+RESPONSE_LIST:= Response.cpp ResponseBuilder.cpp
 RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
@@ -44,6 +44,9 @@ DEP:= $(OBJS:%.o=%.d)
 NAME:= libhttp.a
 
 all: $(NAME)
+
+run: test_http
+	./test_http
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
@@ -69,8 +72,8 @@ valgrind: all
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./test_http
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
-test_http: $(TEST_HTTP) debug
-	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
+test_http: fclean debug
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
 	@mv *.d objs/
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
