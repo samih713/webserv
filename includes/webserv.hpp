@@ -28,7 +28,7 @@ using std::vector;
 
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
-typedef vector<pair<string, string> > vps;
+typedef vector<pair<string, string> > vsp;
 // clang-format on
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 static std::string ERR_NULL("Socket: null ptr error");

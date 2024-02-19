@@ -8,7 +8,16 @@ using namespace webserv::http;
 
 Request::Request(const string &rawRequest)
     : rawRequest(rawRequest)
-{}
+{
+    try
+    {
+        parse();
+    }
+    catch (std::ios_base::failure &f)
+    {
+        throw std::runtime_error("Invalid request\n");
+    }
+}
 
 Request::~Request()
 {}

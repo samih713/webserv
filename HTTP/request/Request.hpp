@@ -18,7 +18,7 @@ class Request
         Request(const Request &other);
         METHOD          get_method() const;
         const string   &get_resource() const;
-        const vps      &get_headers() const;
+        const vsp      &get_headers() const;
         friend ostream &operator<<(ostream &os, const Request &r);
 
     private:
@@ -29,8 +29,8 @@ class Request
         string resource;
         string http_version;
         // field-line   = field-name ":" OWS field-value OWS
-        vps header_fields;
-        vps trailer_fields;
+        vsp header_fields;
+        vsp trailer_fields;
         // clang-format on
         std::string body;
         // deleted copy assigment
