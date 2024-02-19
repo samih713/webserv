@@ -1,6 +1,8 @@
-#include "../request/Request.hpp"
+#include "Request.hpp"
+#include "ResponseBuilder.hpp"
+// #include "Response.hpp"
 #include <iostream>
-#include <sstream>
+#include <stdexcept>
 
 // TODO
 // [ ] Implement response
@@ -11,47 +13,40 @@
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
-using namespace webserv;
+using namespace webserv::http;
 
 // sample http request
-//
-static const std::string sample_message =
-    "GET /docs/tutorials/linux/shellscripts/howto.html HTTP/1.1\r\n"
-    "Host: Linode.com\r\n"
-    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
-    "Gecko/20091102 Firefox/3.5.5 \r\n"
-    "Accept: text/html,application/xhtml+xml, Accept-Language: en-us\r\n"
-    "Accept-Encoding: gzip,deflate\r\n"
-    "Accept-Charset: ISO-8859-1,utf-8\r\n"
-    "Cache-Control: no-cache\r\n"
-    "\r\n"
-    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit\r\n"
-    "enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet.\r\n"
-    "Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem\r\n"
-    "est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud\r\n"
-    "officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat "
-    "reprehenderit\r\n"
-    "commodo officia dolor Lorem duis laboris cupidatat officia voluptate.\r\n"
-    "Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia "
-    "eiusmod.\r\n"
-    "Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim.\r\n"
-    "Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa "
-    "duis.\r\n"
-    "\r\n";
+
+// check resource ? do i have
+// check does user have permission
+// headers i want?
 
 
 int main()
 {
-#if 1 // parsing test
-    http::Request r(sample_message);
+#if 1 // response test
     try
     {
-        r.parse();
-        std::cout << r;
+        Request         request(sample_request);
+        ResponseBuilder builder(request);
+        builder.get_response();
+        // std::cout << endl << endl << endl << request;
     }
-    catch (std::ios_base::failure &failure)
+    catch (std::runtime_error &e)
     {
-        std::cerr << "Invalid http request" << std::endl;
+        std::cerr << e.what() << std::endl;
+    }
+#endif // response test
+
+#if 0  // parsing test
+    try
+    {
+        Request request(sample_request);
+        std::cout << request;
+    }
+    catch (std::runtime_error &e)
+    {
+        std::cerr << e.what() << std::endl;
     }
 #endif // parsing test
 
