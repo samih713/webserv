@@ -8,7 +8,7 @@ RESET:= \033[0m
 
 CXX:= c++
 CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__ 
 SANITIZE:= -fsanitize=address
 
 ifeq ($(shell uname), Linux)
@@ -27,7 +27,7 @@ REQUEST_LIST:= Request.cpp parse.cpp
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
 RESPONSE_DIR:= response
-RESPONSE_LIST:= Response.cpp ResponseBuilder.cpp
+RESPONSE_LIST:= Response.cpp IRequestHandler.cpp
 RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
@@ -59,7 +59,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p objs objs/request objs/response
 
-debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
@@ -73,7 +73,7 @@ valgrind: all
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
 test_http: fclean debug
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
 	@mv *.d objs/
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
