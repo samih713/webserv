@@ -1,15 +1,16 @@
+#include "IRequestHandler.hpp"
 #include "Request.hpp"
-#include "ResponseBuilder.hpp"
-// #include "Response.hpp"
+#include "Response.hpp"
 #include <iostream>
 #include <stdexcept>
 
 // TODO
-// [ ] Implement response
+// [ ] finish up the resource handling for get-requests
 // [ ] Implement logging
 // [ ] Implement unit-testing (with a testing framework)
-// [ ] solve linkage issue (with data)
 // [ ] strict space parsing (only 1 space)
+// [ ] solve linkage issue (with data)
+// [x] Implement response
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
@@ -27,10 +28,12 @@ int main()
 #if 1 // response test
     try
     {
-        Request         request(sample_request);
-        ResponseBuilder builder(request);
-        builder.get_response();
-        // std::cout << endl << endl << endl << request;
+        Request          request(sample_request);
+        IRequestHandler *handler =
+            RequestHandlerFactory::MakeRequestHandler(request.get_method());
+        Response response = handler->handle_request(request);
+        response.write_response(cout);
+        delete handler;
     }
     catch (std::runtime_error &e)
     {

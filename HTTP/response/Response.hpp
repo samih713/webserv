@@ -1,8 +1,6 @@
 #include "Message.hpp"
 #include "Request.hpp"
 #include "webserv.hpp"
-#include <sstream>
-#include <string>
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
@@ -15,17 +13,20 @@ namespace http
 class Response
 {
     public:
-        Response(STATUS_CODE status, vsp headers, string body);
+        Response(STATUS_CODE status, const vsp &headers, const vector<char> &body);
         ~Response();
         Response(const Response &other);
-        const string generate_response(const Request &req);
+        void write_response(ostream &outFile) const;
 
     private:
-        STATUS_CODE status;
-        vsp         headers;
-        string      body;
+        STATUS_CODE  status;
+        vsp          headers;
+        vector<char> body;
         // deleted copy assignment
         void operator=(const Response &);
+        // response constants
+        static const string &server_header_value;
+        static const string &version;
 };
 
 };     // http
