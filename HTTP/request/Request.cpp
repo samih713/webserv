@@ -1,8 +1,7 @@
 #include "Request.hpp"
 #include "debug.hpp"
 #include "enum_utils.tpp"
-#include <ios>
-#include <stdexcept>
+#include "webserv.hpp"
 
 using namespace webserv::http;
 
@@ -36,7 +35,7 @@ METHOD Request::get_method() const
     return method;
 }
 
-const vps &Request::get_headers() const
+const vsp &Request::get_headers() const
 {
     return header_fields;
 }

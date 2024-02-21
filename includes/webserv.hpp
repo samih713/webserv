@@ -8,23 +8,28 @@
 #include "debug.hpp"
 #include <algorithm>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
+#include <sstream>
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::fstream;
+using std::ifstream;
 using std::istream;
 using std::map;
+using std::ofstream;
 using std::ostream;
+using std::ostringstream;
 using std::pair;
 using std::string;
 using std::stringstream;
 using std::vector;
-
 
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
