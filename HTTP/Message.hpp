@@ -38,6 +38,69 @@ enum METHOD
 #undef X
 
 /* ---------------------------- STATUS_CODE ENUM ---------------------------- */
+#define STATUS_CODE_LIST                                                                 \
+    X(CONTINUE)                                                                          \
+    X(SWITCHING_PROTOCOLS)                                                               \
+    X(PROCESSING)                                                                        \
+    X(EARLY_HINTS)                                                                       \
+    X(OK)                                                                                \
+    X(CREATED)                                                                           \
+    X(ACCEPTED)                                                                          \
+    X(NON_AUTHORITATIVE_INFORMATION)                                                     \
+    X(NO_CONTENT)                                                                        \
+    X(RESET_CONTENT)                                                                     \
+    X(PARTIAL_CONTENT)                                                                   \
+    X(MULTI_STATUS)                                                                      \
+    X(ALREADY_REPORTED)                                                                  \
+    X(IM_USED)                                                                           \
+    X(MULTIPLE_CHOICES)                                                                  \
+    X(MOVED_PERMANENTLY)                                                                 \
+    X(FOUND)                                                                             \
+    X(SEE_OTHER)                                                                         \
+    X(NOT_MODIFIED)                                                                      \
+    X(USE_PROXY)                                                                         \
+    X(TEMPORARY_REDIRECT)                                                                \
+    X(PERMANENT_REDIRECT)                                                                \
+    X(BAD_REQUEST)                                                                       \
+    X(UNAUTHORIZED)                                                                      \
+    X(PAYMENT_REQUIRED)                                                                  \
+    X(FORBIDDEN)                                                                         \
+    X(NOT_FOUND)                                                                         \
+    X(METHOD_NOT_ALLOWED)                                                                \
+    X(NOT_ACCEPTABLE)                                                                    \
+    X(PROXY_AUTHENTICATION_REQUIRED)                                                     \
+    X(REQUEST_TIMEOUT)                                                                   \
+    X(CONFLICT)                                                                          \
+    X(GONE)                                                                              \
+    X(LENGTH_REQUIRED)                                                                   \
+    X(PRECONDITION_FAILED)                                                               \
+    X(PAYLOAD_TOO_LARGE)                                                                 \
+    X(URI_TOO_LONG)                                                                      \
+    X(UNSUPPORTED_MEDIA_TYPE)                                                            \
+    X(RANGE_NOT_SATISFIABLE)                                                             \
+    X(EXPECTATION_FAILED)                                                                \
+    X(IM_A_TEAPOT)                                                                       \
+    X(MISDIRECTED_REQUEST)                                                               \
+    X(UNPROCESSABLE_ENTITY)                                                              \
+    X(LOCKED)                                                                            \
+    X(FAILED_DEPENDENCY)                                                                 \
+    X(TOO_EARLY)                                                                         \
+    X(UPGRADE_REQUIRED)                                                                  \
+    X(PRECONDITION_REQUIRED)                                                             \
+    X(TOO_MANY_REQUESTS)                                                                 \
+    X(REQUEST_HEADER_FIELDS_TOO_LARGE)                                                   \
+    X(UNAVAILABLE_FOR_LEGAL_REASONS)                                                     \
+    X(INTERNAL_SERVER_ERROR)                                                             \
+    X(NOT_IMPLEMENTED)                                                                   \
+    X(BAD_GATEWAY)                                                                       \
+    X(SERVICE_UNAVAILABLE)                                                               \
+    X(GATEWAY_TIMEOUT)                                                                   \
+    X(HTTP_VERSION_NOT_SUPPORTED)                                                        \
+    X(VARIANT_ALSO_NEGOTIATES)                                                           \
+    X(INSUFFICIENT_STORAGE)                                                              \
+    X(LOOP_DETECTED)                                                                     \
+    X(NOT_EXTENDED)
+
 enum STATUS_CODE
 {
     CONTINUE = 100,
@@ -343,9 +406,10 @@ static const std::map<std::string, int> fieldNameList(init_values,
 }; // namespace http
 }; // namespace webserv
 
+// "GET /docs/tutorials/linux/shellscripts/howto.html HTTP/1.1\r\n" // request-line
 static const std::string sample_request =
-    "GET /docs/tutorials/linux/shellscripts/howto.html HTTP/1.1\r\n" // request-line
-    "Host: Linode.com\r\n"                                           // headers fields
+    "GET ../resources/sample_pages/index.html HTTP/1.1\r\n" // request-line
+    "Host: Linode.com\r\n"                                  // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
     "Gecko/20091102 Firefox/3.5.5 \r\n"
     "Accept-Encoding: gzip,deflate\r\n"
