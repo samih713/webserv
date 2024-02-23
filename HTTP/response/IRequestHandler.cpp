@@ -1,36 +1,41 @@
 #include "IRequestHandler.hpp"
+#include "FileType.hpp"
 #include "Message.hpp"
 #include "debug.hpp"
 #include "webserv.hpp"
+#include <algorithm>
+#include <cstring>
 #include <ios>
 #include <stdexcept>
+#include <utility>
 
 using namespace webserv::http;
 
-struct FindKey
+// parse accepted formats
+
+inline const string find_resource_type(const string &resource)
 {
-        FindKey(const string &key)
-            : key(key){};
-        bool operator()(const pair<string, string> &header)
-        {
-            return header.first == key;
-        }
-
-    private:
-        const string &key;
-};
-
+    size_t extension_index = resource.find_last_of('.');
+    string file_extension;
+    if (extension_index != string::npos)
+        file_extension = resource.substr(extension_index + 1);
+    else
+        file_extension = "";
+    return (fileTypes.find(file_extension)->second);
+}
 
 const vector<char> GetRequestHandler::get_resource(const string &resource,
                                                    const vsp    &headers)
 {
     (void)headers;
     string       temp = "";
+    string       resource_type = "";
     vector<char> body;
 
     // try to locate the resource
-
-    // parse accepted formats
+    resource_type = find_resource_type(resource);
+    if (resource_type.length() != 0)
+        add_header(std::make_pair<string, string>("Content-Type", resource_type));
 
     /* need to build resource location from the
      * root directory in server configuration
@@ -95,5 +100,12 @@ Response GetRequestHandler::handle_request(const Request &request)
         // empty out the body if anything
         body.clear();
     }
-    return Response(status, request_headers, body);
+    return Response(status, response_headers, body);
+}
+
+// utils
+
+void IRequestHandler::add_header(const pair<string, string> header_field)
+{
+    response_headers.push_back(header_field);
 }

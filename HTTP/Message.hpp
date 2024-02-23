@@ -1,10 +1,7 @@
+#include "webserv.hpp"
+
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
-
-#include <map>
-#include <string>
-
-using std::string;
 
 namespace webserv
 {
@@ -399,9 +396,8 @@ static const std::pair<std::string, int> init_values[] = {
     std::make_pair("*", 228),
 };
 
-static const std::map<std::string, int> fieldNameList(init_values,
-                                                      init_values +
-                                                          sizeof(init_values) /
+static const map<string, int> fieldNameList(init_values,
+                                            init_values + sizeof(init_values) /
                                                               sizeof(init_values[0]));
 }; // namespace http
 }; // namespace webserv

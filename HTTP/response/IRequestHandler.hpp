@@ -1,3 +1,4 @@
+#include "FindHeaderKey.hpp"
 #include "Message.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
@@ -18,6 +19,11 @@ class IRequestHandler
             DEBUG_MSG("IRequestHandler destructor called", M);
         };
         virtual Response handle_request(const Request &request) = 0;
+        void             add_header(pair<string, string> header_field);
+
+        STATUS_CODE  status;
+        vector<char> body;
+        vsp          response_headers;
 };
 
 // concrete types
@@ -31,12 +37,8 @@ class GetRequestHandler : public IRequestHandler
         Response handle_request(const Request &request);
 
     private:
-        void               add_header(pair<string, string> header_field);
         const vector<char> get_resource(const string &resource, const vsp &headers);
         // data members
-        STATUS_CODE  status;
-        vector<char> body;
-        vsp          response_headers;
 };
 
 class RequestHandlerFactory
