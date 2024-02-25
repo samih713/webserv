@@ -18,7 +18,7 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -Isocket/ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/
+INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
 
@@ -31,7 +31,7 @@ TEST_SOCKET:= $(TEST_DIR)/SOCKET_main.cpp
 TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 
 # http request/response directory
-LIBHTTPDIR:= ../HTTP/
+LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)

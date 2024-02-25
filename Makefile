@@ -27,7 +27,7 @@ OBJS:= $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
 
 DEP:= $(OBJS:%.o=%.d)
 
-LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser
+LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser -Lhttp/ -Lhttp
 
 NAME:= webserv
 
@@ -55,6 +55,7 @@ debug: all
 tests:
 	@make tests -sC parser/
 	@make tests -sC server/
+	@make tests -sC http/
 	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
 
 parser:
@@ -64,7 +65,7 @@ server:
 	@make -sC server/
 
 http:
-	@make -sC HTTP/
+	@make -sC http/
 
 clean:
 	@$(RM) $(OBJS_DIR) *.o
