@@ -3,6 +3,7 @@ name: Compilation Check
 on:
   push:
     branches:
+      - main
       - server/*
       - conf-parser
 
