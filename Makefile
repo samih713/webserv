@@ -71,12 +71,14 @@ clean:
 	@$(RM) $(OBJS_DIR) *.o
 	@make clean -sC parser/ > /dev/null 2>&1
 	@make clean -sC server/ > /dev/null 2>&1
+	@make clean -sC http/ > /dev/null 2>&1
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
 	@$(RM) $(NAME)
 	@make fclean -sC parser/ > /dev/null 2>&1
 	@make fclean -sC server/ > /dev/null 2>&1
+	@make fclean -sC http/ > /dev/null 2>&1
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries.\n"
 
 -include $(DEP)

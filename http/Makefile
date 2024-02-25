@@ -23,7 +23,7 @@ INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/
 
 # REQUESTS
 REQUEST_DIR:= request
-REQUEST_LIST:= Request.cpp parse.cpp
+REQUEST_LIST:= parse.cpp Request.cpp 
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
 RESPONSE_DIR:= response
