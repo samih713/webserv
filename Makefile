@@ -36,7 +36,7 @@ all: $(NAME)
 run: re
 	./$(NAME)
 
-$(NAME): parser server $(OBJS)
+$(NAME): parser server http $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready.\n"
 
@@ -63,6 +63,9 @@ parser:
 server:
 	@make -sC server/
 
+http:
+	@make -sC HTTP/
+
 clean:
 	@$(RM) $(OBJS_DIR) *.o
 	@make clean -sC parser/ > /dev/null 2>&1
@@ -79,4 +82,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: clean fclean all re tests server parser debug run
+.PHONY: clean fclean all re tests server parser http debug run
