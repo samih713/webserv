@@ -1,6 +1,6 @@
 #include "Request.hpp"
 #include "debug.hpp"
-#include "enum_utils.tpp"
+#include "enum_utils.hpp"
 #include "webserv.hpp"
 
 using namespace webserv::http;
