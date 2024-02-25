@@ -1,0 +1,25 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-Wall",
+      "-Werror",
+      "-Wextra",
+      "-std=c++98",
+      "-D__LINUX__",
+      "-I./",
+      "-Isocket/",
+      "-I../includes/",
+      "-I../HTTP/",
+      "-I../HTTP/request/",
+      "-I../HTTP/response/",
+      "-c",
+      "-o",
+      "objects/Server.o",
+      "Server.cpp"
+    ],
+    "directory": "/home/eva001/42/webserv/server",
+    "file": "/home/eva001/42/webserv/server/Server.cpp",
+    "output": "/home/eva001/42/webserv/server/objects/Server.o"
+  }
+]

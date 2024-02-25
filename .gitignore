@@ -1,3 +1,13 @@
-.clang-format
 .vscode/
-
+*/objects/
+*/.cache/
+.cache/
+*.o
+libserver.a
+libparser.a
+webserv
+test_parser
+test_server
+test_socket
+client
+*.d
