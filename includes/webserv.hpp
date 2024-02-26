@@ -1,6 +1,18 @@
 #ifndef WEBSERV_HPP
 #define WEBSERV_HPP
 
+/* ---------------------------------- TODO ---------------------------------- */
+
+// [ ] finish up the resource handling for get-requests
+// [ ] Implement logging
+// [ ] Implement unit-testing (with a testing framework)
+// [ ] strict space parsing (only 1 space)
+// [ ] solve linkage issue (with data)
+// [x] Implement response
+// [x] set the stream to throw exception on fail
+// [x] sometimes segfaults when parsing, keep repeating to reproduce
+
+
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
@@ -14,6 +26,7 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 /* --------------------------------- USING ---------------------------------- */
