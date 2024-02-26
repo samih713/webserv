@@ -1,6 +1,7 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include "webserv.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -38,7 +39,7 @@ int main()
     }
     catch (std::runtime_error &e)
     {
-        std::cerr << e.what() << std::endl;
+        cerr << e.what() << std::endl;
     }
 #endif // response test
 
