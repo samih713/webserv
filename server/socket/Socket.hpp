@@ -1,3 +1,4 @@
+#include "../../includes/webserv.hpp"
 #include <cerrno>
 #include <cstring>
 #include <exception>
@@ -6,14 +7,6 @@
 #include <sstream>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "../../includes/webserv.hpp"
-
-// TODO // [P]artially implemented, needs [I]mprovement, [X] done
-//
-// [I] make a unit-tester main
-// [ ] add shutdown functionality (block recv, block send, close())
-// [ ] fix the get_fd functionality is it really necessary
-// [ ] split-up function implementations into their own files
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
@@ -28,9 +21,6 @@ static const int SOCK_FLAG = O_NONBLOCK;
 #else
 static const int SOCK_FLAG = 0;
 #endif
-
-// socket_descriptor type
-typedef int fd;
 
 class Socket
 {
@@ -94,8 +84,11 @@ class Socket
         mutable bool is_listening;
 
         // deleted but can't cause is 98 maguy
-        Socket(const Socket &) {};
-        Socket &operator=(const Socket &) { return *this; };
+        Socket(const Socket &){};
+        Socket &operator=(const Socket &)
+        {
+            return *this;
+        };
 };
 
 #endif // SOCKET_HPP

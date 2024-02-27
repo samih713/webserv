@@ -2,15 +2,7 @@
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
-
-// TODO // [P]artially implemented, needs [I]mprovement, [X] done
 //
-// [ ] handle the connection
-// [ ] first determine if its a read or write
-// [ ] if read (set the buffer_size) splite the request into
-// [ ] if write send
-// [ ] implement different strategies
-
 // constants
 static const std::string wait_message("Server is now waiting for connections...\n");
 // buffer size

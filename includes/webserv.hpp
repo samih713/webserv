@@ -3,15 +3,23 @@
 
 /* ---------------------------------- TODO ---------------------------------- */
 
+// SOCKETS
+// [ ] add shutdown functionality (block recv, block send, close())
+
+// SERVER
+// [ ] handle the connection
+// [ ] sessions manager/connection manager // should disconnect ...
 // [ ] finish up the resource handling for get-requests
-// [ ] Implement logging
-// [ ] Implement unit-testing (with a testing framework)
 // [ ] strict space parsing (only 1 space)
 // [ ] solve linkage issue (with data)
 // [x] Implement response
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
+// [ ] logging
+// [ ] split-up function implementations into their own files
+// [ ] different strategies
+// [ ] testing (with a testing framework)
 
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
@@ -28,6 +36,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <vector>
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
@@ -49,6 +59,8 @@ using std::vector;
 // clang-format off
 typedef vector<pair<string, string> > vsp;
 // clang-format on
+// socket_descriptor type
+typedef int fd;
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 static std::string ERR_NULL("Socket: null ptr error");
 static std::string ERR_CREAT("Socket: creation failed");

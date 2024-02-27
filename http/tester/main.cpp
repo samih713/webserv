@@ -7,9 +7,6 @@
 
 using namespace webserv::http;
 
-// check resource ? do i have
-// check does user have permission
-
 int main()
 {
 #if 1 // response test
