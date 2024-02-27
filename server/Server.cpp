@@ -78,11 +78,11 @@ void Server::__select_strat()
         if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0 && (errno = 2))
             throw std::runtime_error(strerror(errno));
 
-        for (int i = 0; i < FD_SETSIZE; i++)
+        for (fd recv_socket = 0; recv_socket < FD_SETSIZE; recv_socket++)
         {
-            if (FD_ISSET(i, &ready_sockets))
+            if (FD_ISSET(recv_socket, &ready_sockets))
             {
-                if (i == _listenerFD)
+                if (recv_socket == _listenerFD)
                 {
                     fd client_socket = _listener.accept();
                     FD_SET(client_socket, &current_sockets);
@@ -90,8 +90,8 @@ void Server::__select_strat()
                 else
                 {
                     DEBUG_MSG("reading from connection", M);
-                    handle_connection(i);
-                    FD_CLR(i, &current_sockets);
+                    handle_connection(recv_socket);
+                    FD_CLR(recv_socket, &current_sockets);
                 }
             }
         }
