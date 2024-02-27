@@ -51,7 +51,9 @@ namespace http
 {
 std::ostream &operator<<(ostream &os, const Request &r)
 {
-    os << "Method: " << enumToString(r.method) << std::endl;
+    // os << "Method: " << enumToString(r.method) << std::endl;
+    os << "Method: "
+       << "get" << std::endl;
     os << "Request-Target: " << r.resource << std::endl;
     os << "HTTP-Version: " << r.http_version << std::endl;
     os << "************ fields *************\n";
