@@ -1,13 +1,16 @@
 #include "Server.hpp"
+#include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include <cassert>
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
 #include <netinet/in.h>
 #include <stdexcept>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 using std::string;
 
@@ -36,17 +39,6 @@ Server::~Server()
 
 static void handle_connection(fd recv_socket)
 {
-    // assert(false && "not implemented");
-
-    // sessions manager/connection manager
-
-    // generate a request // simple parsing for now
-    // generate a response // simple building response
-    // connection manager // should disconnect ...
-    // I/O multiplexing // which client to
-    // cgi //
-    // class designed // i think we can start simple
-
     char buffer[BUFFER_SIZE];
     int  bytesReceived = recv(recv_socket, &buffer[0], BUFFER_SIZE, 0);
 
@@ -55,6 +47,13 @@ static void handle_connection(fd recv_socket)
 
     string                 message(&buffer[0], &buffer[0] + bytesReceived);
     webserv::http::Request request(message);
+    IRequestHandler       *handler =
+        RequestHandlerFactory::MakeRequestHandler(request.get_method());
+    Response response = handler->handle_request(request);
+
+    response.write_response(recv_socket);
+
+    delete handler;
 }
 
 #if 1
