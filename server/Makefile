@@ -4,7 +4,6 @@ INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
 
-OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -44,17 +43,17 @@ $(LIBHTTP):
 # tests
 client: debug
 	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
 	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
 	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
 tests: test_socket test_server

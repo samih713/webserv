@@ -4,7 +4,6 @@ INCLUDES:= -I./ -I../includes/
 
 SRCS:= ConfigParser.cpp
 
-OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -46,7 +45,7 @@ valgrind: all
 
 test_parser: $(TEST_PARSER) debug
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_PARSER) $(NAME) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
 
 tests: test_parser

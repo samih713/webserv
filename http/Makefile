@@ -13,7 +13,6 @@ RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
 
-OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -38,7 +37,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objs objs/request objs/response
+	@mkdir -p $(OBJS_DIR) $(OBJS_DIR)/request $(OBJS_DIR)/response
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: all
@@ -55,7 +54,7 @@ valgrind: all
 
 test_http: fclean debug
 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
-	@mv *.d objs/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
 

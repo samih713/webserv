@@ -19,3 +19,5 @@ else ifeq ($(shell uname), Darwin)
 endif
 
 RM:= rm -rf
+
+OBJS_DIR:= objects

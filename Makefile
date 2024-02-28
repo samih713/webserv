@@ -4,8 +4,7 @@ INCLUDES:= -I./includes
 
 SRCS:= main.cpp
 
-OBJS_DIR:= objects
-OBJS:= $(SRCS:%.cpp=$(OBJS_DIR)/%.o)
+OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 DEP:= $(OBJS:%.o=%.d)
 
