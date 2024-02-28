@@ -1,18 +1,5 @@
 include ../common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ 
-SANITIZE:= -fsanitize=address
-
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
-
-RM:= rm -rf
-
 INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/
 
 # REQUESTS

@@ -1,17 +1,5 @@
 include common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
-
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
-
-RM:= rm -rf
-
 INCLUDES:= -I./includes
 
 SRCS:= main.cpp
