@@ -42,17 +42,17 @@ $(LIBHTTP):
 	
 # tests
 client: debug
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
