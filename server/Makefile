@@ -2,7 +2,7 @@ include ../common.mk
 
 INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
 
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
@@ -38,8 +38,8 @@ debug: all
 
 #libs
 $(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) 
-	
+	@make -sC $(LIBHTTPDIR)
+
 # tests
 client: debug
 	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
