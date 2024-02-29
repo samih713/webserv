@@ -1,7 +1,7 @@
 #include "Message.hpp"
 #include "Request.hpp"
 #include "debug.hpp"
-#include "enum_utils.tpp"
+#include "enum_utils.hpp"
 #include <ios>
 #include <iostream>
 #include <sstream>

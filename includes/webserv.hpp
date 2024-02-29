@@ -2,7 +2,9 @@
 #define WEBSERV_HPP
 
 /* --------------------------------- MACROS --------------------------------- */
-#define to_str(name) #name
+#define ws_tostr(name) #name
+#define ws_itoa(number)                                                                  \
+    static_cast<std::ostringstream &>((std::ostringstream() << std::dec << number)).str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
@@ -11,10 +13,9 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-
-#include <sstream>
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
 using std::cout;

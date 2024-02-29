@@ -5,6 +5,7 @@
 *.o
 libserver.a
 libparser.a
+libhttp.a
 webserv
 test_parser
 test_server

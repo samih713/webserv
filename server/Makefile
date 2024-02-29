@@ -1,28 +1,11 @@
-###	COLORS ####
-BLUE:= \033[1;34m
-GREEN:= \033[1;32m
-MAGENTA:= \033[1;35m
-RED:= \033[1;31m
-YELLOW:= \033[1;33m
-RESET:= \033[0m
+include ../common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
+NAME:= libserver.a
 
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
+INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
 
-RM:= rm -rf
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
-INCLUDES:= -I./ -Isocket/ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/
-
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
-
-OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -31,12 +14,10 @@ TEST_SOCKET:= $(TEST_DIR)/SOCKET_main.cpp
 TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 
 # http request/response directory
-LIBHTTPDIR:= ../HTTP/
+LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
-
-NAME:= libserver.a
 
 all: $(NAME)
 
@@ -57,22 +38,22 @@ debug: all
 
 #libs
 $(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) 
-	
+	@make -sC $(LIBHTTPDIR)
+
 # tests
 client: debug
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
-	@mv *.d objects/
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
-	@mv *.d objects/
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
-	@mv *.d objects/
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
 tests: test_socket test_server

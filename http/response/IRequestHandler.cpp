@@ -1,24 +1,28 @@
 #include "IRequestHandler.hpp"
+#include "FileType.hpp"
 #include "Message.hpp"
 #include "debug.hpp"
 #include "webserv.hpp"
+#include <algorithm>
+#include <cstring>
 #include <ios>
 #include <stdexcept>
+#include <utility>
 
 using namespace webserv::http;
 
-struct FindKey
-{
-        FindKey(const string &key)
-            : key(key){};
-        bool operator()(const pair<string, string> &header)
-        {
-            return header.first == key;
-        }
+// parse accepted formats
 
-    private:
-        const string &key;
-};
+inline const string find_resource_type(const string &resource)
+{
+    size_t extension_index = resource.find_last_of('.');
+    string file_extension;
+    if (extension_index != string::npos)
+        file_extension = resource.substr(extension_index + 1);
+    else
+        file_extension = "";
+    return (fileTypes.find(file_extension)->second);
+}
 
 
 const vector<char> GetRequestHandler::get_resource(const string &resource,
@@ -26,11 +30,9 @@ const vector<char> GetRequestHandler::get_resource(const string &resource,
 {
     (void)headers;
     string       temp = "";
+    string       resource_type = "";
     vector<char> body;
 
-    // try to locate the resource
-
-    // parse accepted formats
 
     /* need to build resource location from the
      * root directory in server configuration
@@ -53,17 +55,23 @@ const vector<char> GetRequestHandler::get_resource(const string &resource,
      * authentication function goes here for the requested resource
      * */
 
-    /* not a directory or how are directories handled
-     * */
+    /* not a directory or how are directories handled */
 
-    /* determine type for content-type in header_field
-     * */
+    /* determine type for content-type in header_field */
+    resource_type = find_resource_type(resource);
+    if (resource_type.length() != 0)
+        add_header(std::make_pair<string, string>("Content-Type", resource_type));
+    // default header server name
+    add_header(std::make_pair<string, string>("Server", "The Wired"));
+    // order of the headers
 
-    /* determine content length
-     * */
+    /* determine content length */
+    resource_file.seekg(0, std::ios_base::end);
+    size_t resource_size = resource_file.tellg();
+    add_header(std::make_pair<string, string>("Content-length", ws_itoa(resource_size)));
+    resource_file.seekg(0, std::ios_base::beg);
 
-    /* caching control
-     * */
+    /* caching control */
 
     /* compression/encoding
      * */
@@ -73,6 +81,7 @@ const vector<char> GetRequestHandler::get_resource(const string &resource,
 
     body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                         std::istreambuf_iterator<char>());
+    status = OK;
     return body;
 }
 
@@ -85,8 +94,6 @@ Response GetRequestHandler::handle_request(const Request &request)
     try
     {
         body = get_resource(request.get_resource(), request_headers);
-        // if no issues set status
-        status = OK;
     }
     catch (std::runtime_error &re)
     {
@@ -95,5 +102,7 @@ Response GetRequestHandler::handle_request(const Request &request)
         // empty out the body if anything
         body.clear();
     }
-    return Response(status, request_headers, body);
+    return Response(status, response_headers, body);
 }
+
+// utils

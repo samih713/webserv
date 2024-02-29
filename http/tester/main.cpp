@@ -1,6 +1,7 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+#include "webserv.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -20,8 +21,9 @@ using namespace webserv::http;
 
 // check resource ? do i have
 // check does user have permission
-// headers i want?
 
+// tanvir
+// headers i want?
 
 int main()
 {
@@ -37,7 +39,7 @@ int main()
     }
     catch (std::runtime_error &e)
     {
-        std::cerr << e.what() << std::endl;
+        cerr << e.what() << std::endl;
     }
 #endif // response test
 

@@ -1,6 +1,6 @@
 #include "Request.hpp"
 #include "debug.hpp"
-#include "enum_utils.tpp"
+#include "enum_utils.hpp"
 #include "webserv.hpp"
 
 using namespace webserv::http;
@@ -51,7 +51,7 @@ namespace http
 {
 std::ostream &operator<<(ostream &os, const Request &r)
 {
-    os << "Method: " << webserv::enumToString(r.method) << std::endl;
+    os << "Method: " << enumToString(r.method) << std::endl;
     os << "Request-Target: " << r.resource << std::endl;
     os << "HTTP-Version: " << r.http_version << std::endl;
     os << "************ fields *************\n";
