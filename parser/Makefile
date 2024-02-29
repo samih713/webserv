@@ -1,5 +1,7 @@
 include ../common.mk
 
+NAME:= libparser.a
+
 INCLUDES:= -I./ -I../includes/
 
 SRCS:= ConfigParser.cpp
@@ -10,12 +12,10 @@ OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
-DEP:= $(OBJS:%.o=%.d)
-
 CONFIG_DIR:= json
 CONFIG_FILES:= $(CONFIG_DIR)/config_sample.json $(CONFIG_DIR)/simple.json
 
-NAME:= libparser.a
+DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
 

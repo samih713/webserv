@@ -1,5 +1,7 @@
 include ../common.mk
 
+NAME:= libhttp.a
+
 INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/
 
 # REQUESTS
@@ -20,8 +22,6 @@ TEST_DIR:= tester
 TEST_HTTP:= $(TEST_DIR)/main.cpp
 
 DEP:= $(OBJS:%.o=%.d)
-
-NAME:= libhttp.a
 
 all: $(NAME)
 

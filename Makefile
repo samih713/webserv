@@ -1,16 +1,16 @@
 include common.mk
 
+NAME:= webserv
+
 INCLUDES:= -I./includes
 
 SRCS:= main.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
+LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser -Lhttp/ -lhttp
+
 DEP:= $(OBJS:%.o=%.d)
-
-LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser -Lhttp/ -Lhttp
-
-NAME:= webserv
 
 all: $(NAME)
 
@@ -26,7 +26,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects
+	@mkdir -p $(OBJS_DIR)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all

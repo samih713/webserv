@@ -1,5 +1,7 @@
 include ../common.mk
 
+NAME:= libserver.a
+
 INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
@@ -16,8 +18,6 @@ LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
-
-NAME:= libserver.a
 
 all: $(NAME)
 
