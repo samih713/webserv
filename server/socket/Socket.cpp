@@ -8,7 +8,6 @@
 #include <sys/types.h>
 
 /*  [CONSTRUCTORS] */
-
 Socket::Socket(int family, int type, int protocol, int flags)
     : socket_descriptor(invalid_file_descriptor)
     , is_bound(false)
@@ -66,8 +65,6 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
     std::memset(&address, 0, sizeof(address));
 }
 
-/* [DESTRUCTOR] */
-
 Socket::~Socket()
 {
     DEBUG_MSG("socket fd[" << socket_descriptor << "] closed!!", R);
@@ -75,7 +72,6 @@ Socket::~Socket()
     if (socket_descriptor != invalid_file_descriptor)
     {
         close(socket_descriptor);
-        // invalidate the filedescriptor
         socket_descriptor = invalid_file_descriptor;
     }
 }
@@ -88,8 +84,6 @@ void Socket::set_port(int port)
 {
     if (port < 0 || port > 65535)
         throw Socket::Exception("Invalid Socket descriptor\n");
-
-    // set the port number in address struct
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
 
@@ -100,14 +94,9 @@ fd Socket::get_fd() const throw()
 
 void Socket::bind() const
 {
-    int status = ::bind(socket_descriptor, (struct sockaddr *)&address, sizeof(address));
-    if (status == -1)
+    if (::bind(socket_descriptor, (struct sockaddr *)&address, sizeof(address)) == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_BIND));
     is_bound = true;
-
-    DEBUG_MSG("Socket was bound successfully to port["
-                  << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n",
-              B);
 }
 
 void Socket::listen(int backlog) const
@@ -115,34 +104,34 @@ void Socket::listen(int backlog) const
     if (!is_bound)
         throw Socket::Exception(Exception::compose_msg(ERR_NBIND));
 
-    int status = ::listen(socket_descriptor, backlog);
-
-    if (status == -1)
+    if (::listen(socket_descriptor, backlog) == -1)
         throw Socket::Exception(Exception::compose_msg(ERR_LIST));
     is_listening = true;
-
-    DEBUG_MSG("Socket listen was successful, ["
-                  << socket_descriptor << "] is now ready to accept max backlog of ["
-                  << backlog << "] connections\n",
-              M);
 }
 
-
+/**
+ * Accepts a new incoming connection on the listening socket.
+ *
+ * This function checks if the socket is currently in a listening state. If not, it throws
+ * a Socket::Exception with an error message.
+ *
+ * @return fd The file descriptor of the newly accepted connection.
+ *
+ * @throws Socket::Exception If the socket is not in a listening state or if an error
+ * occurs during the accept() system call.
+ */
 fd Socket::accept()
 {
-    // check if socket is listening
     if (!is_listening)
         throw Socket::Exception(Exception::compose_msg(ERR_NLIST));
 
     // This structure is filled in with the address of the peer socket,
-    // as known to the communications layer.
     struct sockaddr peer_info; // does this need to be stored?
     socklen_t       peer_length = sizeof(peer_info);
 
     // The accept() system call is used with connection-based socket types (SOCK_STREAM,
     // SOCK_SEQPACKET).
     // it extracts the first pending connection request in the backlog que form listen.
-    // creates a new connected socket, and returns a new file descriptor
     fd connected_socket;
     connected_socket = ::accept(socket_descriptor, &peer_info, &peer_length);
     if (connected_socket == invalid_file_descriptor)
@@ -150,11 +139,6 @@ fd Socket::accept()
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
         if (errno != EAGAIN && errno != EWOULDBLOCK)
             throw Socket::Exception(Exception::compose_msg(ERR_ACCP));
-
-        DEBUG_MSG("Socket has no incoming connections", D);
     }
-
-    DEBUG_MSG("Socket accepted a connection from", W);
-
     return connected_socket;
 }

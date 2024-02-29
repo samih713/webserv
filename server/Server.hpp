@@ -2,47 +2,48 @@
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
-//
+
 // constants
 static const std::string wait_message("Server is now waiting for connections...\n");
 // buffer size
 static const int BUFFER_SIZE = 4096;
+// set fd size only for testing
+#if 1
+#undef FD_SETSIZE
+#define FD_SETSIZE 24
+#endif
 
 // different polling strategies
 enum polling_strat
 {
-    KQUEUE, // "KQUEUE"
-    SELECT, // "SELECT"
-    POLL,   // "POLL"
-    EPOLL   // "EPOLL"
+    KQUEUE,
+    SELECT,
+    POLL,
+    EPOLL
 };
 
-// simple singleton implementation
 class Server
 {
     protected:
         Server(fd listener_port, int backlog);
 
     public:
-        // this function needs to be static, there won't be an instance of a Server
-        // when its first created
         static Server &getInstance(fd listener_port, int backlog);
-        void           start(enum polling_strat);
         ~Server();
-
-        // member functions
-        void recv();
-        // void send(const char *msg);
-        // void getpeer(struct sockaddr &address);
+        void start(enum polling_strat);
 
     private:
-        TCPSocket       _listener;
-        fd              _listenerFD;
-        int             _listener_port;
-        std::vector<fd> _connections;
+        TCPSocket  listener;
+        vector<fd> connections;
+        string     root_dir;
+        fd         listener_fd;
+        int        listener_port;
 
-        // polling strats
-        void __select_strat();
+
+        void select_strat();
+        // void kqueue_strat();
+        // void poll_strat();
+        // void epoll_strat();
 
         // deleted
         Server(const Server &){};
