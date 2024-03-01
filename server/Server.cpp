@@ -65,15 +65,21 @@ static void handle_connection(fd recv_socket)
     if (bytesReceived == -1)
         throw std::runtime_error(strerror(errno));
 
-    string                 message(&buffer[0], &buffer[0] + bytesReceived);
-    webserv::http::Request request(message);
-    IRequestHandler       *handler =
-        RequestHandlerFactory::MakeRequestHandler(request.get_method());
-    Response response = handler->handle_request(request);
+    string message(&buffer[0], &buffer[0] + bytesReceived);
+    try
+    {
+        Request          request(message);
+        IRequestHandler *handler =
+            RequestHandlerFactory::MakeRequestHandler(request.get_method());
+        Response response = handler->handle_request(request);
 
-    response.write_response(recv_socket);
-
-    delete handler;
+        response.write_response(recv_socket);
+        delete handler;
+    }
+    catch (std::runtime_error &e)
+    {
+        cerr << e.what();
+    }
 }
 
 /**
