@@ -4,6 +4,7 @@
 #include "webserv.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <unistd.h>
 
 using namespace webserv::http;
 
@@ -12,11 +13,12 @@ int main()
 #if 1 // response test
     try
     {
-        Request          request(sample_request);
+        Request request(sample_request);
+        cout << request;
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request);
-        response.write_response(cout);
+        response.write_response(STDOUT_FILENO);
         delete handler;
     }
     catch (std::runtime_error &e)
