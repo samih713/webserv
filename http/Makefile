@@ -72,7 +72,7 @@ valgrind: all
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./test_http
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
-test_http: fclean debug
+test_http: debug
 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
 	@mv *.d objs/
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
