@@ -5,36 +5,50 @@
 using namespace webserv::http;
 
 // defining the char * array
-#define X(a) #a, // stringify the enum
+#define X(a) ws_tostr(a), // stringify the enum
 template<>
 const char *webserv::enumStrings<METHOD>::data[] = { METHOD_ENUMS };
 #undef X
 
 static inline void check_line_terminator(istream &is, const string &check)
 {
-    std::string line_terminator;
+    string line_terminator;
     std::noskipws(is);
-    line_terminator += is.get();
-    line_terminator += is.get();
+
+    string::const_iterator check_end = check.end();
+    for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
+    {
+        line_terminator += is.get();
+    }
+
     if (line_terminator != check)
     {
         is.setstate(std::ios::failbit);
     }
+
     std::skipws(is);
 }
 
 static inline bool peek_line_terminator(istream &is, const string &check)
 {
-    std::string line_terminator;
+    string         line_terminator;
+    std::streampos initialPos = is.tellg();
     std::noskipws(is);
-    line_terminator += is.get();
-    line_terminator += is.get();
-    is.putback(line_terminator[1]);
-    is.putback(line_terminator[0]);
+
+    string::const_iterator check_end = check.end();
+    for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
+    {
+        line_terminator += is.get();
+    }
+
+    is.clear();
+    is.seekg(initialPos, std::ios::beg);
+
     if (line_terminator != check)
     {
         return false;
     }
+
     std::skipws(is);
     return true;
 }
