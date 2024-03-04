@@ -6,12 +6,13 @@
 #    By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 12:40:53 by hmohamed          #+#    #+#              #
-#    Updated: 2024/02/23 12:41:14 by hmohamed         ###   ########.fr        #
+#    Updated: 2024/03/04 12:07:18 by hmohamed         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = temp
 SRC = tester/main.cpp    	    \
+		CGI_handler/Cgi.cpp
 
 OBJ = $(SRC:.cpp=.o)
 CXX = c++
