@@ -67,10 +67,10 @@ Socket::Socket(int family, int type, const char *protocol_name, int flags)
 
 Socket::~Socket()
 {
-    DEBUG_MSG("socket fd[" << socket_descriptor << "] closed!!", R);
 
     if (socket_descriptor != invalid_file_descriptor)
     {
+        DEBUG_MSG("socket fd[" << socket_descriptor << "] closed!!", R);
         close(socket_descriptor);
         socket_descriptor = invalid_file_descriptor;
     }

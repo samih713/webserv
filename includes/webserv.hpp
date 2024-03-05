@@ -7,6 +7,7 @@
 // [ ] add shutdown functionality (block recv, block send, close())
 
 // SERVER
+// [ ] 404 page loading needs to happen once in the server/serve the css page aswell
 // [ ] handle the connection
 // [ ] sessions manager/connection manager // should disconnect ...
 // [ ] finish up the resource handling for get-requests

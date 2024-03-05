@@ -20,7 +20,7 @@ RM:= rm -rf
 
 INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
 
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp 
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
 OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
@@ -57,8 +57,8 @@ debug: all
 
 #libs
 $(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) 
-	
+	@make -sC $(LIBHTTPDIR) debug
+
 # tests
 client: debug
 	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
@@ -70,8 +70,8 @@ test_socket: $(TEST_SOCKET) client
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
-test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+test_server: debug $(LIBHTTP)
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d objects/
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
@@ -84,6 +84,7 @@ clean:
 
 fclean: clean
 	@$(RM) $(NAME)
+	@make fclean -sC ../http/ > /dev/null 2>&1
 	@$(RM) test_socket test_server client
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 

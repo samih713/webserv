@@ -68,11 +68,10 @@ static void handle_connection(fd recv_socket)
     string message(&buffer[0], &buffer[0] + bytesReceived);
     try
     {
-        Request          request(message);
+        Request request(message);
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request);
-
         response.write_response(recv_socket);
         delete handler;
     }
