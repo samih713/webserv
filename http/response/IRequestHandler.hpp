@@ -32,11 +32,12 @@ class IRequestHandler
 class GetRequestHandler : public IRequestHandler
 {
     public:
-        ~GetRequestHandler()
-        {
-            DEBUG_MSG("GetRequestHandler destructor called", M);
-        };
+        GetRequestHandler();
+        ~GetRequestHandler();
         Response handle_request(const Request &request);
+
+        ifstream     _not_found;
+        vector<char> not_found;
 
     private:
         const vector<char> get_resource(const string &resource, const vsp &headers);

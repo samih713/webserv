@@ -11,8 +11,27 @@
 
 using namespace webserv::http;
 
-// parse accepted formats
+GetRequestHandler::GetRequestHandler()
+{
+    DEBUG_MSG("GetRequestHandler constructor called", B);
 
+	DEBUGASSERT("Find a way to only load 404 page once" && false);
+
+    _not_found.open("../resources/sample_pages/404.html", std::ios_base::binary);
+    if (_not_found.fail())
+    {
+        DEBUG_MSG("My guy", B);
+    }
+    not_found = vector<char>((std::istreambuf_iterator<char>(_not_found)),
+                             std::istreambuf_iterator<char>());
+}
+
+GetRequestHandler::~GetRequestHandler()
+{
+    DEBUG_MSG("GetRequestHandler destructor called", B);
+};
+
+// parse accepted formats
 inline const string find_resource_type(const string &resource)
 {
     size_t extension_index = resource.find_last_of('.');
@@ -24,6 +43,8 @@ inline const string find_resource_type(const string &resource)
     return (fileTypes.find(file_extension)->second);
 }
 
+
+// when does this close, should be done in the server
 
 const vector<char> GetRequestHandler::get_resource(const string &resource,
                                                    const vsp    &headers)
@@ -37,18 +58,15 @@ const vector<char> GetRequestHandler::get_resource(const string &resource,
     /* need to build resource location from the
      * root directory in server configuration
      * */
-
     ifstream resource_file(resource.c_str(), std::ios_base::binary);
-    // if not found set status to not found and return
+    if (resource == "/") {
+		DEBUGASSERT("Solve directory issue" && false);
+        resource_file.setstate(std::ios_base::failbit);
+	}
     if (resource_file.fail())
     {
         status = NOT_FOUND;
-        // set the body to page not found
-        // page not found needs to optimized opened once in case multiple calls???
-        // ifstream page_not_found(resource.c_str(), std::ios_base::binary);
-        // body = vector<char>((std::istreambuf_iterator<char>(page_not_found)),
-        //                     std::istreambuf_iterator<char>());
-        return body;
+        return not_found;
     }
 
     /* need to authenticate/authorize
@@ -100,7 +118,7 @@ Response GetRequestHandler::handle_request(const Request &request)
         DEBUG_MSG(re.what(), R);
         status = NOT_FOUND;
         // empty out the body if anything
-        body.clear();
+        // body.clear();
     }
     return Response(status, response_headers, body);
 }
