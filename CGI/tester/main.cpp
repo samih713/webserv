@@ -42,6 +42,8 @@ int main(int argc, char** argv, char** envp)
 {
 	(void)argc;
 	(void)argv;
+
+	const std::string outputFile;
     
     const char* pythonScriptPath = "/Users/hmohamed/cc42/webserv/CGI/tester/file.py";
     const char* pythonInterpreterPath = "/Users/hmohamed/cc42/webserv/CGI/tester/file.py";
@@ -58,7 +60,6 @@ int main(int argc, char** argv, char** envp)
     Cgi cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
 
     // Execute the Python script
-    cgi.execute();
-
+    cgi.execute("std");
     return 0;
 }
