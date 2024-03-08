@@ -19,7 +19,7 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/
+INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/
 
 # REQUESTS
 REQUEST_DIR:= request
@@ -27,10 +27,14 @@ REQUEST_LIST:= parse.cpp Request.cpp
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
 RESPONSE_DIR:= response
-RESPONSE_LIST:= Response.cpp IRequestHandler.cpp
+RESPONSE_LIST:= Response.cpp
 RESPONSE_SRCS:= $(addprefix $(RESPONSE_DIR)/, $(RESPONSE_LIST))
+# RESPONSE
+HANDLER_DIR:= handler
+HANDLER_LIST:= GetRequestHandler.cpp
+HANDLER_SRCS:= $(addprefix $(HANDLER_DIR)/, $(HANDLER_LIST))
 
-SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS)
+SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS)
 
 OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
@@ -57,7 +61,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objs objs/request objs/response
+	@mkdir -p objs $(addprefix $(OBJS_DIR)/, request response handler)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: all
@@ -73,10 +77,9 @@ valgrind: all
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
 test_http: debug
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
 	@mv *.d objs/
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
-
 
 clean:
 	@$(RM) $(OBJS_DIR) *.d

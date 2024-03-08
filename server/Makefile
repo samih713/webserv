@@ -18,7 +18,8 @@ endif
 
 RM:= rm -rf
 
-INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
+HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
+INCLUDES:= -I./ -Isocket/ -I../includes/  $(HTTP_INCLUDES)
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
