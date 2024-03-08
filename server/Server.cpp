@@ -1,3 +1,4 @@
+/* -------------------------------- INCLUDES -------------------------------- */
 #include "Server.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
@@ -12,7 +13,9 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+/* -------------------------------- INCLUDES -------------------------------- */
 
+/* ------------------------------- CONSTRUCTOR ------------------------------ */
 /**
  * Returns the singleton instance of the Server class, creating it if necessary.
  *
@@ -20,7 +23,7 @@
  * @param backlog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server &Server::getInstance(int listenerPort, int backlog)
+Server &Server::get_instance(int listenerPort, int backlog)
 {
     static Server instance(listenerPort, backlog);
     return instance;
@@ -32,14 +35,16 @@ Server &Server::getInstance(int listenerPort, int backlog)
  * @param listenerPort The port number to listen on
  * @param backlog The maximum length of the queue of pending connections
  */
-Server::Server(fd listenerPort, int backlog)
-    : listener_fd(listener.get_fd())
-    , listener_port(listenerPort)
+Server::Server(fd listenerPort, int backLog)
+    : listenerFd(listener.get_fd())
+    , listenerPort(listenerPort)
 {
-    listener.set_port(listener_port);
+    listener.set_port(listenerPort);
     listener.bind();
-    listener.listen(backlog);
+    listener.listen(backLog);
 }
+
+/* ------------------------------- DESTRUCTOR ------------------------------- */
 
 /**
  * Destroys the server closing its listener socket
@@ -49,6 +54,11 @@ Server::~Server()
     ::close(listener.socket_descriptor);
 }
 
+/* ---------------------------- HANDLE CONNECTION --------------------------- */
+
+// buffer size
+static const int BUFFER_SIZE = 4096;
+
 /**
  * Handles a connection on the given socket.
  *
@@ -56,77 +66,86 @@ Server::~Server()
  * determines the appropriate request handler based on the request method,
  * and generates an HTTP response. The response is then written back to the socket.
  *
- * @param recv_socket The file descriptor of the socket to handle the connection on.
+ * @param recvSocket The file descriptor of the socket to handle the connection on.
  * @throws std::runtime_error if an error occurs while receiving data from the socket.
  */
-void Server::handle_connection(fd recv_socket)
+void Server::handle_connection(fd recvSocket)
 {
-    char buffer[BUFFER_SIZE];
-    int  bytesReceived = recv(recv_socket, &buffer[0], BUFFER_SIZE, 0);
-
-    if (bytesReceived == -1)
-        throw std::runtime_error(strerror(errno));
-
-    string message(&buffer[0], &buffer[0] + bytesReceived);
+    char buffer[BUFFER_SIZE] = {0};
+	int  bytesReceived;
     try
     {
+		bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
+		if (bytesReceived == -1)
+			throw std::runtime_error(strerror(errno));
+		string message(&buffer[0], &buffer[0] + bytesReceived);
         Request          request(message);
+		// TODO [ ] compare bytesReceived with size from headers
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request);
-        response.write_response(recv_socket);
+        response.write_response(recvSocket);
         delete handler;
     }
     catch (std::runtime_error &e)
     {
-        cerr << e.what();
+		DEBUG_MSG(e.what(), R);
     }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                POLLING STRAT                               */
+/* -------------------------------------------------------------------------- */
+
+/* --------------------------------- SELECT --------------------------------- */
+
+// set fd size only for testing
+#undef FD_SETSIZE
+#define FD_SETSIZE 24
+
+// wait message
+static const std::string wait_message("Server is now waiting for connections...\n");
 
 /**
  * This function uses the select system call to monitor multiple file descriptors for read
  * readiness.
  *
- * @throws std::runtime_error if an error occurs during the a system call
+ * @throws std::runtime_error if an error occurs during the select system call
  */
 void Server::select_strat()
 {
-    fd_set current_sockets;
-    fd_set ready_to_read;
+    fd_set currentSockets;
+    fd_set readytoRead;
 
-    FD_ZERO(&current_sockets);
-    // adds the listener to the set
-    FD_SET(listener_fd, &current_sockets);
-    while (true) // main server loop
+    FD_ZERO(&currentSockets);
+    FD_SET(listenerFd, &currentSockets);
+    while (true)
     {
         DEBUG_MSG(wait_message, R);
-        // creates a secondary set (select is destructive)
-        ready_to_read = current_sockets;
-        // check all sockets in the set (only checking for ready to read)
-        if (select(FD_SETSIZE, &ready_to_read, NULL, NULL, NULL) < 0 && (errno = 2))
+        readytoRead = currentSockets;
+        if (select(FD_SETSIZE, &readytoRead, NULL, NULL, NULL) < 0 && (errno = 2))
             throw std::runtime_error(strerror(errno));
-        // looping upto FD_SETSIZE(system default/needs to change)
-        for (fd recv_socket = 0; recv_socket < FD_SETSIZE; recv_socket++)
+        for (fd recvSocket = 0; recvSocket < FD_SETSIZE; recvSocket++)
         {
-            if (FD_ISSET(recv_socket, &ready_to_read))
+            if (FD_ISSET(recvSocket, &readytoRead))
             {
-                if (recv_socket == listener_fd)
+                if (recvSocket == listenerFd)
                 {
-                    fd client_socket = listener.accept();
-                    FD_SET(client_socket, &current_sockets);
+                    fd clientSocket = listener.accept();
+                    FD_SET(clientSocket, &currentSockets);
                 }
                 else
                 {
                     DEBUG_MSG("reading from connection", M);
-
-                    handle_connection(recv_socket);
-
-                    FD_CLR(recv_socket, &current_sockets);
+                    handle_connection(recvSocket);
+                    FD_CLR(recvSocket, &currentSockets);
                 }
             }
         }
     }
 }
+
+/* ---------------------------------- START --------------------------------- */
 
 /**
  * Starts the server using the specified polling strategy.

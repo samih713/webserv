@@ -13,6 +13,7 @@
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
 // [ ] solve linkage issue (with data)
+// [ ] (Server.cpp) compare bytesReceived with size from headers
 // [x] Implement response
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
