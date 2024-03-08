@@ -79,10 +79,11 @@ Socket::~Socket()
 
 /* [INTERFACE] */
 
+#define MAX_PORT 65535
 // throws execpetions
 void Socket::set_port(int port)
 {
-    if (port < 0 || port > 65535)
+    if (port < 0 || port > MAX_PORT)
         throw Socket::Exception("Invalid Socket descriptor\n");
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
