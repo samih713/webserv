@@ -139,7 +139,8 @@ void Request::parse()
         if (fieldName.find(' ') != string::npos ||
             fieldNameList.find(fieldName) == fieldNameListEnd)
         {
-			DEBUGASSERT("The header check is wrong, brave sends some weird headers or maybe all browsers do idk" && false);
+            // DEBUGASSERT("The header check is wrong, brave sends some weird headers or
+            // maybe all browsers do idk" && false);
         }
         fieldValue = find_value(message);
         header_fields.push_back(std::make_pair(fieldName, fieldValue));

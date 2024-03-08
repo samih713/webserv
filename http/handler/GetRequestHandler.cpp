@@ -1,21 +1,12 @@
-#include "IRequestHandler.hpp"
+#include "GetRequestHandler.hpp"
 #include "FileType.hpp"
-#include "Message.hpp"
 #include "debug.hpp"
-#include "webserv.hpp"
-#include <algorithm>
-#include <cstring>
-#include <ios>
-#include <stdexcept>
-#include <utility>
-
-using namespace webserv::http;
 
 GetRequestHandler::GetRequestHandler()
 {
     DEBUG_MSG("GetRequestHandler constructor called", B);
 
-	DEBUGASSERT("Find a way to only load 404 page once" && false);
+    // DEBUGASSERT("Find a way to only load 404 page once" && false);
 
     _not_found.open("../resources/sample_pages/404.html", std::ios_base::binary);
     if (_not_found.fail())
@@ -46,8 +37,7 @@ inline const string find_resource_type(const string &resource)
 
 // when does this close, should be done in the server
 
-const vector<char> GetRequestHandler::get_resource(const string &resource,
-                                                   const vsp    &headers)
+const vector<char> GetRequestHandler::get_resource(string resource, const vsp &headers)
 {
     (void)headers;
     string       temp = "";
@@ -58,30 +48,32 @@ const vector<char> GetRequestHandler::get_resource(const string &resource,
     /* need to build resource location from the
      * root directory in server configuration
      * */
-    ifstream resource_file(resource.c_str(), std::ios_base::binary);
-    if (resource == "/") {
-		DEBUGASSERT("Solve directory issue" && false);
-        resource_file.setstate(std::ios_base::failbit);
-	}
-    if (resource_file.fail())
+    string   root = "../resources/sample_pages";
+    ifstream resource_file;
+    if (resource == "/")
     {
+        // DEBUGASSERT("Solve directory issue" && false);
+        DEBUG_MSG(resource, W);
         status = NOT_FOUND;
         return not_found;
     }
+    else
+    {
+        resource = root + resource;
+        resource_file.open(resource.c_str(), std::ios_base::binary);
+    }
+    // fail should be here
 
-    /* need to authenticate/authorize
-     * authentication function goes here for the requested resource
-     * */
+    /* authentication function goes here for the requested resource */
 
-    /* not a directory or how are directories handled */
+    /* determine type for content-type in header_field
+     * order of the headers
+     */
 
-    /* determine type for content-type in header_field */
     resource_type = find_resource_type(resource);
     if (resource_type.length() != 0)
         add_header(std::make_pair<string, string>("Content-Type", resource_type));
-    // default header server name
     add_header(std::make_pair<string, string>("Server", "The Wired"));
-    // order of the headers
 
     /* determine content length */
     resource_file.seekg(0, std::ios_base::end);
@@ -122,5 +114,3 @@ Response GetRequestHandler::handle_request(const Request &request)
     }
     return Response(status, response_headers, body);
 }
-
-// utils
