@@ -1,6 +1,8 @@
 #include "Server.hpp"
+#include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
+#include "RequestHandlerFactory.hpp"
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
@@ -57,7 +59,7 @@ Server::~Server()
  * @param recv_socket The file descriptor of the socket to handle the connection on.
  * @throws std::runtime_error if an error occurs while receiving data from the socket.
  */
-static void handle_connection(fd recv_socket)
+void Server::handle_connection(fd recv_socket)
 {
     char buffer[BUFFER_SIZE];
     int  bytesReceived = recv(recv_socket, &buffer[0], BUFFER_SIZE, 0);
@@ -68,7 +70,7 @@ static void handle_connection(fd recv_socket)
     string message(&buffer[0], &buffer[0] + bytesReceived);
     try
     {
-        Request request(message);
+        Request          request(message);
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request);

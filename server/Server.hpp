@@ -21,6 +21,7 @@ enum polling_strat
     POLL,
     EPOLL
 };
+typedef struct _Config Config;
 
 class Server
 {
@@ -31,11 +32,13 @@ class Server
         static Server &getInstance(fd listener_port, int backlog);
         ~Server();
         void start(enum polling_strat);
+        void handle_connection(fd recv_socket);
 
     private:
+        Config    *config;
         TCPSocket  listener;
         vector<fd> connections;
-        string     root_dir;
+        string     root;
         fd         listener_fd;
         int        listener_port;
 
