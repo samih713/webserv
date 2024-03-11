@@ -4,7 +4,7 @@ NAME:= libparser.a
 
 INCLUDES:= -I./ -I../includes/
 
-SRCS:= ConfigParser.cpp
+SRCS:= ConfigParser.cpp JsonParser.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
