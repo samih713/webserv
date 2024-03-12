@@ -48,21 +48,21 @@ const vector<char> GetRequestHandler::get_resource(string resource, const vsp &h
     /* need to build resource location from the
      * root directory in server configuration
      * */
-    string   root = "../resources/sample_pages";
+
+    // DEBUGASSERT("Solve directory issue" && false);
+    string   root = "../resources/sample_pages/";
     ifstream resource_file;
     if (resource == "/")
+        resource = root + "index.html";
+    else
+        resource = root + resource;
+    DEBUG_MSG(resource, W);
+    resource_file.open(resource.c_str(), std::ios_base::binary);
+    if (resource_file.fail())
     {
-        // DEBUGASSERT("Solve directory issue" && false);
-        DEBUG_MSG(resource, W);
         status = NOT_FOUND;
         return not_found;
     }
-    else
-    {
-        resource = root + resource;
-        resource_file.open(resource.c_str(), std::ios_base::binary);
-    }
-    // fail should be here
 
     /* authentication function goes here for the requested resource */
 
