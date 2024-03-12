@@ -22,8 +22,8 @@ HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/hand
 INCLUDES:= -I./ -Isocket/ -I../includes/  $(HTTP_INCLUDES)
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
+OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -37,6 +37,8 @@ LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
 
+NAME:= libserver.a
+
 all: $(NAME)
 
 $(NAME): $(OBJS)
@@ -48,7 +50,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects objects/socket
+	@mkdir -p $(addprefix $(OBJS_DIR)/,socket)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all

@@ -19,6 +19,7 @@ HANDLER_SRCS:= $(addprefix $(HANDLER_DIR)/, $(HANDLER_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS)
 
+OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -41,7 +42,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objs $(addprefix $(OBJS_DIR)/, request response handler)
+	@mkdir -p $@ $(addprefix $(OBJS_DIR)/, request response handler)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: all
