@@ -1,29 +1,12 @@
-###	COLORS ####
-BLUE:= \033[1;34m
-GREEN:= \033[1;32m
-MAGENTA:= \033[1;35m
-RED:= \033[1;31m
-YELLOW:= \033[1;33m
-RESET:= \033[0m
+include ../common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ 
-SANITIZE:= -fsanitize=address
-
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
-
-RM:= rm -rf
+NAME:= libhttp.a
 
 INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/
 
 # REQUESTS
 REQUEST_DIR:= request
-REQUEST_LIST:= parse.cpp Request.cpp 
+REQUEST_LIST:= parse.cpp Request.cpp
 REQUEST_SRCS:= $(addprefix $(REQUEST_DIR)/, $(REQUEST_LIST))
 # RESPONSE
 RESPONSE_DIR:= response
@@ -36,7 +19,6 @@ HANDLER_SRCS:= $(addprefix $(HANDLER_DIR)/, $(HANDLER_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS)
 
-OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -44,8 +26,6 @@ TEST_DIR:= tester
 TEST_HTTP:= $(TEST_DIR)/main.cpp
 
 DEP:= $(OBJS:%.o=%.d)
-
-NAME:= libhttp.a
 
 all: $(NAME)
 
@@ -78,7 +58,7 @@ valgrind: all
 
 test_http: debug
 	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_HTTP) $(NAME) -o $@
-	@mv *.d objs/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
 clean:

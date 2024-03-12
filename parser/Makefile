@@ -1,41 +1,21 @@
-###	COLORS ####
-BLUE:= \033[1;34m
-GREEN:= \033[1;32m
-MAGENTA:= \033[1;35m
-RED:= \033[1;31m
-YELLOW:= \033[1;33m
-RESET:= \033[0m
+include ../common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__
-SANITIZE:= -fsanitize=address
-
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
-
-RM:= rm -rf
+NAME:= libparser.a
 
 INCLUDES:= -I./ -I../includes/
 
 SRCS:= ConfigParser.cpp
 
-OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
 TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
-DEP:= $(OBJS:%.o=%.d)
-
 CONFIG_DIR:= json
 CONFIG_FILES:= $(CONFIG_DIR)/config_sample.json $(CONFIG_DIR)/simple.json
 
-NAME:= libparser.a
+DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
 
@@ -65,7 +45,7 @@ valgrind: all
 
 test_parser: $(TEST_PARSER) debug
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_PARSER) $(NAME) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser is now ready for testing."
 
 tests: test_parser

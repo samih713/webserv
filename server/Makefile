@@ -22,8 +22,8 @@ HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/hand
 INCLUDES:= -I./ -Isocket/ -I../includes/  $(HTTP_INCLUDES)
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
-OBJS_DIR:= objects
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -36,8 +36,6 @@ LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
-
-NAME:= libserver.a
 
 all: $(NAME)
 
@@ -62,13 +60,13 @@ $(LIBHTTP):
 
 # tests
 client: debug
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
-	@mv *.d objects/
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) -fsanitize=address $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
-	@mv *.d objects/
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug $(LIBHTTP)

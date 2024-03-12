@@ -26,7 +26,7 @@
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
-    static_cast<std::ostringstream &>((std::ostringstream() << std::dec << number)).str()
+    static_cast<const std::ostringstream &>((std::ostringstream() << std::dec << number)).str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
