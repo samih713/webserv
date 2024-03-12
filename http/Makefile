@@ -2,7 +2,7 @@ include ../common.mk
 
 NAME:= libhttp.a
 
-INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/
+INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/
 
 # REQUESTS
 REQUEST_DIR:= request

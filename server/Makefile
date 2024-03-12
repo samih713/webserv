@@ -73,7 +73,7 @@ test_socket: $(TEST_SOCKET) client
 
 test_server: debug $(LIBHTTP)
 	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
-	@mv *.d objects/
+	@mv *.d $(OBJS_DIR) 
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
 tests: test_socket test_server
