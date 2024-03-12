@@ -71,16 +71,16 @@ static const int BUFFER_SIZE = 4096;
  */
 void Server::handle_connection(fd recvSocket)
 {
-    char buffer[BUFFER_SIZE] = {0};
-	int  bytesReceived;
+    char buffer[BUFFER_SIZE] = { 0 };
+    int  bytesReceived;
     try
     {
-		bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
-		if (bytesReceived == -1)
-			throw std::runtime_error(strerror(errno));
-		string message(&buffer[0], &buffer[0] + bytesReceived);
-        Request          request(message);
-		// TODO [ ] compare bytesReceived with size from headers
+        bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
+        if (bytesReceived == -1)
+            throw std::runtime_error(strerror(errno));
+        string  message(&buffer[0], &buffer[0] + bytesReceived);
+        Request request(message);
+        // TODO [ ] compare bytesReceived with size from headers
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request);
@@ -89,7 +89,7 @@ void Server::handle_connection(fd recvSocket)
     }
     catch (std::runtime_error &e)
     {
-		DEBUG_MSG(e.what(), R);
+        DEBUG_MSG(e.what(), R);
     }
 }
 

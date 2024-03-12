@@ -5,7 +5,7 @@ int main()
 {
     try
     {
-        Server &webserv = Server::getInstance(8080, 10);
+        Server &webserv = Server::get_instance(8080, 10);
         webserv.start(SELECT);
     }
     catch (std::exception &e)
