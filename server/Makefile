@@ -1,22 +1,6 @@
-###	COLORS ####
-BLUE:= \033[1;34m
-GREEN:= \033[1;32m
-MAGENTA:= \033[1;35m
-RED:= \033[1;31m
-YELLOW:= \033[1;33m
-RESET:= \033[0m
+include ../common.mk
 
-CXX:= c++
-CXXFLAGS:= -Wall -Werror -Wextra -std=c++98 -MMD -MP
-DEBUGFLAGS:= -ggdb3 -D__DEBUG__ -fsanitize=address
-
-ifeq ($(shell uname), Linux)
-	CXXFLAGS += -D__LINUX__
-else ifeq ($(shell uname), Darwin)
-	CXXFLAGS += -D__MAC__
-endif
-
-RM:= rm -rf
+NAME:= libserver.a
 
 HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
 INCLUDES:= -I./ -Isocket/ -I../includes/  $(HTTP_INCLUDES)
@@ -34,10 +18,12 @@ TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 # http request/response directory
 LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
+#libs
+$(LIBHTTP):
+	@make -sC $(LIBHTTPDIR) debug
 
 DEP:= $(OBJS:%.o=%.d)
 
-NAME:= libserver.a
 
 all: $(NAME)
 
@@ -52,13 +38,9 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $(addprefix $(OBJS_DIR)/,socket)
 
-debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
-
-#libs
-$(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) debug
 
 # tests
 client: debug
@@ -67,12 +49,12 @@ client: debug
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug $(LIBHTTP)
-	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d $(OBJS_DIR) 
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
@@ -85,7 +67,7 @@ clean:
 
 fclean: clean
 	@$(RM) $(NAME)
-	@make fclean -sC ../http/ > /dev/null 2>&1
+	@make -sC $(LIBHTTPDIR) fclean
 	@$(RM) test_socket test_server client
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
