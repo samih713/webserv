@@ -16,7 +16,7 @@ class TCPSocket : public Socket
 
     public:
         TCPSocket();
-        ~TCPSocket();
+        ~TCPSocket() throw();
 
     private:
         static const int family = AF_INET;   ///< The address family for the socket (IPv4)

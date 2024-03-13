@@ -5,14 +5,8 @@
 #endif // __DEBUG__
 
 /**
- * @brief Default constructor for TCPSocket
- *
- * This constructor initializes a TCPSocket object with default values.
+ * @brief This constructor initializes a TCPSocket object with default values.
  * It sets up the socket address structure with INADDR_ANY and family AF_INET.
- *
- * @param None
- *
- * @return None
  *
  * @throws None
  */
@@ -30,7 +24,7 @@ TCPSocket::TCPSocket()
 
 
 /* @brief Destructor for TCPSocket */
-TCPSocket::~TCPSocket()
+TCPSocket::~TCPSocket() throw()
 {
     DEBUG_MSG("TCPSocket closed!!", R);
 }

@@ -58,9 +58,7 @@ Server::Server(const Config &config, int backLog)
  * Destroys the server closing its listener socket
  */
 Server::~Server()
-{
-    ::close(listener.socket_descriptor);
-}
+{}
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 

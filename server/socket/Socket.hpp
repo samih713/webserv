@@ -1,16 +1,12 @@
 #include "webserv.hpp"
-#include <cerrno>
-#include <cstring>
-#include <exception>
-#include <netinet/in.h>
-#include <netinet/ip.h> /* superset of previous */
-#include <sstream>
-#include <sys/socket.h>
-#include <unistd.h>
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
+/**
+ * Set the socket flag for non-blocking I/O operations
+ * based on the operating system.
+ */
 #if defined(__LINUX__) // SOCK_FLAG
 static const int SOCK_FLAG = SOCK_NONBLOCK;
 #elif defined(__MAC__)
@@ -20,49 +16,48 @@ static const int SOCK_FLAG = O_NONBLOCK;
 static const int SOCK_FLAG = 0;
 #endif
 
+/**
+ * @class Socket
+ * @brief A class representing a socket for network communication
+ *
+ * This class provides functionality for creating and managing network sockets.
+ */
 class Socket
 {
-    protected:
-        Socket(int family, int type, int protocol, int flags);
-        struct sockaddr address;
 
     public:
-        virtual ~Socket();
+        virtual ~Socket() throw();
         /* [INTERFACE] */
         void set_port(int port);
         fd   get_fd() const throw();
         void bind() const;
         void listen(int backlog) const;
         fd   accept();
-        // void shutdown(int option);
+        // why is this public
 
-        struct Exception : public std::exception
+        class Exception : public std::exception
         {
-            private:
-                std::string error_message;
 
             public:
-                explicit Exception(const std::string &error_message)
-                    : error_message(error_message){};
+                explicit Exception(const std::string &error_message);
                 ~Exception() throw(){};
-                static std::string compose_msg(const std::string &message)
-                {
-                    std::stringstream _msg;
-                    _msg << message
-                         << (errno ? ": " + std::string(std::strerror(errno)) : "");
-                    return _msg.str();
-                }
-                const char *what() const throw()
-                {
-                    return error_message.c_str();
-                }
+                const char *what() const throw();
+
+            private:
+                std::string error_message;
+                std::string compose_msg(const std::string &message);
         };
-        fd socket_descriptor;
+
+    protected:
+        Socket(int family, int type, int protocol, int flags);
+        struct sockaddr address;
 
     private:
-        static const int invalid_file_descriptor = -1;
-        mutable bool     is_bound;
-        mutable bool     is_listening;
+        static const fd invalidFD = -1;
+        fd              socketFD;
+        mutable bool    isBound;
+        mutable bool    isListening;
+
         // deleted
         Socket(const Socket &){};
         Socket &operator=(const Socket &)
