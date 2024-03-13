@@ -28,15 +28,12 @@ class Server
         Server(const Config &config, int backLog);
 
     private:
-        // config
         const Config &config;
+        CachedPages *cachedPages;
 
         TCPSocket  listener;
         vector<fd> connections;
         fd         listenerFd;
-
-        // Cached Pages
-        CachedPages *cachedPages;
 
         void select_strat();
         // void kqueue_strat();
