@@ -13,7 +13,7 @@ class GetRequestHandler : public IRequestHandler
         GetRequestHandler();
         ~GetRequestHandler();
         Response handle_request(const Request     &request,
-                                const CachedPages &cachedPages,
+                                const CachedPages *cachedPages,
                                 const Config      &config);
         void     add_header(pair<string, string> header_field)
         {
@@ -22,7 +22,7 @@ class GetRequestHandler : public IRequestHandler
 
     private:
         const vector<char> get_resource(const Request     &request,
-                                        const CachedPages &cached,
+                                        const CachedPages *cached,
                                         const Config      &config);
         STATUS_CODE        status;
         vector<char>       body;

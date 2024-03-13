@@ -30,7 +30,7 @@ inline const string find_resource_type(const string &resource)
 
 // when does this close, should be done in the server
 const vector<char> GetRequestHandler::get_resource(const Request     &request,
-                                                   const CachedPages &cachedPages,
+                                                   const CachedPages *cachedPages,
                                                    const Config      &config)
 {
     vsp          requestHeaders = request.get_headers();
@@ -46,16 +46,19 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
      * */
 
     ifstream resource_file;
+    size_t   resource_size = 0;
     status = OK;
     if (resource == "/")
     {
-        body = cachedPages.defaultPage.data;
+        body = cachedPages->defaultPage.data;
         add_header(std::make_pair<string, string>("Content-Type",
-                                                  cachedPages.defaultPage.contentType));
-        DEBUG_MSG("content length is " + ws_itoa(cachedPages.defaultPage.contentLength),
-                  Y);
+                                                  cachedPages->defaultPage.contentType));
+
+        // remove
+        resource_size = cachedPages->defaultPage.contentLength;
+
         add_header(std::make_pair<string, string>(
-            "Content-Length", ws_itoa(cachedPages.defaultPage.contentLength)));
+            "Content-Length", ws_itoa(cachedPages->defaultPage.contentLength)));
     }
     else
     {
@@ -65,33 +68,30 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
         {
             status = NOT_FOUND;
             add_header(std::make_pair<string, string>("Content-Type",
-                                                      cachedPages.notFound.contentType));
+                                                      cachedPages->notFound.contentType));
             add_header(std::make_pair<string, string>(
-                "Content-Length", ws_itoa(cachedPages.notFound.contentLength)));
-            // add Content-length or page gets stuck on loading
-            body = cachedPages.notFound.data;
+                "Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
+            body = cachedPages->notFound.data;
         }
         else
         {
             body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                                 std::istreambuf_iterator<char>());
 
-            /* determine type for content-type in header_field
-             * order of the headers
-             */
+			// content type
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(std::make_pair<string, string>("Content-Type", resource_type));
-            /* determine content length */
+			// content length
             resource_file.seekg(0, std::ios_base::end);
-            size_t resource_size = resource_file.tellg();
+            resource_size = resource_file.tellg();
             add_header(
                 std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
             resource_file.seekg(0, std::ios_base::beg);
         }
     }
     /* authentication function goes here for the requested resource */
-
+    DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
     /* caching control */
 
     /* compression/encoding
@@ -104,7 +104,7 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
 
 
 Response GetRequestHandler::handle_request(const Request     &request,
-                                           const CachedPages &cachedPages,
+                                           const CachedPages *cachedPages,
                                            const Config      &config)
 {
     DEBUG_MSG("Handling get request ... ", B);
