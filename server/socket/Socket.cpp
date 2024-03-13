@@ -7,7 +7,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-/*  [CONSTRUCTORS] */
 Socket::Socket(int family, int type, int protocol, int flags)
     : socket_descriptor(invalid_file_descriptor)
     , is_bound(false)
@@ -19,50 +18,11 @@ Socket::Socket(int family, int type, int protocol, int flags)
     socket_descriptor = socket(family, type, protocol);
     flags |= fcntl(socket_descriptor, F_GETFL, 0);
     fcntl(socket_descriptor, F_SETFL, flags);
-#endif //
-
-    // On success, a file descriptor for the new socket is returned.
+#endif // conditional
     if (socket_descriptor == invalid_file_descriptor)
         throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
-
-    DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
-
-    // zero out the sockaddr struct
     std::memset(&address, 0, sizeof(address));
-}
-
-/* Call protocol by name */
-Socket::Socket(int family, int type, const char *protocol_name, int flags)
-    : socket_descriptor(invalid_file_descriptor)
-    , is_bound(false)
-    , is_listening(false)
-{
-    if (!protocol_name)
-        throw Socket::Exception(Exception::compose_msg(ERR_NULL));
-
-    // identify the protocol name
-    std::string proto_name(protocol_name);
-    for (size_t i = 0; i < proto_name.length(); i++)
-        proto_name[i] = std::tolower(proto_name[i]);
-
-    // continue with the rest of the code
-    struct protoent *protocol = getprotobyname(proto_name.c_str());
-    // check getprotobyname return
-    if (!protocol)
-        throw Socket::Exception(Exception::compose_msg(ERR_NULL));
-
-    DEBUG_MSG("protocol official name is [" << protocol->p_name << "]", Y);
-
-    socket_descriptor = socket(family, type | flags, protocol->p_proto);
-
-    // On success, a file descriptor for the new socket is returned.
-    if (socket_descriptor == invalid_file_descriptor)
-        throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
-
     DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
-
-    // zero out the sockaddr struct
-    std::memset(&address, 0, sizeof(address));
 }
 
 Socket::~Socket()
@@ -78,7 +38,6 @@ Socket::~Socket()
 
 
 /* [INTERFACE] */
-
 #define MAX_PORT 65535
 // throws execpetions
 void Socket::set_port(int port)
