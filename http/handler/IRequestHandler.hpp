@@ -1,4 +1,5 @@
 #include "Response.hpp"
+#include "Server.hpp"
 #include "webserv.hpp"
 
 #ifndef IRequestHandler_HPP
@@ -14,7 +15,9 @@ class IRequestHandler
         {
             DEBUG_MSG("IRequestHandler destructor called", M);
         };
-        virtual Response handle_request(const Request &request) = 0;
+        virtual Response handle_request(const Request     &request,
+                                        const CachedPages &cachedPages,
+                                        const Config      &config) = 0;
         virtual void     add_header(pair<string, string> header_field) = 0;
 };
 

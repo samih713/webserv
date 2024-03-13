@@ -16,16 +16,18 @@
 /* -------------------------------- INCLUDES -------------------------------- */
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
+
 /**
  * Returns the singleton instance of the Server class, creating it if necessary.
  *
- * @param listenerPort The port number to listen on
+ * @param config reference to config object, containing root,
+ * default, error pages ... etc
  * @param backlog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server &Server::get_instance(int listenerPort, int backlog)
+Server &Server::get_instance(const Config &config, int backLog)
 {
-    static Server instance(listenerPort, backlog);
+    static Server instance(config, backLog);
     return instance;
 }
 
@@ -35,13 +37,14 @@ Server &Server::get_instance(int listenerPort, int backlog)
  * @param listenerPort The port number to listen on
  * @param backlog The maximum length of the queue of pending connections
  */
-Server::Server(fd listenerPort, int backLog)
-    : listenerFd(listener.get_fd())
-    , listenerPort(listenerPort)
+Server::Server(const Config &config, int backLog)
+    : config(config)
+    , listenerFd(listener.get_fd())
 {
-    listener.set_port(listenerPort);
+    listener.set_port(config.listenerPort);
     listener.bind();
     listener.listen(backLog);
+    cachedPages = new CachedPages(config);
 }
 
 /* ------------------------------- DESTRUCTOR ------------------------------- */
@@ -83,7 +86,7 @@ void Server::handle_connection(fd recvSocket)
         // TODO [ ] compare bytesReceived with size from headers
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
-        Response response = handler->handle_request(request);
+        Response response = handler->handle_request(request, *cachedPages, config);
         response.write_response(recvSocket);
         delete handler;
     }
