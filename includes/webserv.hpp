@@ -3,10 +3,6 @@
 
 /* ---------------------------------- TODO ---------------------------------- */
 
-// SOCKETS
-// [ ] fix the socket set port functionality, some redundant functions
-// [ ] add shutdown functionality (block recv, block send, close())
-
 // SERVER
 // [ ] handle the keep alive conncetion/ currently not closing the scoket
 // [ ] 404 page loading needs to happen once in the server/serve the css page aswell
@@ -28,20 +24,29 @@
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
-    static_cast<const std::ostringstream &>((std::ostringstream() << std::dec << number)).str()
+    static_cast<const std::ostringstream &>(                                             \
+        (std::ostringstream() << std::dec << number))                                    \
+        .str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
 #include <algorithm>
+#include <cerrno>
 #include <cstdlib>
+#include <cstring>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/ip.h> /* superset of previous */
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <vector>
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
@@ -58,7 +63,6 @@ using std::pair;
 using std::string;
 using std::stringstream;
 using std::vector;
-
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;
