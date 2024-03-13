@@ -7,7 +7,7 @@ int main()
     {
         // default constructor of config
         // Config(string serverRoot = "../resources/sample_pages/",
-        // string defaultPage = "index.html",
+        // string home = "index.html",
         // string notFoundPage = "404.html",
         // fd     listenerPort = 8080)
         //

@@ -6,17 +6,17 @@
 class Config
 {
     public:
-        Config(string serverRoot = "../resources/sample_pages/",
-               string defaultPage = "index.html",
-               string notFoundPage = "404.html",
+        Config(string serverRoot = "../resources/sample_pages",
+               string home = "/index.html",
+               string notFoundPage = "/404.html",
                fd     listenerPort = 8080)
             : serverRoot(serverRoot)
-            , defaultPage(serverRoot + defaultPage)
+            , home(serverRoot + home)
             , notFoundPage(serverRoot + notFoundPage)
             , listenerPort(listenerPort)
         {}
         string serverRoot;
-        string defaultPage;
+        string home;
         string notFoundPage;
         fd     listenerPort;
 };

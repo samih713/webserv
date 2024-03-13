@@ -50,15 +50,15 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
     status = OK;
     if (resource == "/")
     {
-        body = cachedPages->defaultPage.data;
+        body = cachedPages->home.data;
         add_header(std::make_pair<string, string>("Content-Type",
-                                                  cachedPages->defaultPage.contentType));
+                                                  cachedPages->home.contentType));
 
         // remove
-        resource_size = cachedPages->defaultPage.contentLength;
+        resource_size = cachedPages->home.contentLength;
 
         add_header(std::make_pair<string, string>(
-            "Content-Length", ws_itoa(cachedPages->defaultPage.contentLength)));
+            "Content-Length", ws_itoa(cachedPages->home.contentLength)));
     }
     else
     {
