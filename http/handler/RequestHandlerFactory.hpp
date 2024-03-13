@@ -5,6 +5,13 @@
 #ifndef REQUESTHANDLERFACTORY_HPP
 #define REQUESTHANDLERFACTORY_HPP
 
+/**
+ * Creates a new instance of a request handler based on the specified HTTP method.
+ *
+ * @param m The HTTP method for which to create a request handler.
+ * @return A pointer to the newly created request handler.
+ * @throws std::runtime_error if the specified HTTP method is not implemented.
+ */
 class RequestHandlerFactory
 {
     public:
