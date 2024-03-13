@@ -44,9 +44,9 @@ int main(int argc, char** argv, char** envp)
 	(void)argv;
 
 	const std::string outputFile;
-    
-    const char* pythonScriptPath = "/Users/hmohamed/cc42/webserv/CGI/tester/file.py";
-    const char* pythonInterpreterPath = "/Users/hmohamed/cc42/webserv/CGI/tester/file.py";
+
+    const char *pythonScriptPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
+    const char *pythonInterpreterPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
 
     // Check if the Python script exists
     if (access(pythonScriptPath, X_OK) == -1)
