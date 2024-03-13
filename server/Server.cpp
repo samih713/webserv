@@ -32,10 +32,15 @@ Server &Server::get_instance(const Config &config, int backLog)
 }
 
 /**
- * Constructs a new Server object with the specified listener port and backlog.
+ * @brief Constructor for the Server class.
  *
- * @param listenerPort The port number to listen on
- * @param backlog The maximum length of the queue of pending connections
+ * This constructor initializes a Server object with the provided configuration and
+ * backlog.
+ *
+ * @param config The configuration settings for the server.
+ * @param backLog The maximum length of the queue of pending connections.
+ *
+ * @throws std::runtime_error if there is an issue with setting up the listener socket.
  */
 Server::Server(const Config &config, int backLog)
     : config(config)
@@ -86,7 +91,7 @@ void Server::handle_connection(fd recvSocket)
         // TODO [ ] compare bytesReceived with size from headers
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
-        Response response = handler->handle_request(request, *cachedPages, config);
+        Response response = handler->handle_request(request, cachedPages, config);
         response.write_response(recvSocket);
         delete handler;
     }
@@ -141,7 +146,7 @@ void Server::select_strat()
                 {
                     DEBUG_MSG("reading from connection", M);
                     handle_connection(recvSocket);
-                    FD_CLR(recvSocket, &currentSockets);
+                    // FD_CLR(recvSocket, &currentSockets);
                 }
             }
         }
