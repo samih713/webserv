@@ -4,9 +4,11 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SOCKETS
+// [ ] fix the socket set port functionality, some redundant functions
 // [ ] add shutdown functionality (block recv, block send, close())
 
 // SERVER
+// [ ] handle the keep alive conncetion/ currently not closing the scoket
 // [ ] 404 page loading needs to happen once in the server/serve the css page aswell
 // [ ] handle the connection
 // [ ] sessions manager/connection manager // should disconnect ...
