@@ -3,7 +3,7 @@ include ../common.mk
 NAME:= libserver.a
 
 HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
-INCLUDES:= -I./ -Isocket/ -I../includes/  $(HTTP_INCLUDES)
+INCLUDES:= -I./ -I./socket/ -I../includes/  $(HTTP_INCLUDES)
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
 
@@ -18,18 +18,14 @@ TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
 # http request/response directory
 LIBHTTPDIR:= ../http/
 LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
-#libs
-$(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) debug
 
 DEP:= $(OBJS:%.o=%.d)
 
-
 all: $(NAME)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -39,8 +35,12 @@ $(OBJS_DIR):
 	@mkdir -p $(addprefix $(OBJS_DIR)/,socket)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
-debug: all
+debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
+
+# test libs
+libhttp:
+	@make -sC $(LIBHTTPDIR) debug
 
 # tests
 client: debug
@@ -53,7 +53,7 @@ test_socket: $(TEST_SOCKET) client
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
-test_server: debug $(LIBHTTP)
+test_server: debug libhttp
 	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d $(OBJS_DIR) 
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."

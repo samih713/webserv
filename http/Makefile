@@ -2,7 +2,7 @@ include ../common.mk
 
 NAME:= libhttp.a
 
-INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/
+INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/ -I../server/socket/
 
 # REQUESTS
 REQUEST_DIR:= request
@@ -29,13 +29,13 @@ TEST_HTTP:= $(TEST_DIR)/main.cpp
 DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 run: test_http
 	./test_http
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -45,7 +45,7 @@ $(OBJS_DIR):
 	@mkdir -p $@ $(addprefix $(OBJS_DIR)/, request response handler)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
-debug: all
+debug: $(NAME) 
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 sanitize: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
