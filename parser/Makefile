@@ -13,7 +13,7 @@ TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
 CONFIG_DIR:= json
-CONFIG_FILES:= $(CONFIG_DIR)/config_sample.json $(CONFIG_DIR)/simple.json
+CONFIG_FILES:= $(wildcard $(CONFIG_DIR)/*.json)
 
 DEP:= $(OBJS:%.o=%.d)
 
