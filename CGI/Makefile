@@ -6,7 +6,7 @@
 #    By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 12:40:53 by hmohamed          #+#    #+#              #
-#    Updated: 2024/03/12 01:51:15 by hmohamed         ###   ########.fr        #
+#    Updated: 2024/03/14 04:38:12 by hmohamed         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,9 +37,9 @@
 
 include ../common.mk
 
-NAME:= libhttp.a
+NAME:= libcgi.a
 
-INCLUDES:= -I./ -I../includes/ -I../HTTP/request/ -I../HTTP/response/ -ICGI_handler
+INCLUDES:= -I./ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/ -ICGI_handler -I../HTTP/libhttp.a
 
 # CGI
 CGI_DIR:= CGI_handler

@@ -42,24 +42,38 @@ int main(int argc, char** argv, char** envp)
 {
 	(void)argc;
 	(void)argv;
+	(void)envp;
 
-	const std::string outputFile;
+	//const std::string outputFile;
 
-    const char *pythonScriptPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
-    const char *pythonInterpreterPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
-
-    // Check if the Python script exists
-    if (access(pythonScriptPath, X_OK) == -1)
+    try
     {
-        std::cerr << "Error: Python script not found or does not have execution permission." << std::endl;
-        return 1;
+        Request request(sample_request);
+        // Cgi     cgi(request);
+
+        // Execute the Python script
+       // cgi.execute("std");
+    }
+    catch (std::runtime_error &e)
+    {
+        cerr << e.what() << std::endl;
     }
 
-    // Create an instance of the CGI class
-    char* scriptArguments[] = { const_cast<char*>(pythonScriptPath), nullptr };
-    Cgi cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
+    // const char *pythonScriptPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
+    // const char *pythonInterpreterPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
 
-    // Execute the Python script
-    cgi.execute("std");
+    // // Check if the Python script exists
+    // if (access(pythonScriptPath, X_OK) == -1)
+    // {
+    //     std::cerr << "Error: Python script not found or does not have execution permission." << std::endl;
+    //     return 1;
+    // }
+
+    // // Create an instance of the CGI class
+    // char* scriptArguments[] = { const_cast<char*>(pythonScriptPath), nullptr };
+    // Cgi cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
+
+    // // Execute the Python script
+    // cgi.execute("std");
     return 0;
 }

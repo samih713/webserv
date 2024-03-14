@@ -6,16 +6,21 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/03/12 01:56:20 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/03/14 02:12:33 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "Cgi.hpp"
 
 
-Cgi::Cgi(char* filePath, char** arguments, char** environment): filePath(filePath), arguments(arguments), environment(environment)
-{
+// Cgi::Cgi(char* filePath, char** arguments, char** environment): filePath(filePath), arguments(arguments), environment(environment)
+// {
 	
+// }
+
+Cgi::Cgi(const Request &request)
+{
+	headers = request.get_headers();
 }
 
 Cgi::~Cgi()
