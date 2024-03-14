@@ -6,7 +6,7 @@
 #    By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/23 12:40:53 by hmohamed          #+#    #+#              #
-#    Updated: 2024/03/14 04:38:12 by hmohamed         ###   ########.fr        #
+#    Updated: 2024/03/14 04:56:34 by hmohamed         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,9 @@ include ../common.mk
 
 NAME:= libcgi.a
 
-INCLUDES:= -I./ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/ -ICGI_handler -I../HTTP/libhttp.a
+INCLUDES:= -I./ -I../includes/ -I../HTTP/ -I../HTTP/request/ -I../HTTP/response/ -ICGI_handler 
+
+libhttp = ../HTTP/libhttp.a
 
 # CGI
 CGI_DIR:= CGI_handler
@@ -86,7 +88,8 @@ valgrind: all
 	@echo "$(MAGENTA)[ LEAKS ]$(RESET) Checking $(NAME) for leaks."
 
 test_cgi: fclean debug
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_CGI) $(NAME) -o $@
+	@make -C ../HTTP
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(libhttp) $(TEST_CGI) $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) CGI is now ready for testing."
 
@@ -96,6 +99,7 @@ clean:
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
+	make fclean -C ../HTTP
 	@$(RM) $(NAME)
 	@$(RM) test_cgi
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
