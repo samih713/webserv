@@ -1,13 +1,19 @@
 #include "JsonParser.hpp"
 
 /**
- * @brief Parse the JSON string
+ * @brief Parse the JSON string and also check if there are any characters left after parsing
  * 
  * @return JsonValue The main Json object
 */
 JsonValue JsonParser::parseJSON(void) {
     std::cout << "Parsing JSON" << std::endl;
-    return parseValue();
+
+    JsonValue json = parseValue();
+
+    if (_itr != _content.end())
+        throw std::runtime_error(ERR_JSON_PARSE);
+
+    return json;
 }
 
 /**

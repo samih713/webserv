@@ -1,7 +1,7 @@
 #include "ConfigParser.hpp"
 
 ConfigParser::ConfigParser(const std::string filepath) {
-    std::cout << "Reading config file: " << filepath << std::endl;
+    std::cout << "Reading config file: " << W << filepath << RE << std::endl;
 
     struct stat filestat;
     if (stat(filepath.c_str(), &filestat) != 0)
@@ -12,6 +12,8 @@ ConfigParser::ConfigParser(const std::string filepath) {
     std::ifstream inputFileStream(filepath.c_str());
     if (inputFileStream.fail())
         throw std::runtime_error(ERR_OPEN);
+    if (inputFileStream.peek() == std::ifstream::traits_type::eof())
+        throw std::runtime_error(ERR_EMPTY);
 
     // Reading the entire file into a string, then removing all whitespace
     std::string file((std::istreambuf_iterator<char>(inputFileStream)), std::istreambuf_iterator<char>());
@@ -24,5 +26,16 @@ ConfigParser::ConfigParser(const std::string filepath) {
 
 JsonValue ConfigParser::parseConfig(void) {
     JsonValue config = JsonParser(_content).parseJSON();
+
+    if (config.getType() != JsonValue::JSON_OBJECT)
+        throw std::runtime_error(ERR_JSON_PARSE);
+    
+    if (config.asObject().empty())
+        throw std::runtime_error(ERR_EMPTY);
+    // now we need to iterate through the object and validate it as per NGINX config rules
+
+
+    std::cout << L << "Config file parsed successfully" << RE << std::endl;
+
     return config;
 }
