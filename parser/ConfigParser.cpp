@@ -24,4 +24,5 @@ ConfigParser::ConfigParser(const std::string filepath) {
 
 JsonValue ConfigParser::parseConfig(void) {
     JsonValue config = JsonParser(_content).parseJSON();
+    return config;
 }
