@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - server/*
-      - conf-parser
+      - parsing
 
 jobs:
   build-linux:
