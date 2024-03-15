@@ -57,9 +57,6 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-// buffer size
-static const int BUFFER_SIZE = 4096;
-
 /**
  * Handles a connection on the given socket.
  *
@@ -70,15 +67,20 @@ static const int BUFFER_SIZE = 4096;
  * @param recvSocket The file descriptor of the socket to handle the connection on.
  * @throws std::runtime_error if an error occurs while receiving data from the socket.
  */
-void Server::handle_connection(fd recvSocket)
+bool Server::handle_connection(fd recvSocket)
 {
     char buffer[BUFFER_SIZE] = { 0 };
     int  bytesReceived;
     try
     {
         bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
+
         if (bytesReceived == -1)
             throw std::runtime_error(strerror(errno));
+
+        if (bytesReceived == 0)
+            return CLOSE_CONNECTION;
+
         string  message(&buffer[0], &buffer[0] + bytesReceived);
         Request request(message);
         // TODO [ ] compare bytesReceived with size from headers
@@ -92,6 +94,7 @@ void Server::handle_connection(fd recvSocket)
     {
         DEBUG_MSG(e.what(), R);
     }
+    return KEEP_ALIVE;
 }
 
 /* -------------------------------------------------------------------------- */
