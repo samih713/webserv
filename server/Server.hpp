@@ -42,8 +42,6 @@ class Server
         const Config &config;
         CachedPages  *cachedPages;
 
-        ConnectionManager connectionManager;
-
         bool handle_connection(fd recvSocket);
         /* polling strats */
         void select_strat();

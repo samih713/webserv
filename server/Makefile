@@ -34,7 +34,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $(addprefix $(OBJS_DIR)/,socket connection_manager)
 
-debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
+debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
@@ -54,7 +54,7 @@ test_socket: $(TEST_SOCKET) client
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug libhttp
-	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 

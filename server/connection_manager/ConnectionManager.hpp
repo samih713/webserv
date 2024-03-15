@@ -10,37 +10,35 @@ typedef std::map<fd, TimeOut> ConnectionMap;
 class ConnectionManager
 {
     public:
-        ConnectionManager(){}; // default initialization
-        void        remove_expired(fd_set &currentSockets);
-        inline void check_connection(fd currentSocket);
-        inline void remove_connection(fd currentSocket, fd_set &currentSockets);
-        inline void add_connection(fd currentSocket, fd_set &currentSockets);
+        static void        remove_expired(fd_set &activeSockets);
+        static inline void update_connection(fd currentSocket);
+        static inline void remove_connection(fd currentSocket, fd_set &activeSockets);
+        static inline void add_connection(fd newConnection, fd_set &activeSockets);
 
     private:
-        ConnectionMap connectionMap;
+        static ConnectionMap connectionMap;
+        ConnectionManager();
 };
 
-inline void ConnectionManager::check_connection(fd currentSocket)
+inline void ConnectionManager::update_connection(fd currentSocket)
 {
-    // check if currentSocket is already in map
-    std::map<fd, TimeOut>::iterator it = connectionMap.find(currentSocket);
-    if (it == connectionMap.end())
-        connectionMap.insert(std::make_pair(currentSocket, TimeOut()));
-    else // update time
-        it->second.update_time();
+    ConnectionMap::iterator it = connectionMap.find(currentSocket);
+	DEBUGASSERT(it != connectionMap.end() && "Connection not found");
+	it->second.update_time();
 }
 
-inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &currentSockets)
+inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &activeSockets)
 {
-    FD_CLR(currentSocket, &currentSockets);
+    FD_CLR(currentSocket, &activeSockets);
     close(currentSocket);
     connectionMap.erase(connectionMap.find(currentSocket));
+	DEBUG_MSG("Connection closed", L);
 }
 
-inline void ConnectionManager::add_connection(fd clientSocket, fd_set &currentSockets)
+inline void ConnectionManager::add_connection(fd newConnection, fd_set &activeSockets)
 {
-    FD_SET(clientSocket, &currentSockets);
-    connectionMap.insert(std::make_pair(clientSocket, TimeOut()));
+    FD_SET(newConnection, &activeSockets);
+    connectionMap.insert(std::make_pair(newConnection, TimeOut()));
 }
 
 #endif // CONNECTION_MANAGER_HPP

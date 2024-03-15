@@ -45,7 +45,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $@ $(addprefix $(OBJS_DIR)/, request response handler)
 
-debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
+debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
