@@ -23,6 +23,14 @@ public:
     const std::vector<JsonValue>& asArray() const { return _array; };
     const std::map<std::string, JsonValue>& asObject() const { return _object; };
 
+    typedef std::map<std::string, JsonValue>::const_iterator objectIterator;
+    objectIterator begin() const { return _object.begin(); }
+    objectIterator end() const { return _object.end(); }
+
+    typedef std::vector<JsonValue>::const_iterator arrayIterator;
+    arrayIterator beginArray() const { return _array.begin(); }
+    arrayIterator endArray() const { return _array.end(); }
+
 private:
     Type _type;
     int _number;
