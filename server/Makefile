@@ -3,9 +3,9 @@ include ../common.mk
 NAME:= libserver.a
 
 HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
-INCLUDES:= -I./ -I./socket/ -I../includes/  $(HTTP_INCLUDES)
+INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/  $(HTTP_INCLUDES)
 
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp
 
 OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
@@ -32,7 +32,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $(addprefix $(OBJS_DIR)/,socket)
+	@mkdir -p $(addprefix $(OBJS_DIR)/,socket connection_manager)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
 debug: $(NAME)
@@ -54,8 +54,8 @@ test_socket: $(TEST_SOCKET) client
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
 test_server: debug libhttp
-	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
-	@mv *.d $(OBJS_DIR) 
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
 tests: test_socket test_server

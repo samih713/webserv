@@ -2,7 +2,8 @@ include ../common.mk
 
 NAME:= libhttp.a
 
-INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/ -I../server/socket/
+INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/ \
+		   -I../server/socket/ -I../server/connection_manager/
 
 # REQUESTS
 REQUEST_DIR:= request
@@ -45,7 +46,7 @@ $(OBJS_DIR):
 	@mkdir -p $@ $(addprefix $(OBJS_DIR)/, request response handler)
 
 debug: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
-debug: $(NAME) 
+debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 sanitize: CXXFLAGS += $(DEBUGFLAGS) $(SANITIZE)
