@@ -27,11 +27,6 @@ ConfigParser::ConfigParser(const std::string filepath) {
 JsonValue ConfigParser::parseConfig(void) {
     JsonValue config = JsonParser(_content).parseJSON();
 
-    if (config.getType() != JsonValue::JSON_OBJECT)
-        throw std::runtime_error(ERR_JSON_PARSE);
-    
-    if (config.asObject().empty())
-        throw std::runtime_error(ERR_EMPTY);
     // now we need to iterate through the object and validate it as per NGINX config rules
 
 

@@ -13,6 +13,12 @@ JsonValue JsonParser::parseJSON(void) {
     if (_itr != _content.end())
         throw std::runtime_error(ERR_JSON_PARSE);
 
+    if (json.getType() != JsonValue::JSON_OBJECT)
+        throw std::runtime_error(ERR_JSON_TYPE);
+
+    if (json.asObject().empty())
+        throw std::runtime_error(ERR_EMPTY);
+
     return json;
 }
 
