@@ -1,109 +1,180 @@
+/* -------------------------------- INCLUDES -------------------------------- */
 #include "Server.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
 #include "Request.hpp"
-#include <cassert>
-#include <cstddef>
-#include <cstring>
-#include <netinet/in.h>
-#include <stdexcept>
+#include "RequestHandlerFactory.hpp"
+#include "debug.hpp"
+#include <algorithm>
 #include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <utility>
+/* -------------------------------- INCLUDES -------------------------------- */
 
-using std::string;
+/* ------------------------------- CONSTRUCTOR ------------------------------ */
 
-Server &Server::getInstance(int listenerPort, int backlog)
+/**
+ * @brief Returns the singleton instance of the Server class,
+ * creating it if necessary.
+ *
+ * @param config reference to config object, containing root,
+ * default, error pages ... etc
+ * @param backLog The maximum length of the queue of pending connections
+ * @return A reference to the singleton instance of the Server class
+ */
+Server &Server::get_instance(const Config &config, int backLog)
 {
-    // avoid creating another one
-    static Server instance(listenerPort, backlog);
+    static Server instance(config, backLog);
     return instance;
 }
 
-// default constructor
-Server::Server(fd listenerPort, int backlog)
-    : _listenerFD(_listener.get_fd())
-    , _listener_port(listenerPort)
+/**
+ * @brief Constructor for the Server class.
+ *
+ * This constructor initializes a Server object with the provided configuration and
+ * backlog.
+ *
+ * @param config The configuration settings for the server.
+ * @param backLog The maximum length of the queue of pending connections.
+ *
+ * @throws Socket::Exception if there is an issue with setting up the listener socket.
+ */
+Server::Server(const Config &config, int backLog)
+    : listener(config.listenerPort, backLog)
+    , config(config)
+    , cachedPages(new CachedPages(config))
 {
-    // setup the Server
-    _listener.set_port(_listener_port);
-    _listener.bind();
-    _listener.listen(backlog);
+    DEBUG_MSG("Server was created successfully", B);
 }
 
+/* ------------------------------- DESTRUCTOR ------------------------------- */
+
+/**
+ * Destroys the server deleting cahcedPages
+ */
 Server::~Server()
 {
-    ::close(_listener.socket_descriptor);
+    delete cachedPages;
 }
 
-static void handle_connection(fd recv_socket)
+/* ---------------------------- HANDLE CONNECTION --------------------------- */
+
+/**
+ * Handles a connection on the given socket.
+ *
+ * This function reads data from the socket, creates an HTTP request object,
+ * determines the appropriate request handler based on the request method,
+ * and generates an HTTP response. The response is then written back to the socket.
+ *
+ * @param recvSocket The file descriptor of the socket to handle the connection on.
+ *
+ * @throws std::runtime_error if an error occurs while receiving data from the socket.
+ */
+bool Server::handle_connection(fd recvSocket)
 {
-    // assert(false && "not implemented");
-
-    // sessions manager/connection manager
-
-    // generate a request // simple parsing for now
-    // generate a response // simple building response
-    // connection manager // should disconnect ...
-    // I/O multiplexing // which client to
-    // cgi //
-    // class designed // i think we can start simple
-
-    char buffer[BUFFER_SIZE];
-    int  bytesReceived = recv(recv_socket, &buffer[0], BUFFER_SIZE, 0);
-
-    if (bytesReceived == -1)
-        throw std::runtime_error(strerror(errno));
-
-    string                 message(&buffer[0], &buffer[0] + bytesReceived);
-    webserv::http::Request request(message);
-}
-
-#if 1
-#undef FD_SETSIZE
-#define FD_SETSIZE 24
-#endif
-
-void Server::__select_strat()
-{
-    fd_set current_sockets;
-    fd_set ready_sockets;
-
-    FD_ZERO(&current_sockets);
-
-    FD_SET(_listenerFD, &current_sockets);
-    while (true)
+    char buffer[BUFFER_SIZE] = { 0 };
+    int  bytesReceived;
+    try
     {
-        DEBUG_MSG(wait_message, R);
+        bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
 
-        ready_sockets = current_sockets;
-
-        if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0 && (errno = 2))
+        if (bytesReceived == -1)
             throw std::runtime_error(strerror(errno));
 
-        for (int i = 0; i < FD_SETSIZE; i++)
-        {
-            if (FD_ISSET(i, &ready_sockets))
-            {
-                if (i == _listenerFD)
-                {
-                    fd client_socket = _listener.accept();
-                    FD_SET(client_socket, &current_sockets);
-                }
-                else
-                {
-                    DEBUG_MSG("reading from connection", M);
-                    handle_connection(i);
-                    FD_CLR(i, &current_sockets);
-                }
-            }
-        }
+        if (bytesReceived == 0)
+            return CLOSE_CONNECTION;
+
+        string  message(&buffer[0], &buffer[0] + bytesReceived);
+        Request request(message);
+        // TODO [ ] compare bytesReceived with size from headers
+        IRequestHandler *handler =
+            RequestHandlerFactory::MakeRequestHandler(request.get_method());
+        Response response = handler->handle_request(request, cachedPages, config);
+        response.write_response(recvSocket);
+        delete handler;
     }
+    catch (std::runtime_error &e)
+    {
+        DEBUG_MSG(e.what(), R);
+    }
+    return KEEP_ALIVE;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                POLLING STRAT                               */
+/* -------------------------------------------------------------------------- */
+
+// define static member
+ConnectionMap ConnectionManager::connectionMap;
+
+/* --------------------------------- SELECT --------------------------------- */
+
+void Server::select_strat()
+{
+	struct timeval selectTimeOut = { .tv_sec=SELECTWAITTIME, .tv_usec=0 };
+
+	fd newConnection;
+	const fd listenerFd = listener.get_fd();
+
+	fd_set activeSockets;
+	fd_set readytoRead;
+
+	FD_ZERO(&activeSockets);
+	FD_SET(listenerFd, &activeSockets);
+
+	// Initialize with listenerFd
+	fd maxSocketDescriptor = listenerFd;
+
+	while (true)
+	{
+		DEBUG_MSG(WAIT_MESSAGE, L);
+
+		readytoRead = activeSockets;
+
+		if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
+			throw std::runtime_error(strerror(errno));
+		selectTimeOut.tv_sec = SELECTWAITTIME;
+
+		ConnectionManager::remove_expired(activeSockets);
+
+		for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
+		{
+			if (FD_ISSET(currentSocket, &readytoRead))
+			{
+				if (currentSocket == listenerFd)
+				{
+					newConnection = listener.accept();
+					ConnectionManager::add_connection(newConnection, activeSockets);
+					maxSocketDescriptor = std::max(maxSocketDescriptor, newConnection);
+				}
+				else
+				{
+					DEBUG_MSG("reading from connection", M);
+					if (handle_connection(currentSocket) != CLOSE_CONNECTION)
+						ConnectionManager::update_connection(currentSocket);
+					else
+						ConnectionManager::remove_connection(currentSocket, activeSockets);
+				}
+			}
+		}
+	}
+}
+
+/* ---------------------------------- START --------------------------------- */
+
+/**
+ * Starts the server using the specified polling strategy.
+ *
+ * @param strategy The polling strategy to use (SELECT, KQUEUE, POLL, EPOLL)
+ * @throws InvalidStrategyException if an invalid polling strategy is provided
+ */
 void Server::start(enum polling_strat strategy)
 {
     switch (strategy)
     {
-        case SELECT: __select_strat(); break;
-        default: break;
+        case SELECT: select_strat(); break;
+        // case KQUEUE: kqueue_strat(); break;
+        // case POLL: poll_strat(); break;
+        // case EPOLL: epoll_strat(); break;
+        default: throw std::runtime_error("Invalid strategy"); break;
     }
 }

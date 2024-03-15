@@ -45,7 +45,7 @@ Response::Response(const Response &other)
 
 
 //! needs to be adjusted dont use write? for now only doing to test with cout
-void Response::write_response(ostream &outFile) const
+void Response::write_response(fd recv_socket) const
 {
     ostringstream os;
     // status line
@@ -56,12 +56,14 @@ void Response::write_response(ostream &outFile) const
     for (vsp::const_iterator it = begin; it != end; it++)
         os << it->first << ": " << it->second << CRLF;
     os << CRLF;
-    // output the header
-    outFile << os.str();
 
-    // output the body
-    vector<char> v_body(body.begin(), body.end());
-    outFile.write(body.data(), body.size());
+    string headerString = os.str();
+    // add the header
+    vector<char> message(headerString.begin(), headerString.end());
+    // add the body
+    message.insert(message.end(), body.begin(), body.end());
+    // send all
+    ::send(recv_socket, message.data(), message.size(), 0);
 }
 
 // deleted copy assignment
