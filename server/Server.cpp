@@ -51,7 +51,9 @@ Server::Server(const Config &config, int backLog)
  * Destroys the server closing its listener socket
  */
 Server::~Server()
-{}
+{
+    delete cachedPages;
+}
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
