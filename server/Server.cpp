@@ -4,15 +4,10 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "RequestHandlerFactory.hpp"
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <netinet/in.h>
-#include <stdexcept>
+#include "debug.hpp"
+#include <algorithm>
 #include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <utility>
 /* -------------------------------- INCLUDES -------------------------------- */
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
@@ -40,16 +35,14 @@ Server &Server::get_instance(const Config &config, int backLog)
  * @param config The configuration settings for the server.
  * @param backLog The maximum length of the queue of pending connections.
  *
- * @throws std::runtime_error if there is an issue with setting up the listener socket.
+ * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
 Server::Server(const Config &config, int backLog)
-    : config(config)
-    , listenerFd(listener.get_fd())
+    : listener(config.listenerPort, backLog)
+    , config(config)
+    , cachedPages(new CachedPages(config))
 {
-    listener.set_port(config.listenerPort);
-    listener.bind();
-    listener.listen(backLog);
-    cachedPages = new CachedPages(config);
+    DEBUG_MSG("Server was created successfully", B);
 }
 
 /* ------------------------------- DESTRUCTOR ------------------------------- */

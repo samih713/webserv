@@ -8,14 +8,14 @@
  *
  * This class represents a TCP socket that uses the SOCK_STREAM protocol and operates on
  * IPv4 addresses.
- *
+ *x-terminal-emulator
  * @class TCPSocket
  */
 class TCPSocket : public Socket
 {
 
     public:
-        TCPSocket();
+        TCPSocket(int port, int backlog);
         ~TCPSocket() throw();
 
     private:

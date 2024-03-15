@@ -5,12 +5,18 @@
 #endif // __DEBUG__
 
 /**
- * @brief This constructor initializes a TCPSocket object with default values.
- * It sets up the socket address structure with INADDR_ANY and family AF_INET.
+ * @brief Constructor for creating a TCP socket with the specified port and backlog.
  *
- * @throws None
+ * This constructor initializes a TCPSocket object with the given port number and backlog
+ * value. It sets up the socket address structure, binds the socket to the specified port,
+ * and starts listening for incoming connections with the specified backlog.
+ *
+ * @param port The port number to bind the socket to.
+ * @param backLog The maximum length of the queue of pending connections.
+ *
+ * @throws Socket::Exception if there is an error in creating or setting up the socket.
  */
-TCPSocket::TCPSocket()
+TCPSocket::TCPSocket(int port, int backLog)
     : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
@@ -19,11 +25,15 @@ TCPSocket::TCPSocket()
     addr.sin_family = family;
     std::memcpy(&address, &addr, sizeof(addr));
 
-    DEBUG_MSG("TCPSocket created successfully", C);
+    // set-up port
+    set_port(port);
+    bind();
+    listen(backLog);
+    DEBUG_MSG("TCPSocket created successfully, listening on port [" + ws_itoa(port) + "]",
+              L);
 }
 
 
-/* @brief Destructor for TCPSocket */
 TCPSocket::~TCPSocket() throw()
 {
     DEBUG_MSG("TCPSocket closed!!", R);
