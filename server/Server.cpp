@@ -107,42 +107,55 @@ bool Server::handle_connection(fd recvSocket)
 #undef FD_SETSIZE
 #define FD_SETSIZE 24
 
-// wait message
-static const std::string wait_message("Server is now waiting for connections...\n");
 
-/**
- * This function uses the select system call to monitor multiple file descriptors for read
- * readiness.
- *
- * @throws std::runtime_error if an error occurs during the select system call
- */
 void Server::select_strat()
 {
+    struct timeval selectTimeOut = { SELECTWAITTIME, 0 };
+
+    fd       clientSocket;
+    const fd listenerFd = listener.get_fd();
+    bool     connectionStatus = KEEP_ALIVE;
+
     fd_set currentSockets;
     fd_set readytoRead;
 
     FD_ZERO(&currentSockets);
     FD_SET(listenerFd, &currentSockets);
+
     while (true)
     {
-        DEBUG_MSG(wait_message, R);
+        DEBUG_MSG(WAIT_MESSAGE, L);
+
         readytoRead = currentSockets;
-        if (select(FD_SETSIZE, &readytoRead, NULL, NULL, NULL) < 0 && (errno = 2))
+
+        if (select(FD_SETSIZE, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             throw std::runtime_error(strerror(errno));
-        for (fd recvSocket = 0; recvSocket < FD_SETSIZE; recvSocket++)
+        selectTimeOut.tv_sec = SELECTWAITTIME;
+
+        connectionManager.remove_expired(currentSockets);
+
+        for (fd currentSocket = 0; currentSocket < FD_SETSIZE; currentSocket++)
         {
-            if (FD_ISSET(recvSocket, &readytoRead))
+            if (FD_ISSET(currentSocket, &readytoRead))
             {
-                if (recvSocket == listenerFd)
+                if (currentSocket == listenerFd)
                 {
-                    fd clientSocket = listener.accept();
-                    FD_SET(clientSocket, &currentSockets);
+                    clientSocket = listener.accept();
+                    connectionManager.add_connection(clientSocket, currentSockets);
                 }
                 else
                 {
                     DEBUG_MSG("reading from connection", M);
-                    handle_connection(recvSocket);
-                    // FD_CLR(recvSocket, &currentSockets);
+                    connectionStatus = handle_connection(currentSocket);
+                    // check if currentSocket is already in map
+                    connectionManager.check_connection(currentSocket);
+                    // close if recv = 0
+                    if (connectionStatus == CLOSE_CONNECTION)
+                    {
+                        DEBUG_MSG("Connection closed", L);
+                        connectionManager.remove_connection(currentSocket,
+                                                            currentSockets);
+                    }
                 }
             }
         }
