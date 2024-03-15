@@ -24,20 +24,18 @@ static const int SOCK_FLAG = 0;
  */
 class Socket
 {
-
     public:
         virtual ~Socket() throw();
-        /* [INTERFACE] */
+        /* -------------------------------- Interface ------------------------------- */
         void set_port(int port);
         fd   get_fd() const throw();
         void bind() const;
         void listen(int backlog) const;
         fd   accept();
-        // why is this public
 
+        /* ---------------------------- Socket Exception ---------------------------- */
         class Exception : public std::exception
         {
-
             public:
                 explicit Exception(const std::string &error_message);
                 ~Exception() throw(){};
@@ -49,6 +47,7 @@ class Socket
         };
 
     protected:
+        /* ------------------------------- Constructor ------------------------------ */
         Socket(int family, int type, int protocol, int flags);
         struct sockaddr address;
 
@@ -59,11 +58,8 @@ class Socket
         mutable bool    isListening;
 
         // deleted
-        Socket(const Socket &){};
-        Socket &operator=(const Socket &)
-        {
-            return *this;
-        };
+        Socket(const Socket &);
+        Socket &operator=(const Socket &);
 };
 
 #endif // SOCKET_HPP

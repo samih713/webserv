@@ -4,14 +4,14 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
-// [ ] handle the keep alive conncetion/ currently not closing the scoket
-// [ ] 404 page loading needs to happen once in the server/serve the css page aswell
-// [ ] handle the connection
-// [ ] sessions manager/connection manager // should disconnect ...
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
 // [ ] solve linkage issue (with data)
 // [ ] (Server.cpp) compare bytesReceived with size from headers
+// [ ] Address sanitizer error when testing with ./test_server
+// [x] Server constructor needs to handle socket creation failure
+// [x] handle keep alive, currently not closing the scoket
+// [x] 404 page loading needs to happen once in the server/serve the css page aswell
 // [x] Implement response
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
@@ -32,6 +32,8 @@
 #include "debug.hpp"
 #include <algorithm>
 #include <cerrno>
+#include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
@@ -44,6 +46,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>

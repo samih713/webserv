@@ -29,8 +29,9 @@ class CachedPages
                 notFound.contentLength = notFoundDefault.tellg();
                 notFound.contentType = "text/html";
                 notFoundDefault.seekg(0, std::ios_base::beg);
-                notFound.data = vector<char>((std::istreambuf_iterator<char>(notFoundDefault)),
-                                             std::istreambuf_iterator<char>());
+                notFound.data =
+                    vector<char>((std::istreambuf_iterator<char>(notFoundDefault)),
+                                 std::istreambuf_iterator<char>());
             }
             // load the indexDefault page
             ifstream indexDefault(config.home.c_str(), std::ios_base::binary);
@@ -46,7 +47,7 @@ class CachedPages
                 indexDefault.seekg(0, std::ios_base::beg);
                 home.contentType = "text/html";
                 home.data = vector<char>((std::istreambuf_iterator<char>(indexDefault)),
-                                                std::istreambuf_iterator<char>());
+                                         std::istreambuf_iterator<char>());
             }
         }
         ~CachedPages()
