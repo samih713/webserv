@@ -1,4 +1,6 @@
-#include "IRequestHandler.hpp"
+#include "Request.hpp"
+#include "RequestHandlerBase.hpp"
+#include "Response.hpp"
 #include "Server.hpp"
 #include "webserv.hpp"
 
@@ -7,7 +9,7 @@
 
 using namespace webserv::http;
 
-class GetRequestHandler : public IRequestHandler
+class GetRequestHandler : public RequestHandlerBase
 {
     public:
         GetRequestHandler();
@@ -15,18 +17,11 @@ class GetRequestHandler : public IRequestHandler
         Response handle_request(const Request     &request,
                                 const CachedPages *cachedPages,
                                 const Config      &config);
-        void     add_header(pair<string, string> header_field)
-        {
-            response_headers.push_back(header_field);
-        }
 
     private:
         const vector<char> get_resource(const Request     &request,
                                         const CachedPages *cached,
                                         const Config      &config);
-        STATUS_CODE        status;
-        vector<char>       body;
-        vsp                response_headers;
 };
 
 #endif // GETREQUESTHANDLER_HPP

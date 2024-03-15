@@ -1,6 +1,5 @@
 #include "Response.hpp"
 #include "Server.hpp"
-#include "webserv.hpp"
 
 #ifndef IRequestHandler_HPP
 #define IRequestHandler_HPP
@@ -18,8 +17,6 @@ class IRequestHandler
         virtual Response handle_request(const Request     &request,
                                         const CachedPages *cachedPages,
                                         const Config      &config) = 0;
-        virtual void     add_header(pair<string, string> header_field) = 0;
 };
-
 
 #endif // IRequestHandler_HPP

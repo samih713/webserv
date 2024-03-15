@@ -28,7 +28,6 @@ inline const string find_resource_type(const string &resource)
 }
 
 
-// when does this close, should be done in the server
 const vector<char> GetRequestHandler::get_resource(const Request     &request,
                                                    const CachedPages *cachedPages,
                                                    const Config      &config)
@@ -78,11 +77,11 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
             body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                                 std::istreambuf_iterator<char>());
 
-			// content type
+            // content type
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(std::make_pair<string, string>("Content-Type", resource_type));
-			// content length
+            // content length
             resource_file.seekg(0, std::ios_base::end);
             resource_size = resource_file.tellg();
             add_header(
