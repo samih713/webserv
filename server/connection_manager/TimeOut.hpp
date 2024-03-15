@@ -4,7 +4,7 @@
 #define TIMOUT_HPP
 
 // default connection time out, this needs to come from the config
-static const time_t DEFAULT_TIMEOUT(60);
+static const time_t DEFAULT_TIMEOUT(2);
 
 struct TimeOut
 {

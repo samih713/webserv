@@ -124,8 +124,7 @@ void Server::select_strat()
 	// Initialize with listenerFd
 	fd maxSocketDescriptor = listenerFd;
 
-	// while (true)
-	for (int i = 0; i < 10; i++)
+	while (true)
 	{
 		DEBUG_MSG(WAIT_MESSAGE, L);
 

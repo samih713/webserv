@@ -6,9 +6,9 @@
 // SERVER
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
-// [ ] solve linkage issue (with data)
 // [ ] (Server.cpp) compare bytesReceived with size from headers
 // [ ] Address sanitizer error when testing with ./test_server
+// [x] solve linkage issue (with data)
 // [x] Server constructor needs to handle socket creation failure
 // [x] handle keep alive, currently not closing the scoket
 // [x] 404 page loading needs to happen once in the server/serve the css page aswell
