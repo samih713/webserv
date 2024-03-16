@@ -110,53 +110,54 @@ ConnectionMap ConnectionManager::connectionMap;
 
 void Server::select_strat()
 {
-	struct timeval selectTimeOut = { .tv_sec=SELECTWAITTIME, .tv_usec=0 };
+    struct timeval selectTimeOut = { .tv_sec = SELECTWAITTIME, .tv_usec = 0 };
 
-	fd newConnection;
-	const fd listenerFd = listener.get_fd();
+    fd       newConnection;
+    const fd listenerFd = listener.get_fd();
 
-	fd_set activeSockets;
-	fd_set readytoRead;
+    fd_set activeSockets;
+    fd_set readytoRead;
 
-	FD_ZERO(&activeSockets);
-	FD_SET(listenerFd, &activeSockets);
+    FD_ZERO(&activeSockets);
+    FD_SET(listenerFd, &activeSockets);
 
-	// Initialize with listenerFd
-	fd maxSocketDescriptor = listenerFd;
+    // Initialize with listenerFd
+    fd maxSocketDescriptor = listenerFd;
 
-	while (true)
-	{
-		DEBUG_MSG(WAIT_MESSAGE, L);
+    while (true)
+    {
+        DEBUG_MSG(WAIT_MESSAGE, L);
 
-		readytoRead = activeSockets;
+        readytoRead = activeSockets;
 
-		if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-			throw std::runtime_error(strerror(errno));
-		selectTimeOut.tv_sec = SELECTWAITTIME;
+        if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
+            throw std::runtime_error(strerror(errno));
+        selectTimeOut.tv_sec = SELECTWAITTIME;
 
-		ConnectionManager::remove_expired(activeSockets);
+        ConnectionManager::remove_expired(activeSockets);
 
-		for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
-		{
-			if (FD_ISSET(currentSocket, &readytoRead))
-			{
-				if (currentSocket == listenerFd)
-				{
-					newConnection = listener.accept();
-					ConnectionManager::add_connection(newConnection, activeSockets);
-					maxSocketDescriptor = std::max(maxSocketDescriptor, newConnection);
-				}
-				else
-				{
-					DEBUG_MSG("reading from connection", M);
-					if (handle_connection(currentSocket) != CLOSE_CONNECTION)
-						ConnectionManager::update_connection(currentSocket);
-					else
-						ConnectionManager::remove_connection(currentSocket, activeSockets);
-				}
-			}
-		}
-	}
+        for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
+        {
+            if (FD_ISSET(currentSocket, &readytoRead))
+            {
+                if (currentSocket == listenerFd)
+                {
+                    newConnection = listener.accept();
+                    ConnectionManager::add_connection(newConnection, activeSockets);
+                    maxSocketDescriptor = std::max(maxSocketDescriptor, newConnection);
+                }
+                else
+                {
+                    DEBUG_MSG("reading from connection", M);
+                    if (handle_connection(currentSocket) != CLOSE_CONNECTION)
+                        ConnectionManager::update_connection(currentSocket);
+                    else
+                        ConnectionManager::remove_connection(currentSocket,
+                                                             activeSockets);
+                }
+            }
+        }
+    }
 }
 
 /* ---------------------------------- START --------------------------------- */
