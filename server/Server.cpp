@@ -128,13 +128,12 @@ void Server::select_strat()
     {
         DEBUG_MSG(WAIT_MESSAGE, L);
 
+        ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             throw std::runtime_error(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
-
-        ConnectionManager::remove_expired(activeSockets);
 
         for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
         {
