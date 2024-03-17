@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/03/14 02:12:33 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/03/17 04:22:38 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,64 @@
 	
 // }
 
+char **headersToEnv(vsp &headers)
+{
+    std::vector<char *> envVector;
+
+    // Iterate through headers
+    for (vsp::iterator it = headers.begin(); it != headers.end(); ++it)
+    {
+        size_t len = it->first.size() + it->second.size() + 2;
+        char *envEntry = new char[len];
+        std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
+        envVector.push_back(envEntry);
+    }
+
+    // Allocate memory for char* array
+    char **envp = new char *[envVector.size() + 1]; 
+
+    // Copy pointers from vector to char* array
+    for (size_t i = 0; i < envVector.size(); ++i)
+    {
+        envp[i] = envVector[i];
+    }
+    envp[envVector.size()] = NULL;
+
+    return envp;
+}
+
+
 Cgi::Cgi(const Request &request)
 {
 	headers = request.get_headers();
+	environment = headersToEnv(headers);
+    filePath = const_cast<char *> (request.get_resource().c_str());
+    // // Check if the Python script exists
+    if (access(filePath, X_OK) == -1)
+    {
+        std::cerr << "Error: Python script not found or does not have execution permission." << std::endl; 
+		return ;
+    }
+    arguments = new char *[2];
+	arguments[0] = filePath;
+	arguments[1] = NULL;
+
+    cout<<filePath << endl;
+    // Print out the environment variables
+    for (int i = 0; environment[i] != NULL; ++i)
+    {
+        std::cout << environment[i] << std::endl;
+    }
 }
 
 Cgi::~Cgi()
 {
-
+    for (int i = 0; environment[i] != NULL; ++i)
+    {
+        delete[] environment[i];
+    }
+    delete[] environment;
+	delete[] arguments;
 }
 
 // void Cgi::execute()

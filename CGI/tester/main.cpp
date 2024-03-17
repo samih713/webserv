@@ -43,16 +43,27 @@ int main(int argc, char** argv, char** envp)
 	(void)argc;
 	(void)argv;
 	(void)envp;
+	vsp headers;
 
 	//const std::string outputFile;
 
     try
     {
-        Request request(sample_request);
-        // Cgi     cgi(request);
+        Request request(sample_request_cgi);
+        // headers = request.get_headers();
+		// cout<< endl << request.get_resource()<< endl;
 
-        // Execute the Python script
-       // cgi.execute("std");
+        // // Print headers
+        // cout << "Headers:" << endl;
+        // for (vsp::iterator it = headers.begin();
+        //      it != headers.end(); ++it)
+        // {
+        //     cout << it->first << ": " << it->second << endl;
+        // }
+
+        Cgi     cgi(request);
+
+       cgi.execute("stds");
     }
     catch (std::runtime_error &e)
     {
