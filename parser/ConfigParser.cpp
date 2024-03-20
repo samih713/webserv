@@ -4,22 +4,25 @@ ConfigParser::ConfigParser(std::string const& configFile) {
     // read file
     std::cout << "Parsing " << W << configFile << RE << std::endl;
 
+    // checking file extension
     if (configFile.find(".conf") == std::string::npos) {
         throw std::runtime_error(ERR_INVALID_FILE);
         return;
     }
 
+    // check if file exists and is a regular file
     struct stat fileStat;
     if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode)) {
         throw std::runtime_error(ERR_STAT);
         return;
     }
 
+    // open file
     std::ifstream file(configFile.c_str());
     if (!file.is_open()) {
         throw std::runtime_error(ERR_OPEN);
         return;
-    } else if (file.peek() == std::ifstream::traits_type::eof()) {
+    } else if (file.peek() == std::ifstream::traits_type::eof()) { // check if file is empty
         throw std::runtime_error(ERR_EMPTY);
         return;
     }
@@ -45,21 +48,21 @@ ConfigParser::ConfigParser(std::string const& configFile) {
 void ConfigParser::_tokenize(void) {
     std::string currentToken;
     for (std::string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
-        if (*itr == '{' || *itr == '}' || *itr == ';') {
+        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
             if (!currentToken.empty()) {
                 _tokens.push_back(currentToken);
                 currentToken.clear();
             }
             _tokens.push_back(std::string(1, *itr));
         }
-        else if (std::isspace(*itr)) {
+        else if (std::isspace(*itr)) { // whitespace
             if (!currentToken.empty()) {
                 _tokens.push_back(currentToken);
                 currentToken.clear();
             }
         }
         else
-            currentToken.push_back(*itr);
+            currentToken.push_back(*itr); // add character to current token
     }
 }
 
