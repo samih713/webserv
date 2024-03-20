@@ -4,7 +4,7 @@ NAME:= libparser.a
 
 INCLUDES:= -I./ -I../includes/
 
-SRCS:= ConfigParser.cpp JsonParser.cpp
+SRCS:= ConfigParser.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
@@ -12,8 +12,8 @@ OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
-CONFIG_DIR:= json
-CONFIG_FILES:= $(wildcard $(CONFIG_DIR)/*.json)
+CONFIG_DIR:= config_files
+CONFIG_FILES:= $(wildcard $(CONFIG_DIR)/*.conf) $(wildcard $(CONFIG_DIR)/brace_check/*.conf)
 
 DEP:= $(OBJS:%.o=%.d)
 
@@ -28,7 +28,7 @@ $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects
+	@mkdir -p $(OBJS_DIR)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
