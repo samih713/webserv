@@ -1,36 +1,46 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(const std::string filepath) {
-    std::cout << "Reading config file: " << W << filepath << RE << std::endl;
+ConfigParser::ConfigParser(std::string const& configFile) {
+    // read file
+    std::cout << "Parsing " << W << configFile << RE << std::endl;
 
-    struct stat filestat;
-    if (stat(filepath.c_str(), &filestat) != 0)
-        throw std::runtime_error(ERR_OPEN);
-    if (!S_ISREG(filestat.st_mode))
-        throw std::runtime_error(ERR_NOT_REGULAR);
+    if (configFile.find(".conf") == std::string::npos) {
+        throw std::runtime_error(ERR_INVALID_FILE);
+        return;
+    }
 
-    std::ifstream inputFileStream(filepath.c_str());
-    if (inputFileStream.fail())
+    struct stat fileStat;
+    if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode)) {
+        throw std::runtime_error(ERR_STAT);
+        return;
+    }
+
+    std::ifstream file(configFile.c_str());
+    if (!file.is_open()) {
         throw std::runtime_error(ERR_OPEN);
-    if (inputFileStream.peek() == std::ifstream::traits_type::eof())
+        return;
+    } else if (file.peek() == std::ifstream::traits_type::eof()) {
         throw std::runtime_error(ERR_EMPTY);
+        return;
+    }
 
-    // Reading the entire file into a string, then removing all whitespace
-    std::string file((std::istreambuf_iterator<char>(inputFileStream)), std::istreambuf_iterator<char>());
-    file.erase(remove_if(file.begin(), file.end(), isspace), file.end());
+    // get each line, remove comments and ignore empty lines
+    std::string line;
+    while (std::getline(file, line)) {
+        std::string::size_type pos = line.find('#');
+        if (pos != std::string::npos)
+            line.erase(pos);
+        if (line.empty() || line.find_first_not_of(" \t") == std::string::npos)
+            continue;
 
-    _content = file;
+        // remove tabs and spaces at the beginning and end of the line
+        line.erase(0, line.find_first_not_of(" \t"));
 
-    inputFileStream.close();
+        _content.append(line);
+    }
+
+    file.close();
 }
 
-JsonValue ConfigParser::parseConfig(void) {
-    JsonValue config = JsonParser(_content).parseJSON();
-
-    // now we need to iterate through the object and validate it as per NGINX config rules
-
-
-    std::cout << L << "Config file parsed successfully" << RE << std::endl;
-
-    return config;
+void ConfigParser::parse(void) {
 }
