@@ -45,12 +45,13 @@ static std::string ERR_LIST("Socket: listen failed");
 static std::string ERR_NLIST("Socket: not listening");
 static std::string ERR_ACCP("Socket: accept failed");
 
+static std::string ERR_INVALID_FILE("Parser: invalid file");
+static std::string ERR_STAT("Parser: not a regular file");
 static std::string ERR_OPEN("Parser: cannot open file");
 static std::string ERR_EMPTY("Parser: file is empty");
-static std::string ERR_NOT_REGULAR("Parser: not a regular file");
-static std::string ERR_JSON_PARSE("Parser: invalid JSON syntax");
-static std::string ERR_JSON_TYPE("Parser: invalid JSON type");
-static std::string ERR_JSON_QUOTE("Parser: unclosed quote");
+static std::string ERR_CLOSING_BRACE("Parser: } missing");
+static std::string ERR_OPENINING_BRACE("Parser: { missing");
+static std::string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
 
 static std::string ERR_MEMORY_ALLOC("Memory: allocation failed");
 
