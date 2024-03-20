@@ -8,10 +8,11 @@ int main(int argc, char **argv) {
 
     try {
         ConfigParser parser(argv[1]);
-        JsonValue json = parser.parseConfig();
-    } catch (std::exception& error) {
-        std::cerr << error.what() << std::endl;
-        exit(1);
+        parser.parse();
+    }
+    catch (std::exception &error) {
+        std::cerr << R << "[ ERROR ] " << RE << error.what() << std::endl;
+        return 1;
     }
     return 0;
 }
