@@ -2,33 +2,31 @@
 
 ### Description
 
-This library is used to parse the config file (in the JSON format) with a few caveats.
+This library is used to parse a config file (in the JSON format) with a few caveats.
 
 ### Rules
 
-1. The config file must be in the JSON format.
-2. The config file must contain the following fields:
-	- `host` - the host to listen on
-	- `port` - the port to listen on
-	- `server_name` - the server name
-	- `error_page` - the path to the error page
-	- `client_max_body_size` - the maximum size of the body
-	- `location` - the location block
-3. The `location` block must contain the following fields:
-	- `path` - the path to the location
-	- `root` - the root directory
-	- `index` - the index file
-	- `autoindex` - the autoindex flag
-	- `methods` - the list of allowed methods
-	- `cgi` - the cgi block
-4. The `cgi` block must contain the following fields:
-	- `path` - the path to the cgi script
-	- `extension` - the extension of the cgi script
-	- `method` - the method to use to run the cgi script
-	- `cgi_pass` - the cgi pass block
-5. Floating point numbers are not supported.
-6. The `autoindex` flag must be either `true` or `false`.
-7. The `methods` list must contain at least one method.
-8. The `method` field must be either `GET` or `POST`.
-9. Invalid syntax will result in an exception being thrown.
-10. Error pages will be set to the default error page if the path is invalid or if no error page is specified.
+In the configuration file, you should be able to:
+- Choose the port and host of each ’server’.
+- Setup the server_names or not.
+- The first server for a host:port will be the default for this host:port (that means it will answer to all the requests that don’t belong to an other server).
+- Setup default error pages.
+- Limit client body size.
+- Setup routes with one or multiple of the following rules/configuration (routes wont be using regexp):
+    - Define a list of accepted HTTP methods for the route.
+    - Define a HTTP redirection.
+    - Define a directory or a file from where the file should be searched (for example, if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is /tmp/www/pouic/toto/pouet).
+    - Turn on or off directory listing.
+    - Set a default file to answer if the request is a directory.
+    - Execute CGI based on certain file extension (for example .php).
+    - Make it work with POST and GET methods.
+    - Make the route able to accept uploaded files and configure where they should be saved.
+        - Do you wonder what a CGI is?
+        - Because you won’t call the CGI directly, use the full path as PATH_INFO.
+        - Just remember that, for chunked request, your server needs to unchunk it, the CGI will expect EOF as end of the body.
+        - Same things for the output of the CGI. If no content_length is returned from the CGI, EOF will mark the end of the returned data.
+        - Your program should call the CGI with the file requested as first argument.
+        - The CGI should be run in the correct directory for relative path file access.
+        - Your server should work with one CGI (php-CGI, Python, and so forth).
+
+You must provide some configuration files and default basic files to test and demonstrate every feature works during evaluation.
