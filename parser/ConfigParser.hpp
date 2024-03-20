@@ -3,20 +3,22 @@
 
 #include "../includes/webserv.hpp"
 #include <fstream>
-#include <map>
-#include <cstring>
 #include <sys/stat.h>
 #include "JsonParser.hpp"
 
 class ConfigParser {
 public:
-    ConfigParser(const std::string filepath);
+    ConfigParser(std::string const& filepath);
     ~ConfigParser() {};
 
-    JsonValue parseConfig(void);
+    void parse(void);
 
 private:
     std::string _content;
+    std::vector<std::string> _tokens;
+
+    ConfigParser();
+    void _tokenize(void);
 };
 
 #endif // CONFIG_PARSER_HPP
