@@ -45,27 +45,6 @@ ConfigParser::ConfigParser(std::string const& configFile) {
     file.close();
 }
 
-void ConfigParser::_tokenize(void) {
-    std::string currentToken;
-    for (std::string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
-        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-            _tokens.push_back(std::string(1, *itr));
-        }
-        else if (std::isspace(*itr)) { // whitespace
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-        }
-        else
-            currentToken.push_back(*itr); // add character to current token
-    }
-}
-
 void ConfigParser::_validate(void) {
     // check braces
     std::stack<std::string> braces;
@@ -86,7 +65,25 @@ void ConfigParser::_validate(void) {
 }
 
 void ConfigParser::parse(void) {
-    _tokenize();
+    // tokenizing content
+    std::string currentToken;
+    for (std::string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
+        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+            _tokens.push_back(std::string(1, *itr));
+        }
+        else if (std::isspace(*itr)) { // whitespace
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+        }
+        else
+            currentToken.push_back(*itr); // add character to current token
+    }
 
     _validate();
 }
