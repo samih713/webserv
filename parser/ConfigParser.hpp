@@ -19,6 +19,7 @@ private:
 
     ConfigParser();
     void _tokenize(void);
+    void _validate(void);
 };
 
 #endif // CONFIG_PARSER_HPP

@@ -66,6 +66,27 @@ void ConfigParser::_tokenize(void) {
     }
 }
 
+void ConfigParser::_validate(void) {
+    // check braces
+    std::stack<std::string> braces;
+    for (std::vector<std::string>::const_iterator itr = _tokens.begin();
+         itr != _tokens.end(); ++itr)
+    {
+        if (*itr == "{")
+            braces.push("{");
+        else if (*itr == "}") {
+            if (braces.empty()) // missing opening brace
+                throw std::runtime_error(ERR_OPENINING_BRACE);
+            braces.pop();
+        }
+    }
+    if (!braces.empty()) // missing closing brace
+        throw std::runtime_error(ERR_CLOSING_BRACE);
+
+}
+
 void ConfigParser::parse(void) {
     _tokenize();
+
+    _validate();
 }
