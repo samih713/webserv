@@ -5,27 +5,20 @@ ConfigParser::ConfigParser(std::string const& configFile) {
     std::cout << "Parsing " << W << configFile << RE << std::endl;
 
     // checking file extension
-    if (configFile.find(".conf") == std::string::npos) {
+    if (configFile.find(".conf") == std::string::npos)
         throw std::runtime_error(ERR_INVALID_FILE);
-        return;
-    }
 
     // check if file exists and is a regular file
     struct stat fileStat;
-    if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode)) {
+    if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode))
         throw std::runtime_error(ERR_STAT);
-        return;
-    }
 
     // open file
     std::ifstream file(configFile.c_str());
-    if (!file.is_open()) {
+    if (!file.is_open())
         throw std::runtime_error(ERR_OPEN);
-        return;
-    } else if (file.peek() == std::ifstream::traits_type::eof()) { // check if file is empty
+    else if (file.peek() == std::ifstream::traits_type::eof()) // check if file is empty
         throw std::runtime_error(ERR_EMPTY);
-        return;
-    }
 
     // get each line, remove comments and ignore empty lines
     std::string line;
