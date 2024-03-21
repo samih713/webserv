@@ -112,6 +112,17 @@ inline static string find_value(stringstream &message)
     return fieldValue;
 }
 
+/*
+ * @brief Replaces all occurrences of "%20" in the resource string with a space character.
+ *
+ * @param resource The resource string to replace "%20" with a space character.
+*/
+static void replace_spaces(string &resource)
+{
+	size_t pos;
+	while ((pos = resource.find("%20")) != std::string::npos)
+		resource.replace(pos, 3, " ");
+}
 
 /**
  * @brief Parses the raw request data into method, resource, HTTP version, headers, and
@@ -130,7 +141,8 @@ void Request::parse()
     // Request Line
     message >> enumFromString(method) >> resource >> http_version;
     check_line_terminator(message, CRLF);
-
+	// replace %20 with space
+	replace_spaces(resource);
     // Headers
     static map<string, int>::const_iterator fieldNameListEnd = fieldNameList.end();
     while (true)
