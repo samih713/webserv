@@ -4,6 +4,7 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
+// [ ] better option handling
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
 // [ ] (Server.cpp) compare bytesReceived with size from headers
