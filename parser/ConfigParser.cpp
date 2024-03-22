@@ -1,10 +1,10 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(std::string const& configFile) {
-    DEBUG_MSG("Parsing " << configFile, W);
+ConfigParser::ConfigParser(string const& configFile) {
+    DEBUG_MSG("Parsing " << W << configFile, RE);
 
     // checking file extension
-    if (configFile.find(".conf") == std::string::npos)
+    if (configFile.find(".conf") == string::npos)
         throw std::runtime_error(ERR_INVALID_FILE);
 
     // check if file exists and is a regular file
@@ -13,19 +13,19 @@ ConfigParser::ConfigParser(std::string const& configFile) {
         throw std::runtime_error(ERR_STAT);
 
     // open file
-    std::ifstream file(configFile.c_str());
+    ifstream file(configFile.c_str());
     if (!file.is_open())
         throw std::runtime_error(ERR_OPEN);
-    else if (file.peek() == std::ifstream::traits_type::eof()) // check if file is empty
+    else if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
         throw std::runtime_error(ERR_EMPTY);
 
     // get each line, remove comments and ignore empty lines
-    std::string line;
+    string line;
     while (std::getline(file, line)) {
         size_t pos = line.find('#');
-        if (pos != std::string::npos)
+        if (pos != string::npos)
             line.erase(pos);
-        if (line.empty() || line.find_first_not_of(" \t") == std::string::npos)
+        if (line.empty() || line.find_first_not_of(" \t") == string::npos)
             continue;
 
         // remove tabs and spaces at the beginning and end of the line
@@ -39,8 +39,8 @@ ConfigParser::ConfigParser(std::string const& configFile) {
 
 void ConfigParser::_validate(void) {
     // check braces
-    std::stack<std::string> braces;
-    for (std::vector<std::string>::const_iterator itr = _tokens.begin();
+    stack<string> braces;
+    for (vector<string>::const_iterator itr = _tokens.begin();
          itr != _tokens.end(); ++itr)
     {
         if (*itr == "{")
@@ -58,14 +58,14 @@ void ConfigParser::_validate(void) {
 
 void ConfigParser::parse(void) {
     // tokenizing content
-    std::string currentToken;
-    for (std::string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
+    string currentToken;
+    for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
         if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
             if (!currentToken.empty()) {
                 _tokens.push_back(currentToken);
                 currentToken.clear();
             }
-            _tokens.push_back(std::string(1, *itr));
+            _tokens.push_back(string(1, *itr));
         }
         else if (std::isspace(*itr)) { // whitespace
             if (!currentToken.empty()) {
