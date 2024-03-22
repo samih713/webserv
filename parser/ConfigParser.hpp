@@ -17,7 +17,6 @@ private:
     std::string _content;
     std::vector<std::string> _tokens;
 
-    ConfigParser();
     void _validate(void);
 };
 
