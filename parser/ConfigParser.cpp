@@ -30,6 +30,7 @@ ConfigParser::ConfigParser(string const& configFile) {
 
         // remove tabs and spaces at the beginning and end of the line
         line.erase(0, line.find_first_not_of(" \t"));
+        line.erase(line.find_last_not_of(" \t") + 1);
 
         _content.append(line);
     }
