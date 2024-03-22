@@ -19,9 +19,9 @@ ConfigParser::ConfigParser(string const& configFile) {
     else if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
         throw runtime_error(ERR_EMPTY);
 
-    // get each line, remove comments and ignore empty lines
     string line;
     while (std::getline(file, line)) {
+        // remove comments
         size_t pos = line.find('#');
         if (pos != string::npos)
             line.erase(pos);
