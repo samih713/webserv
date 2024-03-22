@@ -2,9 +2,11 @@
 #define CONFIG_PARSER_HPP
 
 #include "../includes/webserv.hpp"
-#include <fstream>
 #include <sys/stat.h>
 #include <stack>
+
+using std::stack;
+using std::runtime_error;
 
 static std::string ERR_INVALID_FILE("Parser: invalid file");
 static std::string ERR_STAT("Parser: not a regular file");

@@ -5,19 +5,19 @@ ConfigParser::ConfigParser(string const& configFile) {
 
     // checking file extension
     if (configFile.find(".conf") == string::npos)
-        throw std::runtime_error(ERR_INVALID_FILE);
+        throw runtime_error(ERR_INVALID_FILE);
 
     // check if file exists and is a regular file
     struct stat fileStat;
     if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode))
-        throw std::runtime_error(ERR_STAT);
+        throw runtime_error(ERR_STAT);
 
     // open file
     ifstream file(configFile.c_str());
     if (!file.is_open())
-        throw std::runtime_error(ERR_OPEN);
+        throw runtime_error(ERR_OPEN);
     else if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
-        throw std::runtime_error(ERR_EMPTY);
+        throw runtime_error(ERR_EMPTY);
 
     // get each line, remove comments and ignore empty lines
     string line;
@@ -47,12 +47,12 @@ void ConfigParser::_validate(void) {
             braces.push("{");
         else if (*itr == "}") {
             if (braces.empty()) // missing opening brace
-                throw std::runtime_error(ERR_OPENINING_BRACE);
+                throw runtime_error(ERR_OPENINING_BRACE);
             braces.pop();
         }
     }
     if (!braces.empty()) // missing closing brace
-        throw std::runtime_error(ERR_CLOSING_BRACE);
+        throw runtime_error(ERR_CLOSING_BRACE);
 
 }
 
