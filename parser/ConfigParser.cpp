@@ -1,8 +1,7 @@
 #include "ConfigParser.hpp"
 
 ConfigParser::ConfigParser(std::string const& configFile) {
-    // read file
-    std::cout << "Parsing " << W << configFile << RE << std::endl;
+    DEBUG_MSG("Parsing " << configFile, W);
 
     // checking file extension
     if (configFile.find(".conf") == std::string::npos)
@@ -23,7 +22,7 @@ ConfigParser::ConfigParser(std::string const& configFile) {
     // get each line, remove comments and ignore empty lines
     std::string line;
     while (std::getline(file, line)) {
-        std::string::size_type pos = line.find('#');
+        size_t pos = line.find('#');
         if (pos != std::string::npos)
             line.erase(pos);
         if (line.empty() || line.find_first_not_of(" \t") == std::string::npos)
