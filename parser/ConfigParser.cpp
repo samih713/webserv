@@ -25,12 +25,13 @@ ConfigParser::ConfigParser(string const& configFile) {
         size_t pos = line.find('#');
         if (pos != string::npos)
             line.erase(pos);
-        if (line.empty() || line.find_first_not_of(" \t") == string::npos)
-            continue;
 
         // remove tabs and spaces at the beginning and end of the line
         line.erase(0, line.find_first_not_of(" \t"));
         line.erase(line.find_last_not_of(" \t") + 1);
+
+        if (line.empty())
+            continue;
 
         _content.append(line);
     }
