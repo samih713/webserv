@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/03/17 04:22:38 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/03/21 01:33:54 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,23 +44,73 @@ char **headersToEnv(vsp &headers)
     return envp;
 }
 
+// string *geturi(string res)
+// {
+//     char *result;
+// 	string *resn;
+// 	size_t qu;
+
+// 	result = NULL;
+// 	qu = res.find('?', 0); 
+// 	resn = new string(res.substr(0, qu));
+// 	//result = const_cast<char *>(res.substr(0,qu).c_str());
+// 	cout << *resn << endl;
+// 	cout<< "test" << qu <<endl;
+// 	result = const_cast<char *>(resn->c_str());
+// 	cout<< "result : " << result <<endl;
+//     return (resn);
+// }
+
+string geturi(string res)
+{
+	string resn;
+	size_t qu;
+
+	qu = res.find('?', 0); 
+	resn = res.substr(0, qu);
+	//result = const_cast<char *>(res.substr(0,qu).c_str());
+	cout << resn << endl;
+	cout<< "test" << qu <<endl;
+    return (resn);
+}
+
+string getStingQuery(string res)
+{
+	string resn;
+	size_t qu;
+	size_t length;
+
+	qu = res.find('?', 0); 
+	length = res.length();
+	resn = res.substr(qu + 1, length);
+	//result = const_cast<char *>(res.substr(0,qu).c_str());
+	cout << resn << endl;
+	cout<< "test" << qu <<endl;
+    return (resn);
+}
+
 
 Cgi::Cgi(const Request &request)
 {
+	string res;
+
+	res = const_cast<char *>(request.get_resource().c_str());
 	headers = request.get_headers();
 	environment = headersToEnv(headers);
-    filePath = const_cast<char *> (request.get_resource().c_str());
+	//filePath = const_cast<char *>(geturi(request.get_resource())->c_str());
+	filePath = (geturi(res));
+    //filePath = const_cast<char *> (request.get_resource().c_str());
     // // Check if the Python script exists
-    if (access(filePath, X_OK) == -1)
-    {
-        std::cerr << "Error: Python script not found or does not have execution permission." << std::endl; 
-		return ;
-    }
+    // if (access(filePath, X_OK) == -1)
+    // {
+    //     std::cerr << "Error: Python script not found or does not have execution permission." << std::endl; 
+	// 	return ;
+    // }
+   	cout<< "file path :" << filePath << endl;
     arguments = new char *[2];
-	arguments[0] = filePath;
+	arguments[0] = const_cast<char *>(filePath.c_str());
 	arguments[1] = NULL;
 
-    cout<<filePath << endl;
     // Print out the environment variables
     for (int i = 0; environment[i] != NULL; ++i)
     {
@@ -139,7 +189,7 @@ void Cgi::execute(const std::string& outputFile)
         close(fd[0]);
         close(fd[1]);
 
-        if (execve(filePath, arguments, environment) == -1) {
+        if (execve(const_cast<char *>(filePath.c_str()), arguments, environment) == -1) {
             std::cerr << "Error executing execve: " << strerror(errno) << std::endl;
             _exit(EXIT_FAILURE);
         }

@@ -42,8 +42,14 @@ int main(int argc, char** argv, char** envp)
 {
 	(void)argc;
 	(void)argv;
-	(void)envp;
+	//(void)envp;
 	vsp headers;
+
+	for (int i = 0; envp[i] != NULL; ++i)
+    {
+        std::cout << envp[i] << std::endl;
+    }
+	cout<< endl<<endl;
 
 	//const std::string outputFile;
 
