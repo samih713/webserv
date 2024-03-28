@@ -1,4 +1,6 @@
 #include "Message.hpp"
+#include "Server.hpp"
+#include "webserv.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstring>
@@ -42,7 +44,7 @@ int main()
     std::cout << "Message sent to server successfully." << std::endl;
 
     // Receive a response back from the server
-    char    buffer[1024] = { 0 };
+    char    buffer[BUFFER_SIZE] = { 0 };
     ssize_t bytesReceived = recv(sockfd, buffer, sizeof(buffer), 0);
     if (bytesReceived < 0)
     {

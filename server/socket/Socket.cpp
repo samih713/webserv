@@ -1,160 +1,198 @@
 #include "Socket.hpp"
-#include <cerrno>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include "webserv.hpp"
 
-/*  [CONSTRUCTORS] */
+/* ------------------------------- Constructor ------------------------------ */
 
+/**
+ * @brief Constructor for the Socket class
+ *
+ * This constructor initializes a Socket object with the specified parameters.
+ *
+ * @param family The address family (e.g. AF_INET for IPv4)
+ * @param type The socket type (e.g. SOCK_STREAM for TCP)
+ * @param protocol The protocol to be used (e.g. IPPROTO_TCP for TCP)
+ * @param flags Additional flags to be used when creating the socket
+ *
+ * @throws Socket::Exception if the socket creation fails
+ *
+ * @return None
+ */
 Socket::Socket(int family, int type, int protocol, int flags)
-    : socket_descriptor(invalid_file_descriptor)
-    , is_bound(false)
-    , is_listening(false)
+    : socketFD(invalidFD)
+    , isBound(false)
+    , isListening(false)
 {
+
 #if defined(__LINUX__)
-    socket_descriptor = socket(family, type | flags, protocol);
+    socketFD = socket(family, type | flags, protocol);
 #elif defined(__MAC__)
-    socket_descriptor = socket(family, type, protocol);
-    flags |= fcntl(socket_descriptor, F_GETFL, 0);
-    fcntl(socket_descriptor, F_SETFL, flags);
-#endif //
+    socketFD = socket(family, type, protocol);
+    flags |= fcntl(socketFD, F_GETFL, 0);
+    fcntl(socketFD, F_SETFL, flags);
+#endif // conditional
 
-    // On success, a file descriptor for the new socket is returned.
-    if (socket_descriptor == invalid_file_descriptor)
-        throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
+    if (socketFD == invalidFD)
+        throw Socket::Exception(ERR_CREAT);
 
-    DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
-
-    // zero out the sockaddr struct
     std::memset(&address, 0, sizeof(address));
+
+    DEBUG_MSG("Socket was created successfully fd[" << socketFD << "]", Y);
 }
 
-/* Call protocol by name */
-Socket::Socket(int family, int type, const char *protocol_name, int flags)
-    : socket_descriptor(invalid_file_descriptor)
-    , is_bound(false)
-    , is_listening(false)
+
+/**
+ * @brief Destructor for the Socket class
+ *
+ * This function closes the socket file descriptor if it is not already closed.
+ *
+ * @return void
+ */
+Socket::~Socket() throw()
 {
-    if (!protocol_name)
-        throw Socket::Exception(Exception::compose_msg(ERR_NULL));
 
-    // identify the protocol name
-    std::string proto_name(protocol_name);
-    for (size_t i = 0; i < proto_name.length(); i++)
-        proto_name[i] = std::tolower(proto_name[i]);
-
-    // continue with the rest of the code
-    struct protoent *protocol = getprotobyname(proto_name.c_str());
-    // check getprotobyname return
-    if (!protocol)
-        throw Socket::Exception(Exception::compose_msg(ERR_NULL));
-
-    DEBUG_MSG("protocol official name is [" << protocol->p_name << "]", Y);
-
-    socket_descriptor = socket(family, type | flags, protocol->p_proto);
-
-    // On success, a file descriptor for the new socket is returned.
-    if (socket_descriptor == invalid_file_descriptor)
-        throw Socket::Exception(Exception::compose_msg(ERR_CREAT));
-
-    DEBUG_MSG("Socket was created successfully fd[" << socket_descriptor << "]", Y);
-
-    // zero out the sockaddr struct
-    std::memset(&address, 0, sizeof(address));
-}
-
-/* [DESTRUCTOR] */
-
-Socket::~Socket()
-{
-    DEBUG_MSG("socket fd[" << socket_descriptor << "] closed!!", R);
-
-    if (socket_descriptor != invalid_file_descriptor)
+    if (socketFD != invalidFD)
     {
-        close(socket_descriptor);
-        // invalidate the filedescriptor
-        socket_descriptor = invalid_file_descriptor;
+        DEBUG_MSG("socket fd[" << socketFD << "] closed!!", R);
+        close(socketFD);
+        socketFD = invalidFD;
     }
 }
 
+/* -------------------------------- Interface ------------------------------- */
 
-/* [INTERFACE] */
+#define MAX_PORT 65535
 
-// throws execpetions
+/**
+ * Sets the port for the Socket object.
+ *
+ * This function sets the port for the Socket object to the specified port number.
+ *
+ * @param port An integer representing the port number to set for the Socket object.
+ *
+ * @throws Socket::Exception if the port number is not within the valid range (0 to
+ * MAX_PORT).
+ */
 void Socket::set_port(int port)
 {
-    if (port < 0 || port > 65535)
+    if (port < 0 || port > MAX_PORT)
         throw Socket::Exception("Invalid Socket descriptor\n");
 
-    // set the port number in address struct
+    // cast address to socketaddr_in and set sin_port
     ((struct sockaddr_in *)(&address))->sin_port = htons(port);
 }
 
+
 fd Socket::get_fd() const throw()
 {
-    return socket_descriptor;
+    return socketFD;
 }
 
+/**
+ * Binds the socket to a specific address and port.
+ *
+ * This function binds the socket to the address and port specified in the 'address'
+ * member variable.
+ *
+ * @throws Socket::Exception if the bind operation fails
+ */
 void Socket::bind() const
 {
-    int status = ::bind(socket_descriptor, (struct sockaddr *)&address, sizeof(address));
-    if (status == -1)
-        throw Socket::Exception(Exception::compose_msg(ERR_BIND));
-    is_bound = true;
-
-    DEBUG_MSG("Socket was bound successfully to port["
-                  << ntohs(((struct sockaddr_in *)&address)->sin_port) << "]\n",
-              B);
+    if (::bind(socketFD, (struct sockaddr *)&address, sizeof(address)) == -1)
+        throw Socket::Exception(ERR_BIND);
+    isBound = true;
 }
 
+/**
+ * Starts listening for incoming connections on the socket.
+ *
+ * @param backlog The maximum length of the queue of pending connections.
+ * @throws Socket::Exception if the socket is not bound or if an error occurs while
+ * listening.
+ */
 void Socket::listen(int backlog) const
 {
-    if (!is_bound)
-        throw Socket::Exception(Exception::compose_msg(ERR_NBIND));
+    if (!isBound)
+        throw Socket::Exception(ERR_NBIND);
 
-    int status = ::listen(socket_descriptor, backlog);
-
-    if (status == -1)
-        throw Socket::Exception(Exception::compose_msg(ERR_LIST));
-    is_listening = true;
-
-    DEBUG_MSG("Socket listen was successful, ["
-                  << socket_descriptor << "] is now ready to accept max backlog of ["
-                  << backlog << "] connections\n",
-              M);
+    if (::listen(socketFD, backlog) == -1)
+        throw Socket::Exception(ERR_LIST);
+    isListening = true;
 }
 
 
+/**
+ * Accepts a new incoming connection on the listening socket.
+ *
+ * This function checks if the socket is currently in a listening state. If not, it throws
+ * a Socket::Exception with an error message.
+ *
+ * @return fd The file descriptor of the newly accepted connection.
+ *
+ * @throws Socket::Exception If the socket is not in a listening state or if an error
+ * occurs during the accept() system call.
+ */
 fd Socket::accept()
 {
-    // check if socket is listening
-    if (!is_listening)
-        throw Socket::Exception(Exception::compose_msg(ERR_NLIST));
+    if (!isListening)
+        throw Socket::Exception(ERR_NLIST);
 
     // This structure is filled in with the address of the peer socket,
-    // as known to the communications layer.
-    struct sockaddr peer_info; // does this need to be stored?
-    socklen_t       peer_length = sizeof(peer_info);
+    struct sockaddr peerInfo; // does this need to be stored?
+    socklen_t       peerLength = sizeof(peerInfo);
 
     // The accept() system call is used with connection-based socket types (SOCK_STREAM,
     // SOCK_SEQPACKET).
     // it extracts the first pending connection request in the backlog que form listen.
-    // creates a new connected socket, and returns a new file descriptor
-    fd connected_socket;
-    connected_socket = ::accept(socket_descriptor, &peer_info, &peer_length);
-    if (connected_socket == invalid_file_descriptor)
+    fd newSocket;
+    newSocket = ::accept(socketFD, &peerInfo, &peerLength);
+    if (newSocket == invalidFD)
     {
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
         if (errno != EAGAIN && errno != EWOULDBLOCK)
-            throw Socket::Exception(Exception::compose_msg(ERR_ACCP));
-
-        DEBUG_MSG("Socket has no incoming connections", D);
+            throw Socket::Exception(ERR_ACCP);
     }
+    return newSocket;
+}
 
-    DEBUG_MSG("Socket accepted a connection from", W);
+/* ---------------------------- Socket Exception ---------------------------- */
 
-    return connected_socket;
+/**
+ * @brief Constructor for the Socket Exception class
+ *
+ * This constructor initializes a new instance of the Socket Exception class with the
+ * provided error message.
+ *
+ * @param error_message The error message associated with the exception
+ * @return A new instance of the Socket Exception class
+ *
+ * @throws None
+ */
+Socket::Exception::Exception(const std::string &error_message)
+{
+    this->error_message = compose_msg(error_message);
+};
+
+/**
+ * @brief Returns a C-style string describing the error message associated with this
+ * exception.
+ *
+ * @return const char* a C-style string containing the error message.
+ */
+const char *Socket::Exception::what() const throw()
+{
+    return error_message.c_str();
+}
+
+/**
+ * Composes an error message by combining the provided message with the system error
+ * message corresponding to the current value of errno.
+ *
+ * @param message The message to be included in the error message.
+ * @return A string containing the composed error message.
+ */
+std::string Socket::Exception::compose_msg(const std::string &message)
+{
+    std::stringstream _msg;
+    _msg << message << (errno ? ": " + std::string(std::strerror(errno)) : "");
+    return _msg.str();
 }

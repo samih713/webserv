@@ -1,10 +1,13 @@
+# server makefile
+
 include ../common.mk
 
 NAME:= libserver.a
 
-INCLUDES:= -I./ -Isocket/ -I../includes/ -I../http/ -I../http/request/ -I../http/response/
+HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
+INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/  $(HTTP_INCLUDES)
 
-SRCS:= socket/Socket.cpp socket/TCPSocket.cpp Server.cpp
+SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
@@ -23,22 +26,22 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects objects/socket
+	@mkdir -p $(addprefix $(OBJS_DIR)/,socket connection_manager)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: all
+debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
-#libs
-$(LIBHTTP):
-	@make -sC $(LIBHTTPDIR)
+# test libs
+libhttp:
+	@make -sC $(LIBHTTPDIR) debug
 
 # tests
 client: debug
@@ -47,12 +50,12 @@ client: debug
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 
 test_socket: $(TEST_SOCKET) client
-	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_SOCKET) $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
-test_server: debug $(NAME) $(TEST_SOCKET) $(LIBHTTP) 
-	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES)  $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
+test_server: debug libhttp
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
 
@@ -60,13 +63,19 @@ tests: test_socket test_server
 	@echo ""
 
 clean:
-	@$(RM) $(OBJS_DIR) *.d
-	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
+	@if [ -d $(OBJS_DIR) ]; then \
+		$(RM) $(OBJS_DIR); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	fi
 
 fclean: clean
-	@$(RM) $(NAME)
+	@if [ -f $(NAME) ]; then \
+		$(RM) $(NAME); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	fi
+	@make -sC $(LIBHTTPDIR) fclean
 	@$(RM) test_socket test_server client
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
+# @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 

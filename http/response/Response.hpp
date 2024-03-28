@@ -16,7 +16,7 @@ class Response
         Response(STATUS_CODE status, const vsp &headers, const vector<char> &body);
         ~Response();
         Response(const Response &other);
-        void write_response(ostream &outFile) const;
+        void write_response(fd recv_socket) const;
 
     private:
         STATUS_CODE  status;

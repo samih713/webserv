@@ -1,63 +1,57 @@
+#include "CachedPages.hpp"
+#include "Config.hpp"
+#include "ConnectionManager.hpp"
 #include "TCPSocket.hpp"
+#include "debug.hpp"
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-// TODO // [P]artially implemented, needs [I]mprovement, [X] done
-//
-// [ ] handle the connection
-// [ ] first determine if its a read or write
-// [ ] if read (set the buffer_size) splite the request into
-// [ ] if write send
-// [ ] implement different strategies
-
-// constants
-static const std::string wait_message("Server is now waiting for connections...\n");
-// buffer size
 static const int BUFFER_SIZE = 4096;
 
-// different polling strategies
+#define CLOSE_CONNECTION 1
+#define KEEP_ALIVE       0
+
 enum polling_strat
 {
-    KQUEUE, // "KQUEUE"
-    SELECT, // "SELECT"
-    POLL,   // "POLL"
-    EPOLL   // "EPOLL"
+    KQUEUE,
+    SELECT,
+    POLL,
+    EPOLL
 };
 
-// simple singleton implementation
+// wait message
+static const std::string WAIT_MESSAGE("*** Server is now waiting for connections ***");
+// default backLog
+static const int DEFAULT_BACKLOG(16);
+// default select wait
+static const int SELECTWAITTIME(5);
+
 class Server
 {
-    protected:
-        Server(fd listener_port, int backlog);
-
     public:
-        // this function needs to be static, there won't be an instance of a Server
-        // when its first created
-        static Server &getInstance(fd listener_port, int backlog);
-        void           start(enum polling_strat);
+        static Server &get_instance(const Config &config, int backLog = DEFAULT_BACKLOG);
         ~Server();
+        void start(enum polling_strat);
 
-        // member functions
-        void recv();
-        // void send(const char *msg);
-        // void getpeer(struct sockaddr &address);
+    protected:
+        Server(const Config &config, int backLog);
 
     private:
-        TCPSocket       _listener;
-        fd              _listenerFD;
-        int             _listener_port;
-        std::vector<fd> _connections;
+        TCPSocket     listener;
+        const Config &config;
+        CachedPages  *cachedPages;
 
-        // polling strats
-        void __select_strat();
+        bool handle_connection(fd recvSocket);
+        /* polling strats */
+        void select_strat();
+        // void kqueue_strat();
+        // void poll_strat();
+        // void epoll_strat();
 
         // deleted
-        Server(const Server &){};
-        Server &operator=(const Server &)
-        {
-            return *this;
-        };
+        Server(const Server &);
+        Server &operator=(const Server &);
 };
 
 #endif // SERVER_HPP
