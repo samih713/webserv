@@ -14,8 +14,8 @@ OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 TEST_DIR:= tester
 TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
 
-CONFIG_DIR:= json
-CONFIG_FILES:= $(CONFIG_DIR)/config_sample.json $(CONFIG_DIR)/simple.json
+CONFIG_DIR:= config_files
+CONFIG_FILES:= $(wildcard $(CONFIG_DIR)/*.conf) $(wildcard $(CONFIG_DIR)/brace_check/*.conf)
 
 DEP:= $(OBJS:%.o=%.d)
 
