@@ -1,3 +1,5 @@
+# main makefile
+
 include common.mk
 
 NAME:= webserv
@@ -19,7 +21,7 @@ run: re
 
 $(NAME): parser server http $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
-	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready.\n"
+	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -49,18 +51,22 @@ http:
 	@make -sC http/
 
 clean:
-	@$(RM) $(OBJS_DIR) *.o
+	@if [ -d $(OBJS_DIR) ]; then \
+		$(RM) $(OBJS_DIR); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	fi
 	@make clean -sC parser/ > /dev/null 2>&1
 	@make clean -sC server/ > /dev/null 2>&1
 	@make clean -sC http/ > /dev/null 2>&1
-	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
-	@$(RM) $(NAME)
+	@if [ -f $(NAME) ]; then \
+		$(RM) $(NAME); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	fi
 	@make fclean -sC parser/ > /dev/null 2>&1
 	@make fclean -sC server/ > /dev/null 2>&1
 	@make fclean -sC http/ > /dev/null 2>&1
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries.\n"
 
 -include $(DEP)
 

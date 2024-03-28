@@ -1,3 +1,5 @@
+# server makefile
+
 include ../common.mk
 
 NAME:= libserver.a
@@ -7,7 +9,6 @@ INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/  $(HTTP_INCLU
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp
 
-OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -22,10 +23,10 @@ LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -62,14 +63,19 @@ tests: test_socket test_server
 	@echo ""
 
 clean:
-	@$(RM) $(OBJS_DIR) *.d
-	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
+	@if [ -d $(OBJS_DIR) ]; then \
+		$(RM) $(OBJS_DIR); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	fi
 
 fclean: clean
-	@$(RM) $(NAME)
+	@if [ -f $(NAME) ]; then \
+		$(RM) $(NAME); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	fi
 	@make -sC $(LIBHTTPDIR) fclean
 	@$(RM) test_socket test_server client
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
+# @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 

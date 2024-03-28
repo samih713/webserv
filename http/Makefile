@@ -1,3 +1,5 @@
+# http makefile
+
 include ../common.mk
 
 NAME:= libhttp.a
@@ -20,7 +22,6 @@ HANDLER_SRCS:= $(addprefix $(HANDLER_DIR)/, $(HANDLER_LIST))
 
 SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS)
 
-OBJS_DIR:= objs
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
@@ -30,13 +31,13 @@ TEST_HTTP:= $(TEST_DIR)/main.cpp
 DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 run: test_http
 	./test_http
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
@@ -64,13 +65,18 @@ test_http: debug
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP is now ready for testing."
 
 clean:
-	@$(RM) $(OBJS_DIR) *.d
-	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
+	@if [ -d $(OBJS_DIR) ]; then \
+		$(RM) $(OBJS_DIR); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	fi
 
 fclean: clean
-	@$(RM) $(NAME)
+	@if [ -f $(NAME) ]; then \
+		$(RM) $(NAME); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	fi
 	@$(RM) test_http
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
+# @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 

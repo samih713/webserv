@@ -1,3 +1,5 @@
+# parser makefile
+
 include ../common.mk
 
 NAME:= libparser.a
@@ -21,14 +23,14 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready.\n"
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p objects
+	@mkdir -p $(OBJS_DIR)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: all
@@ -55,13 +57,20 @@ tests: test_parser
 	done
 
 clean:
-	@$(RM) $(OBJS_DIR) *.d
-	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
+	@if [ -d $(OBJS_DIR) ]; then \
+		$(RM) $(OBJS_DIR); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	fi
 
 fclean: clean
-	@$(RM) $(NAME)
-	@$(RM) test_parser
-	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
+	@if [ -f $(NAME) ]; then \
+		$(RM) $(NAME); \
+		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	fi
+	@if [ -f test_parser ]; then \
+		$(RM) test_parser; \
+		echo "$(RED)[ DELETE ]$(RESET) Removed test_parser."; \
+	fi
 
 -include $(DEP)
 
