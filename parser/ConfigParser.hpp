@@ -9,13 +9,14 @@
 using std::stack;
 using std::runtime_error;
 
-static std::string ERR_INVALID_FILE("Parser: invalid file");
-static std::string ERR_STAT("Parser: not a regular file");
-static std::string ERR_OPEN("Parser: cannot open file");
-static std::string ERR_EMPTY("Parser: file is empty");
-static std::string ERR_CLOSING_BRACE("Parser: } missing");
-static std::string ERR_OPENINING_BRACE("Parser: { missing");
-static std::string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
+static string ERR_INVALID_FILE("Parser: invalid file");
+static string ERR_STAT("Parser: not a regular file");
+static string ERR_OPEN("Parser: cannot open file");
+static string ERR_EMPTY("Parser: file is empty");
+static string ERR_CLOSING_BRACE("Parser: } missing");
+static string ERR_OPENINING_BRACE("Parser: { missing");
+static string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
+static string ERR_MISSING_SERVER("Parser: server block missing");
 
 class ConfigParser {
 public:
