@@ -2,6 +2,7 @@
 #define CONFIG_PARSER_HPP
 
 #include "../includes/webserv.hpp"
+#include "../server/Config.hpp"
 #include <sys/stat.h>
 #include <stack>
 
@@ -26,6 +27,7 @@ public:
 private:
     std::string _content;
     std::vector<std::string> _tokens;
+    Config _config;
 
     void _validate(void);
 };
