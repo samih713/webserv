@@ -22,10 +22,10 @@ LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
 DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@

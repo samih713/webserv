@@ -30,13 +30,13 @@ TEST_HTTP:= $(TEST_DIR)/main.cpp
 DEP:= $(OBJS:%.o=%.d)
 
 all: $(NAME)
-	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 run: test_http
 	./test_http
 
 $(NAME): $(OBJS)
 	@ar rcs $(NAME) $(OBJS)
+	@echo "$(YELLOW)[ LIBRARY ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
