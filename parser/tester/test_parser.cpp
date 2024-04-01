@@ -8,7 +8,8 @@ int main(int argc, char **argv) {
 
     try {
         ConfigParser parser(argv[1]);
-        parser.parse();
+        Config configurations = parser.parse();
+        configurations.print();
     }
     catch (std::exception &error) {
         std::cerr << R << "[ ERROR ] " << RE << error.what() << std::endl;

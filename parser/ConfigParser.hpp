@@ -5,6 +5,7 @@
 #include "../server/Config.hpp"
 #include <sys/stat.h>
 #include <stack>
+#include "../server/Config.hpp"
 
 using std::stack;
 using std::runtime_error;
@@ -30,7 +31,7 @@ public:
     ConfigParser(string const& filepath);
     ~ConfigParser() {};
 
-    void parse(void);
+    Config parse(void);
 
 private:
     string _content;

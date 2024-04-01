@@ -59,7 +59,7 @@ void ConfigParser::_validate(void) {
 
 }
 
-void ConfigParser::parse(void) {
+Config ConfigParser::parse(void) {
     // tokenizing content
     string currentToken;
     for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
@@ -81,4 +81,28 @@ void ConfigParser::parse(void) {
     }
 
     _validate();
+
+    // setting values for Config object
+    for (vector<string>::const_iterator itr = _tokens.begin();
+         itr != _tokens.end(); ++itr)
+    {
+        if (*itr == "listen") {
+            ++itr; // move to port number
+
+            if (*(itr + 1) != ";")
+                throw runtime_error(ERR_MISSING_SEMICOLON);
+
+            // check if port number is valid
+            if (itr->find_first_not_of("0123456789") != string::npos)
+                throw runtime_error("Parser: invalid port number");
+
+            _config.listenerPort = std::atoi(itr->c_str());
+            if (_config.listenerPort < 0 || _config.listenerPort > 65535)
+                throw runtime_error("Parser: invalid port number");
+
+            ++itr; // move to ;
+        }
+    }
+
+    return _config;
 }
