@@ -4,10 +4,10 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
+// [ ] hanlde partial sends and recieves (Server::handle_connection)
 // [ ] better option handling
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
-// [ ] (Server.cpp) compare bytesReceived with size from headers
 // [ ] Address sanitizer error when testing with ./test_server
 // [ ] ensure that the backlog isn't greater than 1024
 // [x] solve linkage issue (with data)

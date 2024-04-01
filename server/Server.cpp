@@ -58,6 +58,8 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
+// TODO [ ] hanlde partial sends and recieves
+
 /**
  * Handles a connection on the given socket.
  *
@@ -85,7 +87,6 @@ bool Server::handle_connection(fd recvSocket)
 
         string  message(&buffer[0], &buffer[0] + bytesReceived);
         Request request(message);
-        // TODO [ ] compare bytesReceived with size from headers
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request, cachedPages, config);
