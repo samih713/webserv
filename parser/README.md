@@ -30,3 +30,18 @@ In the configuration file, you should be able to:
         - Your server should work with one CGI (php-CGI, Python, and so forth).
 
 You must provide some configuration files and default basic files to test and demonstrate every feature works during evaluation.
+
+
+### Accepted keywords
+- server
+- server_name
+- listen
+- error_page
+- client_max_body_size
+- location
+- root
+- index
+- autoindex
+- cgi
+- upload
+- 

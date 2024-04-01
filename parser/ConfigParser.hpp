@@ -17,17 +17,24 @@ static string ERR_CLOSING_BRACE("Parser: } missing");
 static string ERR_OPENINING_BRACE("Parser: { missing");
 static string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
 static string ERR_MISSING_SERVER("Parser: server block missing");
+static string ERR_MISSING_HTTP("Parser: http block missing");
+
+// TODO:
+// * Add more error messages
+// * Parse context blocks and fill into _config
+// * For semi-colon missing, check if it's the last line of the block by checking for the required values
+// * maybe remove the ConfigParser class and put the parse function in the Config class
 
 class ConfigParser {
 public:
-    ConfigParser(std::string const& filepath);
+    ConfigParser(string const& filepath);
     ~ConfigParser() {};
 
     void parse(void);
 
 private:
-    std::string _content;
-    std::vector<std::string> _tokens;
+    string _content;
+    vector<string> _tokens;
     Config _config;
 
     void _validate(void);
