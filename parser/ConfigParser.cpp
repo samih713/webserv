@@ -190,6 +190,13 @@ void ConfigParser::_parse_server_name_directive(ServerConfig& serverConfig) {
 
 string ConfigParser::_parse_root_directive(void) {
     DEBUG_MSG("Parsing root directive", RE);
+
+    ++_itr; // move to root path
+    if (*(_itr + 1) != ";")
+        throw runtime_error(ERR_MISSING_SEMICOLON);
+    string rootPath = *_itr;
+    _checkSemicolon();
+    return rootPath;
 }
 
 string ConfigParser::_parse_client_max_body_size_directive(void) {
