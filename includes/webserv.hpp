@@ -21,6 +21,10 @@
 // [ ] different strategies
 // [ ] testing (with a testing framework)
 
+/* -------------------------------- WARNINGS -------------------------------- */
+// PARSER
+// [ ] maybe there's stuff in the global context that need to be parsed
+
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
