@@ -40,7 +40,7 @@ ConfigParser::ConfigParser(string const& configFile) {
     file.close();
 }
 
-void ConfigParser::_validateBraces(void) {
+void ConfigParser::_validate_braces(void) {
     DEBUG_MSG("Validating braces", RE);
 
     // check braces
@@ -63,7 +63,11 @@ void ConfigParser::_validateBraces(void) {
         throw runtime_error(ERR_CLOSING_BRACE);
 }
 
-void ConfigParser::_parseIndexDirective(void) {
+void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
+    DEBUG_MSG("Parsing error_page directive", RE);
+}
+
+vector<string> ConfigParser::_parse_index_directive(void) {
     DEBUG_MSG("Parsing index directive", RE);
 
     ++_itr; // move to index file
@@ -76,7 +80,7 @@ void ConfigParser::_parseIndexDirective(void) {
     }
 }
 
-void ConfigParser::_parseLocationContext(void) {
+Location ConfigParser::_parse_location_context(void) {
     DEBUG_MSG("Parsing location context", RE);
 
     ++_itr; // move to location modifier/path
@@ -109,13 +113,8 @@ void ConfigParser::_parseLocationContext(void) {
     ++_itr; // move to next directive
 }
 
-void ConfigParser::_parseServerContext(void) {
-    DEBUG_MSG("Parsing server context", RE);
-
-    ++_itr; // move to {
-    if (*_itr != "{")
-        throw runtime_error(ERR_OPENINING_BRACE);
-    ++_itr; // move to first directive
+fd ConfigParser::_parse_listen_directive(void) {
+    DEBUG_MSG("Parsing listen directive", RE);
 
     while (*_itr != "}")
     {
@@ -128,38 +127,27 @@ void ConfigParser::_parseServerContext(void) {
             if (!_isStringNumber(*_itr))
                 throw runtime_error(ERR_INVALID_LISTEN);
 
-            _config.listenerPort = std::atoi(_itr->c_str());
-            if (_config.listenerPort > MAX_PORT || _config.listenerPort < 0)
-                throw runtime_error(ERR_INVALID_LISTEN);
-            ++_itr; // move to semicolon
-        } else if (*_itr == "server_name") {
-            ++_itr; // move to server name
-            while (*_itr != ";") {
-                if (_isKeyword(*_itr))
-                    throw runtime_error(ERR_INVALID_SERVER_NAME);
-                _config.serverName.push_back(*_itr);
-                ++_itr;
-            }
-        } else if (*_itr == "error_page") {
-            ++_itr; // move to error code
-            while (_isStringNumber(*_itr)) {
-                // _config.errorPages.codes.push_back(std::atoi(_itr->c_str()));
-                ++_itr; // move to next error code
-            }
-            if (*_itr == ";")
-                throw runtime_error(ERR_ERROR_PATH);
+}
 
-            // _config.errorPages.page = *_itr;
-            _checkSemicolon();
-        } else if (*_itr == "root") {
-            ++_itr; // move to root path
-            _config.serverRoot = *_itr;
-            _checkSemicolon();
-        } else if (*_itr == "index") {
-            _parseIndexDirective();
-        } else if (*_itr == "location") {
-            _parseLocationContext();
-        } else {
+void ConfigParser::_parse_server_name_directive(ServerConfig& serverConfig) {
+    DEBUG_MSG("Parsing server_name directive", RE);
+
+}
+
+string ConfigParser::_parse_root_directive(void) {
+    DEBUG_MSG("Parsing root directive", RE);
+}
+
+string ConfigParser::_parse_client_max_body_size_directive(void) {
+    DEBUG_MSG("Parsing client_max_body_size directive", RE);
+}
+
+bool ConfigParser::_parse_autoindex_directive(void) {
+    DEBUG_MSG("Parsing autoindex directive", RE);
+}
+
+ServerConfig ConfigParser::_parse_server_context(void) {
+    DEBUG_MSG("Parsing server context", RE);
             cout << "ERROR: " << *_itr << endl;
             throw runtime_error(ERR_UNEXPECTED_TOKENS_IN_SERVER);
         }
@@ -168,7 +156,7 @@ void ConfigParser::_parseServerContext(void) {
     }
 }
 
-void ConfigParser::_parseHTTPContext(void) {
+void ConfigParser::_parse_HTTP_context(void) {
     DEBUG_MSG("Parsing HTTP context", RE);
 
     // setting values for Config object
@@ -185,8 +173,7 @@ void ConfigParser::_parseHTTPContext(void) {
         if (*_itr == "}")
             break;
         if (*_itr == "server")
-            _parseServerContext();
-        //! else if (*_itr == "index")
+            _serverConfigs.push_back(_parse_server_context());
         else
             throw runtime_error(ERR_UNEXPECTED_TOKENS_IN);
         ++_itr;
@@ -196,7 +183,7 @@ void ConfigParser::_parseHTTPContext(void) {
         throw runtime_error(ERR_UNEXPECTED_TOKENS_OUT);
 }
 
-Config ConfigParser::parse(void) {
+vector<ServerConfig> ConfigParser::parse(void) {
     DEBUG_MSG("Tokenizing content", RE);
     string currentToken;
     for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
@@ -217,8 +204,8 @@ Config ConfigParser::parse(void) {
             currentToken.push_back(*itr); // add character to current token
     }
 
-    _validateBraces();
-    _parseHTTPContext();
+    _validate_braces();
+    _parse_HTTP_context();
 
-    return _config;
+    return _serverConfigs;
 }
