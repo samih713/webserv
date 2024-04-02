@@ -44,4 +44,19 @@ You must provide some configuration files and default basic files to test and de
 - autoindex
 - cgi
 - upload
-- 
+
+### Location
+- Location is a context block like so:
+
+```c++
+location [modifier] [URI] {
+    [directive] [value];
+}
+```
+
+- The URI is the path to match.
+- The modifier is one of the following:
+    - =: exact match
+    - ~: case-sensitive regular expression match
+    - ~*: case-insensitive regular expression match
+    - ^~: non-regular expression match
