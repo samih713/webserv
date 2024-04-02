@@ -148,12 +148,39 @@ bool ConfigParser::_parse_autoindex_directive(void) {
 
 ServerConfig ConfigParser::_parse_server_context(void) {
     DEBUG_MSG("Parsing server context", RE);
-            cout << "ERROR: " << *_itr << endl;
+
+    ServerConfig _serverConfig;
+
+    ++_itr; // move to {
+    if (*_itr != "{")
+        throw runtime_error(ERR_OPENINING_BRACE);
+    ++_itr; // move to first directive
+
+    while (*_itr != "}")
+    {
+        if (*_itr == "listen")
+            _serverConfig.listenerPort = _parse_listen_directive();
+        else if (*_itr == "server_name")
+            _parse_server_name_directive(_serverConfig);
+        else if (*_itr == "error_page")
+            _parse_error_page_directive(_serverConfig.errorPages);
+        else if (*_itr == "root")
+            _serverConfig.serverRoot = _parse_root_directive();
+        else if (*_itr == "client_max_body_size")
+            _serverConfig.maxBodySize = _parse_client_max_body_size_directive();
+        else if (*_itr == "index")
+            _serverConfig.indexFiles =_parse_index_directive();
+        else if (*_itr == "location")
+            _serverConfig.locations.push_back(_parse_location_context());
+        else if (*_itr == "autoindex")
+            _serverConfig.autoindex = _parse_autoindex_directive();
+        else
             throw runtime_error(ERR_UNEXPECTED_TOKENS_IN_SERVER);
-        }
         if (*_itr == ";")
             ++_itr;
     }
+
+    return _serverConfig;
 }
 
 void ConfigParser::_parse_HTTP_context(void) {
