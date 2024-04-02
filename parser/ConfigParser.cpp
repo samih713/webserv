@@ -41,17 +41,16 @@ ConfigParser::ConfigParser(string const& configFile) {
 }
 
 void ConfigParser::_validateBraces(void) {
+    DEBUG_MSG("Validating braces", RE);
+
     // check braces
     stack<string> braces;
     for (vector<string>::const_iterator itr = _tokens.begin();
          itr != _tokens.end(); ++itr)
     {
         if (*itr == "{") {
-            if (*(itr - 1) != "server" && *(itr - 1) != "http" && *(itr - 2) != "location" && *(itr - 3) != "location") {
-                if (*(itr - 1) == "location")
-                    throw runtime_error(ERR_INVALID_LOCATION);
+            if (*(itr - 1) != "server" && *(itr - 1) != "http" && *(itr - 2) != "location" && *(itr - 3) != "location")
                 throw runtime_error(ERR_MISSING_CONTEXT);
-            }
             braces.push("{");
         }
         else if (*itr == "}") {
