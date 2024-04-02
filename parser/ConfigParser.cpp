@@ -201,6 +201,18 @@ string ConfigParser::_parse_root_directive(void) {
 
 string ConfigParser::_parse_client_max_body_size_directive(void) {
     DEBUG_MSG("Parsing client_max_body_size directive", RE);
+
+    ++_itr; // move to max body size
+    if (*(_itr + 1) != ";")
+        throw runtime_error(ERR_MISSING_SEMICOLON);
+    string maxBodySize = *_itr;
+    //! need to handle suffixes like 1m, 1k, 1g
+    if (maxBodySize.find_first_not_of("0123456789kKmMgG") != string::npos)
+        throw runtime_error(ERR_INVALID_BODY_SIZE);
+    else if (maxBodySize.find_first_of("0123456789") == string::npos)
+        throw runtime_error(ERR_INVALID_BODY_SIZE);
+    _checkSemicolon();
+    return maxBodySize;
 }
 
 bool ConfigParser::_parse_autoindex_directive(void) {
