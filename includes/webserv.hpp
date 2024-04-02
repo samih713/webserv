@@ -4,12 +4,9 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
-<<<<<<< Updated upstream
 // [ ] hanlde partial sends and recieves (Server::handle_connection)
 // [ ] better option handling
-=======
 // [ ] add vector<page> to CachedPages
->>>>>>> Stashed changes
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
 // [ ] Address sanitizer error when testing with ./test_server

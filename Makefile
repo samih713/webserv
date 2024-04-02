@@ -22,7 +22,7 @@ run: re
 	./$(NAME)
 
 $(NAME): $(LIB_HTTP) $(LIB_PARSER) $(LIB_SERVER) $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready.\n"
 
 $(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
@@ -38,32 +38,32 @@ debug: all
 
 # @make -sC tester/ # need to add tests for parser and server
 tests:
-	@make tests -sC parser/
-	@make tests -sC server/
-	@make tests -sC http/
+	@+make tests -sC parser/
+	@+make tests -sC server/
+	@+make tests -sC http/
 	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
 
 $(LIB_HTTP):
-	@make -sC http/
+	@+make -sC http/
 
 $(LIB_PARSER):
-	@make -sC parser/
+	@+make -sC parser/
 
 $(LIB_SERVER):
-	@make -sC server/
+	@+make -sC server/
 
 clean:
 	@$(RM) $(OBJS_DIR) *.o
-	@make clean -sC parser/ > /dev/null 2>&1
-	@make clean -sC server/ > /dev/null 2>&1
-	@make clean -sC http/ > /dev/null 2>&1
+	@+make clean -sC parser/ > /dev/null 2>&1
+	@+make clean -sC server/ > /dev/null 2>&1
+	@+make clean -sC http/ > /dev/null 2>&1
 	@echo "$(RED)[ DELETE ]$(RESET) Removed object files."
 
 fclean: clean
 	@$(RM) $(NAME)
-	@make fclean -sC parser/ > /dev/null 2>&1
-	@make fclean -sC server/ > /dev/null 2>&1
-	@make fclean -sC http/ > /dev/null 2>&1
+	@+make fclean -sC parser/ > /dev/null 2>&1
+	@+make fclean -sC server/ > /dev/null 2>&1
+	@+make fclean -sC http/ > /dev/null 2>&1
 	@echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and libraries.\n"
 
 -include $(DEP)
