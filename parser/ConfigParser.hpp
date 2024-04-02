@@ -55,8 +55,11 @@ private:
     Config _config;
     vector<string>::const_iterator _itr;
 
-    void _parseServerContext(void);
     void _validateBraces(void);
+    void _parseHTTPContext(void);
+    void _parseServerContext(void);
+    void _parseLocationContext(void);
+    void _parseIndexDirective(void);
 };
 
 #endif // CONFIG_PARSER_HPP
