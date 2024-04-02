@@ -29,7 +29,12 @@ static string ERR_INVALID_LISTEN("Parser: invalid listen directive");
 static string ERR_INVALID_SERVER_NAME("Parser: invalid server_name directive");
 static string ERR_INVALID_ROOT("Parser: invalid root directive");
 static string ERR_INVALID_INDEX("Parser: invalid index directive");
+static string ERR_INVALID_AUTOINDEX("Parser: invalid autoindex directive");
+static string ERR_INVALID_BODY_SIZE("Parser: invalid client_max_body_size directive");
+
 static string ERR_ERROR_PATH("Parser: error page path missing");
+static string ERR_ERROR_CODE("Parser: error page code missing");
+static string ERR_INVALID_ERROR_PATH("Parser: invalid error page path");
 
 static string ERR_INVALID_LOCATION("Parser: invalid location context");
 static string ERR_LOCATION_PATH("Parser: location path missing");
@@ -38,9 +43,8 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 #define MAX_PORT 65535
 
 // TODO:
-// * Parse context blocks and fill into _config
-// * For semi-colon missing, check if it's the last line of the block by checking for the required values
-// * maybe remove the ConfigParser class and put the parse function in the Config class
+// [ ] need a way to parse multiple location blocks and store them based on the server block and context
+// [ ] need a way to parse multiple error_pages into a vector of ErrorPage structs
 
 const string keywords[8] = {
     "server",
