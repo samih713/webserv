@@ -217,6 +217,12 @@ string ConfigParser::_parse_client_max_body_size_directive(void) {
 
 bool ConfigParser::_parse_autoindex_directive(void) {
     DEBUG_MSG("Parsing autoindex directive", RE);
+
+    ++_itr; // move to on/off
+    if (*_itr != "on" && *_itr != "off")
+        throw runtime_error(ERR_INVALID_AUTOINDEX);
+    _checkSemicolon();
+    return *(_itr - 1) == "on";
 }
 
 ServerConfig ConfigParser::_parse_server_context(void) {
