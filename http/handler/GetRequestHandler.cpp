@@ -1,6 +1,7 @@
 #include "GetRequestHandler.hpp"
-#include "../server/CachedPages.hpp"
+#include "CachedPages.hpp"
 #include "FileType.hpp"
+#include "RequestHandlerBase.hpp"
 #include "Server.hpp"
 #include "debug.hpp"
 #include "webserv.hpp"

@@ -57,8 +57,8 @@ std::ostream &operator<<(ostream &os, const Request &r)
     os << "************ fields *************\n";
     for (size_t i = 0; i < r.header_fields.size(); i++)
     {
-        os << "[" << r.header_fields[i].first << "]"
-           << ": " << r.header_fields[i].second << std::endl;
+        os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
+           << std::endl;
     }
     os << "************ body *************\n";
     os << r.body << std::endl;

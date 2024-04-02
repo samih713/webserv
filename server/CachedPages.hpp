@@ -54,6 +54,7 @@ class CachedPages
         {
             DEBUG_MSG("Cached Pages destructor called", R);
         }
+		vector<Page> pages;
         Page notFound;
         Page home;
 };
