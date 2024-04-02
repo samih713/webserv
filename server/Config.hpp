@@ -1,7 +1,10 @@
 #include "webserv.hpp"
+#include "../http/Message.hpp"
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+
+using webserv::http::STATUS_CODE;
 
 class Config {
 public:
