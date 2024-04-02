@@ -43,7 +43,7 @@ private:
     string _content;
     vector<string> _tokens;
     Config _config;
-    vector<string>::const_iterator _citr;
+    vector<string>::const_iterator _itr;
 
     void _parseServerContext(void);
     void _validateBraces(void);

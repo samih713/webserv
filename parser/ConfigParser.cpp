@@ -65,37 +65,37 @@ void ConfigParser::_validateBraces(void) {
 }
 
 void ConfigParser::_parseServerContext(void) {
-    ++_citr; // move to {
-    if (*_citr != "{")
+    ++_itr; // move to {
+    if (*_itr != "{")
         throw runtime_error(ERR_OPENINING_BRACE);
 
-    while (*_citr != "}") {
-        std::cout << *_citr << std::endl;
-        if (*_citr == "listen") {
-            ++_citr; // move to port number
-            for (string::const_iterator portItr = _citr->begin(); portItr != _citr->end(); ++portItr) {
+    while (*_itr != "}") {
+        std::cout << *_itr << std::endl;
+        if (*_itr == "listen") {
+            ++_itr; // move to port number
+            for (string::const_iterator portItr = _itr->begin(); portItr != _itr->end(); ++portItr) {
                 if (!std::isdigit(*portItr))
                     throw runtime_error(ERR_INVALID_LISTEN);
             }
-            _config.listenerPort = std::atoi(_citr->c_str());
+            _config.listenerPort = std::atoi(_itr->c_str());
             if (_config.listenerPort > MAX_PORT || _config.listenerPort < 0)
                 throw runtime_error(ERR_INVALID_LISTEN);
         }
-        else if (*_citr == "server_name") {
-            ++_citr; // move to server name
-            while (*_citr != ";") {
-                _config.serverName.push_back(*_citr);
-                ++_citr;
+        else if (*_itr == "server_name") {
+            ++_itr; // move to server name
+            while (*_itr != ";") {
+                _config.serverName.push_back(*_itr);
+                ++_itr;
             }
         }
-        else if (*_citr == "location") {
-            // ++_citr; // move to location path
-            // _config.locations.push_back(*_citr);
-            while (*_citr != "}")
-                ++_citr;
-            ++_citr;
+        else if (*_itr == "location") {
+            // ++_itr; // move to location path
+            // _config.locations.push_back(*_itr);
+            while (*_itr != "}")
+                ++_itr;
+            ++_itr;
         }
-        ++_citr;
+        ++_itr;
     }
 }
 
@@ -123,19 +123,19 @@ Config ConfigParser::parse(void) {
     _validateBraces();
 
     // setting values for Config object
-    _citr = _tokens.begin();
-    if (*_citr != "http")
+    _itr = _tokens.begin();
+    if (*_itr != "http")
         throw runtime_error(ERR_MISSING_HTTP);
-    ++_citr; // move to {
-    if (*_citr != "{")
+    ++_itr; // move to {
+    if (*_itr != "{")
         throw runtime_error(ERR_OPENINING_BRACE);
 
-    while (_citr != _tokens.end()) {
-        if (*_citr == "{")
-            ++_citr;
-        if (*_citr == "server")
+    while (_itr != _tokens.end()) {
+        if (*_itr == "{")
+            ++_itr;
+        if (*_itr == "server")
             _parseServerContext();
-        ++_citr;
+        ++_itr;
     }
 
     return _config;
