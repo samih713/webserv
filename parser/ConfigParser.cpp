@@ -78,6 +78,35 @@ void ConfigParser::_parseIndexDirective(void) {
 
 void ConfigParser::_parseLocationContext(void) {
     DEBUG_MSG("Parsing location context", RE);
+
+    ++_itr; // move to location modifier/path
+    if (*_itr == "{")
+        throw runtime_error(ERR_INVALID_LOCATION);
+    if (*_itr == "=" || *_itr == "~") {
+        _config.location.modifier = *_itr;
+        ++_itr; // move to path
+    }
+    _config.location.path = *_itr;
+
+    ++_itr; // move to {
+    if (*_itr != "{")
+        throw runtime_error(ERR_INVALID_LOCATION);
+    ++_itr; // move to location content
+
+    while (*_itr != "}") {
+        if (*_itr == "root") {
+            ++_itr; // move to next root path
+            _config.location.root = *_itr;
+            _checkSemicolon();
+        } else if (*_itr == "index") {
+            _parseIndexDirective();
+        } else {
+            cout << *_itr << endl;
+            throw runtime_error(ERR_UNEXPECTED_TOKENS_IN_LOCATION);
+        }
+        ++_itr;
+    }
+    ++_itr; // move to next directive
 }
 
 void ConfigParser::_parseServerContext(void) {
