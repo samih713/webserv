@@ -33,17 +33,16 @@ You must provide some configuration files and default basic files to test and de
 
 
 ### Accepted keywords
-- server
-- server_name
-- listen
-- error_page
-- client_max_body_size
-- location
-- root
-- index
-- autoindex
-- cgi
-- upload
+- server (can be in http only)
+- server_name (can be in server only)
+- listen (can be in server only)
+- location (can be in server only)
+- fastcgi_pass (can be in location only)
+- error_page (can be in http, server, location blocks)
+- client_max_body_size (can be in http, server, location blocks)
+- root (can be in http, server, location blocks)
+- index (can be in http, server, location blocks)
+- autoindex (can be in http, server, location blocks)
 
 ### Location
 - Location is a context block like so:
@@ -60,3 +59,8 @@ location [modifier] [URI] {
     - ~: case-sensitive regular expression match
     - ~*: case-insensitive regular expression match
     - ^~: non-regular expression match
+
+
+### References
+- [Nginx Configuration](https://nginx.org/en/docs/beginners_guide.html)
+- [Nginx Configuration](https://nginx.org/en/docs/http/ngx_http_core_module.html)
