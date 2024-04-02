@@ -10,6 +10,10 @@ SRCS:= main.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
+LIB_HTTP:= ./http/libhttp.a
+LIB_SERVER:= ./server/libserver.a
+LIB_PARSER:= ./parser/libparser.a
+
 LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser -Lhttp/ -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
@@ -19,7 +23,7 @@ all: $(NAME)
 run: re
 	./$(NAME)
 
-$(NAME): parser server http $(OBJS)
+$(NAME): $(LIB_HTTP) $(LIB_PARSER) $(LIB_SERVER) $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
@@ -41,14 +45,14 @@ tests:
 	@make tests -sC http/
 	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
 
-parser:
+$(LIB_HTTP):
+	@make -sC http/
+
+$(LIB_PARSER):
 	@make -sC parser/
 
-server:
+$(LIB_SERVER):
 	@make -sC server/
-
-http:
-	@make -sC http/
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
@@ -72,4 +76,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: clean fclean all re tests server parser http debug run
+.PHONY: clean fclean all re tests debug run
