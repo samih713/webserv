@@ -115,18 +115,22 @@ Location ConfigParser::_parse_location_context(void) {
 
 fd ConfigParser::_parse_listen_directive(void) {
     DEBUG_MSG("Parsing listen directive", RE);
+    fd listenerPort;
 
-    while (*_itr != "}")
-    {
-        if (*_itr == "listen") {
-            //! listen can also handle IP address like 0.0.0.0:80
-            ++_itr; // move to port number
-            if (*(_itr + 1) != ";")
-                throw runtime_error(ERR_MISSING_SEMICOLON);
+    ++_itr; // move to port number
+    if (*(_itr + 1) != ";")
+        throw runtime_error(ERR_MISSING_SEMICOLON);
 
-            if (!_isStringNumber(*_itr))
-                throw runtime_error(ERR_INVALID_LISTEN);
+    if (!_isStringNumber(*_itr))
+        throw runtime_error(ERR_INVALID_LISTEN);
 
+    listenerPort = std::atoi(_itr->c_str());
+    if (listenerPort > MAX_PORT || listenerPort < 0)
+        throw runtime_error(ERR_INVALID_LISTEN);
+    ++_itr; // move to semicolon
+
+    //! listen can also handle IP address like 0.0.0.0:80
+    return listenerPort;
 }
 
 void ConfigParser::_parse_server_name_directive(ServerConfig& serverConfig) {
