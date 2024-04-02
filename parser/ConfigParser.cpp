@@ -40,25 +40,6 @@ ConfigParser::ConfigParser(string const& configFile) {
     file.close();
 }
 
-void ConfigParser::_validate(void) {
-    // check braces
-    stack<string> braces;
-    for (vector<string>::const_iterator itr = _tokens.begin();
-         itr != _tokens.end(); ++itr)
-    {
-        if (*itr == "{")
-            braces.push("{");
-        else if (*itr == "}") {
-            if (braces.empty()) // missing opening brace
-                throw runtime_error(ERR_OPENINING_BRACE);
-            braces.pop();
-        }
-    }
-    if (!braces.empty()) // missing closing brace
-        throw runtime_error(ERR_CLOSING_BRACE);
-
-}
-
 Config ConfigParser::parse(void) {
     // tokenizing content
     string currentToken;
@@ -80,7 +61,21 @@ Config ConfigParser::parse(void) {
             currentToken.push_back(*itr); // add character to current token
     }
 
-    _validate();
+    // check braces
+    stack<string> braces;
+    for (vector<string>::const_iterator itr = _tokens.begin();
+         itr != _tokens.end(); ++itr)
+    {
+        if (*itr == "{")
+            braces.push("{");
+        else if (*itr == "}") {
+            if (braces.empty()) // missing opening brace
+                throw runtime_error(ERR_OPENINING_BRACE);
+            braces.pop();
+        }
+    }
+    if (!braces.empty()) // missing closing brace
+        throw runtime_error(ERR_CLOSING_BRACE);
 
     // setting values for Config object
     for (vector<string>::const_iterator itr = _tokens.begin();

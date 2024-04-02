@@ -37,8 +37,6 @@ private:
     string _content;
     vector<string> _tokens;
     Config _config;
-
-    void _validate(void);
 };
 
 #endif // CONFIG_PARSER_HPP
