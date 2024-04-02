@@ -65,6 +65,15 @@ void ConfigParser::_validateBraces(void) {
 
 void ConfigParser::_parseIndexDirective(void) {
     DEBUG_MSG("Parsing index directive", RE);
+
+    ++_itr; // move to index file
+    _config.home = _config.serverRoot;
+    while (*_itr != ";") {
+        if (_isKeyword(*_itr))
+            throw runtime_error(ERR_INVALID_INDEX);
+        _config.home += "/" + *_itr;
+        ++_itr;
+    }
 }
 
 void ConfigParser::_parseLocationContext(void) {
