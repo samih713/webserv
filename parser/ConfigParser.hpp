@@ -42,6 +42,17 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 // * For semi-colon missing, check if it's the last line of the block by checking for the required values
 // * maybe remove the ConfigParser class and put the parse function in the Config class
 
+const string keywords[8] = {
+    "server",
+    "listen",
+    "server_name",
+    "location",
+    "root",
+    "index",
+    "error_page",
+    "autoindex"
+};
+
 class ConfigParser {
 public:
     ConfigParser(string const& filepath);
@@ -60,6 +71,26 @@ private:
     void _parseServerContext(void);
     void _parseLocationContext(void);
     void _parseIndexDirective(void);
+
+    bool _isStringNumber(const string& str) {
+        for (string::const_iterator itr = str.begin(); itr != str.end(); ++itr) {
+            if (!std::isdigit(*itr))
+                return false;
+        }
+        return true;
+    }
+    bool _isKeyword(const string& str) {
+        for (size_t i = 0; i < 8; ++i) {
+            if (str == keywords[i])
+                return true;
+        }
+        return false;
+    }
+    void _checkSemicolon(void) {
+        if (*(_itr + 1) != ";")
+            throw runtime_error(ERR_MISSING_SEMICOLON);
+        ++_itr; // move to semicolon
+    }
 };
 
 #endif // CONFIG_PARSER_HPP
