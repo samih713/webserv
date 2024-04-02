@@ -19,6 +19,8 @@ public:
     string home;
     string notFoundPage;
     fd     listenerPort;
+    vector<string> serverName;
+    vector<string> locations;
 
     void print(void) {
         std::cout << "Server root: " << serverRoot << std::endl;

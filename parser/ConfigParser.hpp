@@ -20,9 +20,12 @@ static string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
 static string ERR_MISSING_CONTEXT("Parser: missing context");
 static string ERR_MISSING_HTTP("Parser: missing HTTP context");
 static string ERR_MISSING_SERVER("Parser: missing server context");
+static string ERR_INVALID_LISTEN("Parser: invalid listen directive");
 static string ERR_INVALID_LOCATION("Parser: invalid listen directive");
 static string ERR_UNEXPECTED_TOKENS_IN("Parser: Unexpected tokens found inside the HTTP context");
 static string ERR_UNEXPECTED_TOKENS_OUT("Parser: Unexpected tokens found outside the HTTP context");
+
+#define MAX_PORT 65535
 
 // TODO:
 // * Parse context blocks and fill into _config
@@ -42,6 +45,7 @@ private:
     Config _config;
     vector<string>::const_iterator _citr;
 
+    void _parseServerContext(void);
     void _validateBraces(void);
 };
 
