@@ -179,6 +179,13 @@ fd ConfigParser::_parse_listen_directive(void) {
 void ConfigParser::_parse_server_name_directive(ServerConfig& serverConfig) {
     DEBUG_MSG("Parsing server_name directive", RE);
 
+    ++_itr; // move to server name
+    while (*_itr != ";") {
+        if (_isKeyword(*_itr))
+            throw runtime_error(ERR_INVALID_SERVER_NAME);
+        serverConfig.serverName.push_back(*_itr);
+        ++_itr;
+    }
 }
 
 string ConfigParser::_parse_root_directive(void) {
