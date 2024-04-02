@@ -62,19 +62,25 @@ public:
     ConfigParser(string const& filepath);
     ~ConfigParser() {};
 
-    Config parse(void);
+    vector<ServerConfig> parse(void);
 
 private:
     string _content;
     vector<string> _tokens;
-    Config _config;
+    vector<ServerConfig> _serverConfigs;
     vector<string>::const_iterator _itr;
 
-    void _validateBraces(void);
-    void _parseHTTPContext(void);
-    void _parseServerContext(void);
-    void _parseLocationContext(void);
-    void _parseIndexDirective(void);
+    void _validate_braces(void);
+    void _parse_HTTP_context(void);
+    ServerConfig _parse_server_context(void);
+    Location _parse_location_context(void);
+    vector<string> _parse_index_directive(void);
+    void _parse_error_page_directive(vector<ErrorPage>& errorPages);
+    fd _parse_listen_directive(void);
+    void _parse_server_name_directive(ServerConfig& serverConfig);
+    string _parse_root_directive(void);
+    string _parse_client_max_body_size_directive(void);
+    bool _parse_autoindex_directive(void);
 
     bool _isStringNumber(const string& str) {
         for (string::const_iterator itr = str.begin(); itr != str.end(); ++itr) {
