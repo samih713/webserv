@@ -1,11 +1,10 @@
-#ifndef CONFIG_PARSER_HPP
-#define CONFIG_PARSER_HPP
-
 #include "../includes/webserv.hpp"
 #include "../server/Config.hpp"
 #include <sys/stat.h>
 #include <stack>
-#include "../server/Config.hpp"
+
+#ifndef CONFIG_PARSER_HPP
+#define CONFIG_PARSER_HPP
 
 using std::stack;
 using std::runtime_error;
