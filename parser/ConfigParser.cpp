@@ -65,6 +65,44 @@ void ConfigParser::_validate_braces(void) {
 
 void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
     DEBUG_MSG("Parsing error_page directive", RE);
+    ErrorPage errorPage;
+
+    ++_itr; // move to error code
+    if (*_itr == ";")
+        throw runtime_error(ERR_ERROR_CODE);
+
+    while (_isStringNumber(*_itr)) {
+        errorPage.code = static_cast<STATUS_CODE>(std::atoi(_itr->c_str()));
+        if (errorPage.code < 100)
+            throw runtime_error(ERR_ERROR_CODE);
+        errorPages.push_back(errorPage);
+        ++_itr; // move to next error code
+    }
+    if (*_itr == ";")
+        throw runtime_error(ERR_ERROR_PATH);
+
+    string errorPath = *_itr;
+    if (errorPath.find(".html") == string::npos &&
+        errorPath.find(".htm") == string::npos &&
+        errorPath.find(".txt") == string::npos)
+        throw runtime_error(ERR_INVALID_ERROR_PATH);
+    else if (errorPath.find_first_of("/") != errorPath.find_last_of("/"))
+        throw runtime_error(ERR_INVALID_ERROR_PATH);
+    else if (errorPath.find_first_of("x") != errorPath.find_last_of("x"))
+        throw runtime_error(ERR_INVALID_ERROR_PATH);
+
+    for (size_t i = 0; i < errorPages.size(); ++i) {
+        if (!errorPages[i].page.empty())
+            continue;
+        errorPages[i].page = errorPath;
+        size_t xPos = errorPath.find("x");
+        if (xPos != string::npos) {
+            char code = errorPages[i].code % 10 + '0';
+            errorPages[i].page.replace(xPos, 1, 1, code);
+        }
+    }
+
+    _checkSemicolon();
 }
 
 vector<string> ConfigParser::_parse_index_directive(void) {
