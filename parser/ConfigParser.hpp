@@ -13,16 +13,27 @@ static string ERR_INVALID_FILE("Parser: invalid file");
 static string ERR_STAT("Parser: not a regular file");
 static string ERR_OPEN("Parser: cannot open file");
 static string ERR_EMPTY("Parser: file is empty");
+
 static string ERR_CLOSING_BRACE("Parser: } missing");
 static string ERR_OPENINING_BRACE("Parser: { missing");
-static string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
+static string ERR_MISSING_SEMICOLON("Parser: missing semicolon");
 static string ERR_MISSING_CONTEXT("Parser: missing context");
+
 static string ERR_MISSING_HTTP("Parser: missing HTTP context");
-static string ERR_MISSING_SERVER("Parser: missing server context");
-static string ERR_INVALID_LISTEN("Parser: invalid listen directive");
-static string ERR_INVALID_LOCATION("Parser: invalid listen directive");
 static string ERR_UNEXPECTED_TOKENS_IN("Parser: Unexpected tokens found inside the HTTP context");
 static string ERR_UNEXPECTED_TOKENS_OUT("Parser: Unexpected tokens found outside the HTTP context");
+
+static string ERR_MISSING_SERVER("Parser: missing server context");
+static string ERR_UNEXPECTED_TOKENS_IN_SERVER("Parser: Unexpected tokens found inside the server context");
+static string ERR_INVALID_LISTEN("Parser: invalid listen directive");
+static string ERR_INVALID_SERVER_NAME("Parser: invalid server_name directive");
+static string ERR_INVALID_ROOT("Parser: invalid root directive");
+static string ERR_INVALID_INDEX("Parser: invalid index directive");
+static string ERR_ERROR_PATH("Parser: error page path missing");
+
+static string ERR_INVALID_LOCATION("Parser: invalid location context");
+static string ERR_LOCATION_PATH("Parser: location path missing");
+static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found inside the location context");
 
 #define MAX_PORT 65535
 
