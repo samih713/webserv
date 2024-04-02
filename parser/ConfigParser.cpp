@@ -69,15 +69,17 @@ void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
 
 vector<string> ConfigParser::_parse_index_directive(void) {
     DEBUG_MSG("Parsing index directive", RE);
+    vector<string> indexFiles;
 
     ++_itr; // move to index file
-    _config.home = _config.serverRoot;
     while (*_itr != ";") {
         if (_isKeyword(*_itr))
             throw runtime_error(ERR_INVALID_INDEX);
-        _config.home += "/" + *_itr;
+        indexFiles.push_back(*_itr);
         ++_itr;
     }
+
+    return indexFiles;
 }
 
 Location ConfigParser::_parse_location_context(void) {
