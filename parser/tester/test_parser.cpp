@@ -8,8 +8,9 @@ int main(int argc, char **argv) {
 
     try {
         ConfigParser parser(argv[1]);
-        Config configurations = parser.parse();
-        configurations.print();
+        vector<ServerConfig> configurations = parser.parse();
+        for (vector<ServerConfig>::const_iterator itr = configurations.begin(); itr != configurations.end(); ++itr)
+            itr->print();
     }
     catch (std::exception &error) {
         std::cerr << R << "[ ERROR ] " << RE << error.what() << std::endl;
