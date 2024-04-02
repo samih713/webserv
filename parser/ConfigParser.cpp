@@ -40,6 +40,31 @@ ConfigParser::ConfigParser(string const& configFile) {
     file.close();
 }
 
+void ConfigParser::_validateBraces(void) {
+    // check braces
+    stack<string> braces;
+    for (vector<string>::const_iterator itr = _tokens.begin();
+         itr != _tokens.end(); ++itr)
+    {
+        if (*itr == "{") {
+            if (*(itr - 1) != "server" && *(itr - 1) != "http" && *(itr - 2) != "location" && *(itr - 3) != "location") {
+                if (*(itr - 1) == "location")
+                    throw runtime_error(ERR_INVALID_LOCATION);
+                throw runtime_error(ERR_MISSING_CONTEXT);
+            }
+            braces.push("{");
+        }
+        else if (*itr == "}") {
+            if (braces.empty()) // missing opening brace
+                throw runtime_error(ERR_OPENINING_BRACE);
+            braces.pop();
+        }
+    }
+    if (!braces.empty()) // missing closing brace
+        throw runtime_error(ERR_CLOSING_BRACE);
+}
+
+
 Config ConfigParser::parse(void) {
     // tokenizing content
     string currentToken;
@@ -61,42 +86,19 @@ Config ConfigParser::parse(void) {
             currentToken.push_back(*itr); // add character to current token
     }
 
-    // check braces
-    stack<string> braces;
-    for (vector<string>::const_iterator itr = _tokens.begin();
-         itr != _tokens.end(); ++itr)
-    {
-        if (*itr == "{")
-            braces.push("{");
-        else if (*itr == "}") {
-            if (braces.empty()) // missing opening brace
-                throw runtime_error(ERR_OPENINING_BRACE);
-            braces.pop();
-        }
-    }
-    if (!braces.empty()) // missing closing brace
-        throw runtime_error(ERR_CLOSING_BRACE);
+    _validateBraces();
 
     // setting values for Config object
-    for (vector<string>::const_iterator itr = _tokens.begin();
-         itr != _tokens.end(); ++itr)
-    {
-        if (*itr == "listen") {
-            ++itr; // move to port number
+    _citr = _tokens.begin();
+    if (*_citr != "http")
+        throw runtime_error(ERR_MISSING_HTTP);
+    ++_citr; // move to {
+    if (*_citr != "{")
+        throw runtime_error(ERR_OPENINING_BRACE);
 
-            if (*(itr + 1) != ";")
-                throw runtime_error(ERR_MISSING_SEMICOLON);
-
-            // check if port number is valid
-            if (itr->find_first_not_of("0123456789") != string::npos)
-                throw runtime_error("Parser: invalid port number");
-
-            _config.listenerPort = std::atoi(itr->c_str());
-            if (_config.listenerPort < 0 || _config.listenerPort > 65535)
-                throw runtime_error("Parser: invalid port number");
-
-            ++itr; // move to ;
-        }
+    while (_citr != _tokens.end()) {
+        if (*_citr == "{")
+        ++_citr;
     }
 
     return _config;
