@@ -17,8 +17,10 @@ static string ERR_EMPTY("Parser: file is empty");
 static string ERR_CLOSING_BRACE("Parser: } missing");
 static string ERR_OPENINING_BRACE("Parser: { missing");
 static string ERR_MISSING_SEMICOLON("Parser: semicolon missing");
-static string ERR_MISSING_SERVER("Parser: server block missing");
-static string ERR_MISSING_HTTP("Parser: http block missing");
+static string ERR_MISSING_CONTEXT("Parser: missing context");
+static string ERR_MISSING_HTTP("Parser: missing HTTP context");
+static string ERR_MULTIPLE_HTTP("Parser: multiple HTTP contexts found");
+static string ERR_MISSING_SERVER("Parser: missing server context");
 
 // TODO:
 // * Add more error messages
