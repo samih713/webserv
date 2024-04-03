@@ -25,8 +25,8 @@ SRCS:=  $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS)
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
-TEST_DIR:= tester
-TEST_HTTP:= $(TEST_DIR)/main.cpp
+TESTS_DIR:= .tests
+TEST_HTTP:= $(TESTS_DIR)/main.cpp
 
 DEP:= $(OBJS:%.o=%.d)
 

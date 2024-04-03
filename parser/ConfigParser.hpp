@@ -45,6 +45,13 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 
 // TODO:
 // [ ] might be better to use a map of (code,page) instead of a vector for error pages
+// [ ] check for duplicate server names
+// [ ] check for duplicate listen ports
+// [ ] check for duplicate locations
+// [ ] check for duplicate indexes
+// [ ] check for duplicate error pages
+// [ ] check for duplicate autoindex (depends on context)
+// [ ] empty root can cause problems even if it's valid
 
 const string keywords[9] = {
     "http",

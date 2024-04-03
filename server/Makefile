@@ -12,9 +12,9 @@ SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManag
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
-TEST_DIR:= tester
-TEST_SOCKET:= $(TEST_DIR)/SOCKET_main.cpp
-TEST_SERVER:= $(TEST_DIR)/SERVER_main.cpp
+TESTS_DIR:= .tests
+TEST_SOCKET:= $(TESTS_DIR)/SOCKET_main.cpp
+TEST_SERVER:= $(TESTS_DIR)/SERVER_main.cpp
 
 # http request/response directory
 LIBHTTPDIR:= ../http/
@@ -45,7 +45,7 @@ libhttp:
 
 # tests
 client: debug
-	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TEST_DIR)/ClientTest.cpp $(NAME) -o $@
+	@$(CXX) $(CXXFLAGS) $(SANITIZE) $(INCLUDES) $(TESTS_DIR)/ClientTest.cpp $(NAME) -o $@
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Client ready."
 

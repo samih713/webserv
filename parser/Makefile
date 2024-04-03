@@ -11,8 +11,8 @@ SRCS:= ConfigParser.cpp
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
 # tester mains
-TEST_DIR:= tester
-TEST_PARSER:= $(TEST_DIR)/test_parser.cpp
+TESTS_DIR:= .tests
+TEST_PARSER:= $(TESTS_DIR)/test_parser.cpp
 
 CONFIG_DIR:= config_files
 CONFIG_FILES:= $(wildcard $(CONFIG_DIR)/*.conf) $(wildcard $(CONFIG_DIR)/brace_check/*.conf)
