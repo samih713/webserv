@@ -44,10 +44,10 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] need a way to parse multiple location blocks and store them based on the server block and context
-// [ ] need a way to parse multiple error_pages into a vector of ErrorPage structs
+// [ ] might be better to use a map of (code,page) instead of a vector for error pages
 
-const string keywords[8] = {
+const string keywords[9] = {
+    "http",
     "server",
     "listen",
     "server_name",
@@ -84,10 +84,8 @@ private:
     bool _parse_autoindex_directive(void);
 
     bool _isStringNumber(const string& str) {
-        for (string::const_iterator itr = str.begin(); itr != str.end(); ++itr) {
-            if (!std::isdigit(*itr))
-                return false;
-        }
+        if (str.find_first_not_of("0123456789") != string::npos)
+            return false;
         return true;
     }
     bool _isKeyword(const string& str) {
