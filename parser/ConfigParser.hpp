@@ -28,6 +28,7 @@ static string ERR_UNEXPECTED_TOKENS_IN_SERVER("Parser: Unexpected tokens found i
 static string ERR_INVALID_LISTEN("Parser: invalid listen directive");
 static string ERR_INVALID_SERVER_NAME("Parser: invalid server_name directive");
 static string ERR_INVALID_ROOT("Parser: invalid root directive");
+static string ERR_MISSING_ROOT("Parser: missing root directive");
 static string ERR_INVALID_INDEX("Parser: invalid index directive");
 static string ERR_INVALID_AUTOINDEX("Parser: invalid autoindex directive");
 static string ERR_INVALID_BODY_SIZE("Parser: invalid client_max_body_size directive");
@@ -74,10 +75,10 @@ private:
     void _parse_HTTP_context(void);
     ServerConfig _parse_server_context(void);
     Location _parse_location_context(void);
-    vector<string> _parse_index_directive(void);
-    void _parse_error_page_directive(vector<ErrorPage>& errorPages);
+    vector<string> _parse_index_directive(string const& root);
+    void _parse_error_page_directive(vector<ErrorPage>& errorPages, string const& root);
     fd _parse_listen_directive(void);
-    void _parse_server_name_directive(ServerConfig& serverConfig);
+    void _parse_server_name_directive(vector<string>& serverName);
     string _parse_root_directive(void);
     string _parse_client_max_body_size_directive(void);
     bool _parse_autoindex_directive(void);

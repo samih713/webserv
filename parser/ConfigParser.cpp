@@ -63,9 +63,12 @@ void ConfigParser::_validate_braces(void) {
         throw runtime_error(ERR_CLOSING_BRACE);
 }
 
-void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
+void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages, string const& root) {
     DEBUG_MSG("Parsing error_page directive", RE);
     ErrorPage errorPage;
+
+    if (root.empty())
+        throw runtime_error(ERR_MISSING_ROOT);
 
     ++_itr; // move to error code
     if (*_itr == ";")
@@ -94,7 +97,7 @@ void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
     for (size_t i = 0; i < errorPages.size(); ++i) {
         if (!errorPages[i].page.empty())
             continue;
-        errorPages[i].page = errorPath;
+        errorPages[i].page = root + "/" + errorPath;
         size_t xPos = errorPath.find("x");
         if (xPos != string::npos) {
             char code = errorPages[i].code % 10 + '0';
@@ -105,15 +108,18 @@ void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages) {
     _checkSemicolon();
 }
 
-vector<string> ConfigParser::_parse_index_directive(void) {
+vector<string> ConfigParser::_parse_index_directive(string const& root) {
     DEBUG_MSG("Parsing index directive", RE);
     vector<string> indexFiles;
+
+    if (root.empty())
+        throw runtime_error(ERR_MISSING_ROOT);
 
     ++_itr; // move to index file
     while (*_itr != ";") {
         if (_isKeyword(*_itr))
             throw runtime_error(ERR_INVALID_INDEX);
-        indexFiles.push_back(*_itr);
+        indexFiles.push_back(root + "/" + *_itr);
         ++_itr;
     }
 
@@ -144,7 +150,7 @@ Location ConfigParser::_parse_location_context(void) {
         else if (*_itr == "autoindex")
             location.autoindex = _parse_autoindex_directive();
         else if (*_itr == "index")
-            location.indexFiles = _parse_index_directive();
+            location.indexFiles = _parse_index_directive(location.root);
         else {
             cout << *_itr << endl;
             throw runtime_error(ERR_UNEXPECTED_TOKENS_IN_LOCATION);
@@ -176,14 +182,14 @@ fd ConfigParser::_parse_listen_directive(void) {
     return listenerPort;
 }
 
-void ConfigParser::_parse_server_name_directive(ServerConfig& serverConfig) {
+void ConfigParser::_parse_server_name_directive(vector<string>& serverName) {
     DEBUG_MSG("Parsing server_name directive", RE);
 
     ++_itr; // move to server name
     while (*_itr != ";") {
         if (_isKeyword(*_itr))
             throw runtime_error(ERR_INVALID_SERVER_NAME);
-        serverConfig.serverName.push_back(*_itr);
+        serverName.push_back(*_itr);
         ++_itr;
     }
 }
@@ -240,15 +246,15 @@ ServerConfig ConfigParser::_parse_server_context(void) {
         if (*_itr == "listen")
             _serverConfig.listenerPort = _parse_listen_directive();
         else if (*_itr == "server_name")
-            _parse_server_name_directive(_serverConfig);
+            _parse_server_name_directive(_serverConfig.serverName);
         else if (*_itr == "error_page")
-            _parse_error_page_directive(_serverConfig.errorPages);
+            _parse_error_page_directive(_serverConfig.errorPages, _serverConfig.serverRoot);
         else if (*_itr == "root")
             _serverConfig.serverRoot = _parse_root_directive();
         else if (*_itr == "client_max_body_size")
             _serverConfig.maxBodySize = _parse_client_max_body_size_directive();
         else if (*_itr == "index")
-            _serverConfig.indexFiles =_parse_index_directive();
+            _serverConfig.indexFiles =_parse_index_directive(_serverConfig.serverRoot);
         else if (*_itr == "location")
             _serverConfig.locations.push_back(_parse_location_context());
         else if (*_itr == "autoindex")
