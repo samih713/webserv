@@ -1,6 +1,6 @@
 # parser makefile
 
-include ../common.mk
+include ../.common.mk
 
 NAME:= libparser.a
 

@@ -1,6 +1,6 @@
 # main makefile
 
-include common.mk
+include .common.mk
 
 NAME:= webserv
 

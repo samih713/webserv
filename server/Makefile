@@ -1,6 +1,6 @@
 # server makefile
 
-include ../common.mk
+include ../.common.mk
 
 NAME:= libserver.a
 
