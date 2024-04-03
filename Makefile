@@ -35,7 +35,11 @@ $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: all
+debug:
+	@make debug -sC parser/
+	@make debug -sC server/
+	@make debug -sC http/
+	@make -sC ./
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 # @make -sC tester/ # need to add tests for parser and server
