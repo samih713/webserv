@@ -63,9 +63,8 @@ void ConfigParser::_validate_braces(void) {
         throw runtime_error(ERR_CLOSING_BRACE);
 }
 
-void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages, string const& root) {
+void ConfigParser::_parse_error_page_directive(map<STATUS_CODE, string>& errorPages, string const& root) {
     DEBUG_MSG("Parsing error_page directive", RE);
-    ErrorPage errorPage;
 
     if (root.empty())
         throw runtime_error(ERR_MISSING_ROOT);
@@ -74,11 +73,9 @@ void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages, st
     if (*_itr == ";")
         throw runtime_error(ERR_ERROR_CODE);
 
+    vector<STATUS_CODE> codes;
     while (_isStringNumber(*_itr)) {
-        errorPage.code = static_cast<STATUS_CODE>(std::atoi(_itr->c_str()));
-        if (errorPage.code < 100)
-            throw runtime_error(ERR_ERROR_CODE);
-        errorPages.push_back(errorPage);
+        codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
         ++_itr; // move to next error code
     }
     if (*_itr == ";")
@@ -89,20 +86,23 @@ void ConfigParser::_parse_error_page_directive(vector<ErrorPage>& errorPages, st
         errorPath.find(".htm") == string::npos &&
         errorPath.find(".txt") == string::npos)
         throw runtime_error(ERR_INVALID_ERROR_PATH);
+    if (errorPath.find("/") == string::npos)
+        throw runtime_error(ERR_INVALID_ERROR_PATH);
     else if (errorPath.find_first_of("/") != errorPath.find_last_of("/"))
         throw runtime_error(ERR_INVALID_ERROR_PATH);
-    else if (errorPath.find_first_of("x") != errorPath.find_last_of("x"))
-        throw runtime_error(ERR_INVALID_ERROR_PATH);
+    if (errorPath.find("x") == string::npos) {
+        if (errorPath.find_first_of("x") != errorPath.find_last_of("x"))
+            throw runtime_error(ERR_INVALID_ERROR_PATH);
+    }
 
-    for (size_t i = 0; i < errorPages.size(); ++i) {
-        if (!errorPages[i].page.empty())
-            continue;
-        errorPages[i].page = root + "/" + errorPath;
-        size_t xPos = errorPath.find("x");
+    for (vector<STATUS_CODE>::const_iterator itr = codes.begin(); itr != codes.end(); ++itr) {
+        string page = root + errorPath;
+        size_t xPos = page.find("x");
         if (xPos != string::npos) {
-            char code = errorPages[i].code % 10 + '0';
-            errorPages[i].page.replace(xPos, 1, 1, code);
+            char lastDigit = *itr % 10 + '0';
+            page.replace(xPos, 1, 1, lastDigit);
         }
+        errorPages[*itr] = page;
     }
 
     _checkSemicolon();

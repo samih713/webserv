@@ -76,7 +76,7 @@ private:
     ServerConfig _parse_server_context(void);
     Location _parse_location_context(void);
     vector<string> _parse_index_directive(string const& root);
-    void _parse_error_page_directive(vector<ErrorPage>& errorPages, string const& root);
+    void _parse_error_page_directive(map<STATUS_CODE, string>& errorPages, string const& root);
     fd _parse_listen_directive(void);
     void _parse_server_name_directive(vector<string>& serverName);
     string _parse_root_directive(void);

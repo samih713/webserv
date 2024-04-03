@@ -17,8 +17,8 @@ class CachedPages
         CachedPages(const ServerConfig &config)
         {
             // load the error page
-            //! errorPages is a vector of ErrorPage structs and errorPages[0] usually holds /404.html
-            ifstream notFoundDefault(config.errorPages[0].page.c_str(), std::ios_base::binary);
+            //! would be better to remove the webserv namespace
+            ifstream notFoundDefault(config.errorPages.at(webserv::http::NOT_FOUND).c_str(), std::ios_base::binary);
             if (notFoundDefault.fail())
             {
                 DEBUG_MSG("404 page failed to load", B);

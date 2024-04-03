@@ -15,11 +15,6 @@ struct Location {
     Location() : autoindex(false) {}
 };
 
-struct ErrorPage {
-    STATUS_CODE code;
-    string page;
-};
-
 struct ServerConfig {
     fd listenerPort;
     string maxBodySize;
@@ -27,7 +22,7 @@ struct ServerConfig {
     string serverRoot;
     vector<string> indexFiles;
     vector<Location> locations;
-    vector<ErrorPage> errorPages;
+    map<STATUS_CODE, string> errorPages;
     bool autoindex;
 
     ServerConfig() : listenerPort(8080), autoindex(false) {}
@@ -70,11 +65,8 @@ struct ServerConfig {
         }
         cout << "  ]" << endl;
         cout << "  errorPages: [" << endl;
-        for (vector<ErrorPage>::const_iterator itr = errorPages.begin(); itr != errorPages.end(); ++itr) {
-            cout << "    ErrorPage {" << endl;
-            cout << "      code: " << itr->code << endl;
-            cout << "      page: " << itr->page << endl;
-            cout << "    }" << endl;
+        for (map<STATUS_CODE, string>::const_iterator itr = errorPages.begin(); itr != errorPages.end(); ++itr) {
+            cout << "    " << itr->first << ": " << itr->second << endl;
         }
         cout << "  ]" << endl;
         cout << "}" << endl;
