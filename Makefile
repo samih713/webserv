@@ -6,24 +6,24 @@ NAME:= webserv
 
 INCLUDES:= -I./includes
 
-SRCS:= main.cpp
+SRCS:= $(SRCS_DIR)/main.cpp
 
 OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 
-LIB_HTTP:= ./http/libhttp.a
-LIB_SERVER:= ./server/libserver.a
-LIB_PARSER:= ./parser/libparser.a
+HTTP_DIR:= $(SRCS_DIR)/http/
+PARSER_DIR:= $(SRCS_DIR)/parser/
+SERVER_DIR:= $(SRCS_DIR)/server/
 
-LIBRARY_FLAGS:= -Lserver/ -lserver -Lparser/ -lparser -Lhttp/ -lhttp
+LIBRARY_FLAGS:= -L$(SERVER_DIR) -lserver -L$(PARSER_DIR) -lparser -L$(HTTP_DIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
 
-all: $(NAME)
+all: libraries $(NAME)
 
 run: re
 	./$(NAME)
 
-$(NAME): $(LIB_HTTP) $(LIB_PARSER) $(LIB_SERVER) $(OBJS)
+$(NAME): $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
@@ -36,45 +36,41 @@ $(OBJS_DIR):
 
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug:
-	@make debug -sC parser/
-	@make debug -sC server/
-	@make debug -sC http/
+	@make debug -sC $(HTTP_DIR)
+	@make debug -sC $(PARSER_DIR)
+	@make debug -sC $(SERVER_DIR)
 	@make -sC ./
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 # @make -sC tester/ # need to add tests for parser and server
 tests:
-	@make tests -sC parser/
-	@make tests -sC server/
-	@make tests -sC http/
+	@make tests -sC $(HTTP_DIR)
+	@make tests -sC $(PARSER_DIR)
+	@make tests -sC $(SERVER_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
 
-$(LIB_HTTP):
-	@make -sC http/
-
-$(LIB_PARSER):
-	@make -sC parser/
-
-$(LIB_SERVER):
-	@make -sC server/
+libraries:
+	@make -sC $(HTTP_DIR)
+	@make -sC $(PARSER_DIR)
+	@make -sC $(SERVER_DIR)
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
 	fi
-	@make clean -sC parser/ > /dev/null 2>&1
-	@make clean -sC server/ > /dev/null 2>&1
-	@make clean -sC http/ > /dev/null 2>&1
+	@make clean -sC $(HTTP_DIR) > /dev/null 2>&1
+	@make clean -sC $(PARSER_DIR) > /dev/null 2>&1
+	@make clean -sC $(SERVER_DIR) > /dev/null 2>&1
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
 	fi
-	@make fclean -sC parser/ > /dev/null 2>&1
-	@make fclean -sC server/ > /dev/null 2>&1
-	@make fclean -sC http/ > /dev/null 2>&1
+	@make fclean -sC $(HTTP_DIR) > /dev/null 2>&1
+	@make fclean -sC $(PARSER_DIR) > /dev/null 2>&1
+	@make fclean -sC $(SERVER_DIR) > /dev/null 2>&1
 
 -include $(DEP)
 

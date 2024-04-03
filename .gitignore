@@ -13,4 +13,5 @@ test_parser
 test_server
 test_socket
 client
+test_http
 *.d

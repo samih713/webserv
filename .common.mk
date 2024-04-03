@@ -25,5 +25,6 @@ endif
 RM:= rm -rf
 
 ### DIRECTORIES ###
+SRCS_DIR:= sources
 OBJS_DIR:= objects
 DEPS_DIR:= deps

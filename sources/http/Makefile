@@ -1,6 +1,6 @@
 # http makefile
 
-include ../.common.mk
+include ../../.common.mk
 
 NAME:= libhttp.a
 
