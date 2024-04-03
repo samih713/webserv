@@ -1,4 +1,5 @@
-#include "Server.hpp"
+#include "../../parser/ConfigParser.hpp"
+#include "../Server.hpp"
 #include <iostream>
 
 int main()
@@ -9,10 +10,11 @@ int main()
     // string notFoundPage = "404.html",
     // fd     listenerPort = 8080)
     //
-    Config config;
     try
     {
-        Server &webserv = Server::get_instance(config, 10);
+        ConfigParser parser("../../../configs/webserv.conf");
+        vector<ServerConfig> configs = parser.parse();
+        Server &webserv = Server::get_instance(configs[0], 10);
         webserv.start(SELECT);
     }
     catch (std::exception &e)

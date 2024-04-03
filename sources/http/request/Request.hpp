@@ -1,8 +1,8 @@
+#include "../Message.hpp"
+#include "../../../includes/webserv.hpp"
+
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
-
-#include "Message.hpp"
-#include "webserv.hpp"
 
 namespace webserv
 {

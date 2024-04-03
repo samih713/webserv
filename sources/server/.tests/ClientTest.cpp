@@ -1,14 +1,7 @@
-#include "Message.hpp"
-#include "Server.hpp"
-#include "webserv.hpp"
+#include "../../http/Message.hpp"
+#include "../Server.hpp"
+#include "../../../includes/webserv.hpp"
 #include <arpa/inet.h>
-#include <cerrno>
-#include <cstring>
-#include <iostream>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 int main()
 {

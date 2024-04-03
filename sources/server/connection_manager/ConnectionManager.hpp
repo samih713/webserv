@@ -1,6 +1,5 @@
-#include "TimeOut.hpp"
-#include "map"
-#include "webserv.hpp"
+#include "./TimeOut.hpp"
+#include "../../../includes/webserv.hpp"
 
 #ifndef CONNECTION_MANAGER_HPP
 #define CONNECTION_MANAGER_HPP

@@ -33,7 +33,7 @@
         .str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
-#include "debug.hpp"
+#include "./debug.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>

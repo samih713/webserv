@@ -1,6 +1,6 @@
-#include "Request.hpp"
-#include "Response.hpp"
-#include "webserv.hpp"
+#include "../request/Request.hpp"
+#include "../response/Response.hpp"
+#include "../includes/webserv.hpp"
 
 using namespace webserv::http;
 

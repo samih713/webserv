@@ -1,5 +1,5 @@
-#include "../includes/webserv.hpp"
-#include "../server/Config.hpp"
+#include "../../includes/webserv.hpp"
+#include "../server/ServerConfig.hpp"
 #include <sys/stat.h>
 #include <stack>
 

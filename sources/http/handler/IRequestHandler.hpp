@@ -1,5 +1,5 @@
-#include "Response.hpp"
-#include "Server.hpp"
+#include "../response/Response.hpp"
+#include "../../server/Server.hpp"
 
 #ifndef IRequestHandler_HPP
 #define IRequestHandler_HPP

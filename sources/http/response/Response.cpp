@@ -1,7 +1,6 @@
 #include "Response.hpp"
-#include "Message.hpp"
-#include "debug.hpp"
-#include "enum_utils.hpp"
+#include "../../../includes/debug.hpp"
+#include "../../../includes/enum_utils.hpp"
 
 using namespace webserv::http;
 

@@ -1,9 +1,7 @@
-#include "GetRequestHandler.hpp"
+#include "./GetRequestHandler.hpp"
 #include "../server/CachedPages.hpp"
-#include "FileType.hpp"
-#include "Server.hpp"
-#include "debug.hpp"
-#include "webserv.hpp"
+#include "../FileType.hpp"
+#include "../../../includes/debug.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {

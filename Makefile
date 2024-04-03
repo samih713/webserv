@@ -6,9 +6,11 @@ NAME:= webserv
 
 INCLUDES:= -I./includes
 
-SRCS:= $(SRCS_DIR)/main.cpp
+SRCS_LIST:= main.cpp
+SRCS:= $(addprefix $(SRCS_DIR)/, $(SRCS_LIST))
 
-OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
+OBJS_LIST:= $(SRCS_LIST:%.cpp=%.o)
+OBJS:= $(addprefix $(OBJS_DIR)/, $(OBJS_LIST))
 
 HTTP_DIR:= $(SRCS_DIR)/http/
 PARSER_DIR:= $(SRCS_DIR)/parser/
@@ -27,7 +29,7 @@ $(NAME): $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
-$(OBJS_DIR)/%.o: %.cpp | $(OBJS_DIR)
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
