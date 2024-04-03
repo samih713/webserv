@@ -36,6 +36,13 @@ struct ServerConfig {
         cout << "ServerConfig {" << endl;
         cout << "  listenerPort: " << listenerPort << endl;
         cout << "  maxBodySize: " << maxBodySize << endl;
+        cout << "  indexFiles: [";
+        for (vector<string>::const_iterator itr = indexFiles.begin(); itr != indexFiles.end(); ++itr) {
+            cout << *itr;
+            if (itr + 1 != indexFiles.end())
+                cout << ", ";
+        }
+        cout << "]" << endl;
         cout << "  autoindex: " << autoindex << endl;
         cout << "  serverName: [";
         for (vector<string>::const_iterator itr = serverName.begin(); itr != serverName.end(); ++itr) {
