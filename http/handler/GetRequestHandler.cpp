@@ -30,7 +30,7 @@ inline const string find_resource_type(const string &resource)
 
 const vector<char> GetRequestHandler::get_resource(const Request     &request,
                                                    const CachedPages *cachedPages,
-                                                   const Config      &config)
+                                                   const ServerConfig &config)
 {
     vsp          requestHeaders = request.get_headers();
     string       resource = request.get_resource();
@@ -104,7 +104,7 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
 
 Response GetRequestHandler::handle_request(const Request     &request,
                                            const CachedPages *cachedPages,
-                                           const Config      &config)
+                                           const ServerConfig &config)
 {
     DEBUG_MSG("Handling get request ... ", B);
 

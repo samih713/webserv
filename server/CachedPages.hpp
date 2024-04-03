@@ -14,10 +14,11 @@ struct Page
 class CachedPages
 {
     public:
-        CachedPages(const Config &config)
+        CachedPages(const ServerConfig &config)
         {
             // load the error page
-            ifstream notFoundDefault(config.notFoundPage.c_str(), std::ios_base::binary);
+            //! errorPages is a vector of ErrorPage structs and errorPages[0] usually holds /404.html
+            ifstream notFoundDefault(config.errorPages[0].page.c_str(), std::ios_base::binary);
             if (notFoundDefault.fail())
             {
                 DEBUG_MSG("404 page failed to load", B);
@@ -34,7 +35,8 @@ class CachedPages
                                  std::istreambuf_iterator<char>());
             }
             // load the indexDefault page
-            ifstream indexDefault(config.home.c_str(), std::ios_base::binary);
+            //! indexFiles is a vector of strings and indexFiles[0] usually holds /index.html
+            ifstream indexDefault(config.indexFiles[0].c_str(), std::ios_base::binary);
             if (indexDefault.fail())
             {
                 DEBUG_MSG("Index page failed to load", B);

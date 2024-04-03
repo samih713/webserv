@@ -21,7 +21,7 @@
  * @param backLog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server &Server::get_instance(const Config &config, int backLog)
+Server &Server::get_instance(const ServerConfig &config, int backLog)
 {
     static Server instance(config, backLog);
     return instance;
@@ -38,7 +38,7 @@ Server &Server::get_instance(const Config &config, int backLog)
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
-Server::Server(const Config &config, int backLog)
+Server::Server(const ServerConfig &config, int backLog)
     : listener(config.listenerPort, backLog)
     , config(config)
     , cachedPages(new CachedPages(config))

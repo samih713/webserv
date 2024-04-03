@@ -16,7 +16,7 @@ class IRequestHandler
         };
         virtual Response handle_request(const Request     &request,
                                         const CachedPages *cachedPages,
-                                        const Config      &config) = 0;
+                                        const ServerConfig &config) = 0;
 };
 
 #endif // IRequestHandler_HPP

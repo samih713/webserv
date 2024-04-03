@@ -1,7 +1,7 @@
 #include "CachedPages.hpp"
 #include "Config.hpp"
-#include "ConnectionManager.hpp"
-#include "TCPSocket.hpp"
+#include "connection_manager/ConnectionManager.hpp"
+#include "socket/TCPSocket.hpp"
 #include "debug.hpp"
 
 #ifndef SERVER_HPP
@@ -30,16 +30,16 @@ static const int SELECTWAITTIME(5);
 class Server
 {
     public:
-        static Server &get_instance(const Config &config, int backLog = DEFAULT_BACKLOG);
+        static Server &get_instance(const ServerConfig &config, int backLog = DEFAULT_BACKLOG);
         ~Server();
         void start(enum polling_strat);
 
     protected:
-        Server(const Config &config, int backLog);
+        Server(const ServerConfig &config, int backLog);
 
     private:
         TCPSocket     listener;
-        const Config &config;
+        const ServerConfig &config;
         CachedPages  *cachedPages;
 
         bool handle_connection(fd recvSocket);

@@ -1,4 +1,4 @@
-#include "Request.hpp"
+#include "../request/Request.hpp"
 #include "RequestHandlerBase.hpp"
 #include "Response.hpp"
 #include "Server.hpp"
@@ -16,12 +16,12 @@ class GetRequestHandler : public RequestHandlerBase
         ~GetRequestHandler();
         Response handle_request(const Request     &request,
                                 const CachedPages *cachedPages,
-                                const Config      &config);
+                                const ServerConfig &config);
 
     private:
         const vector<char> get_resource(const Request     &request,
                                         const CachedPages *cached,
-                                        const Config      &config);
+                                        const ServerConfig &config);
 };
 
 #endif // GETREQUESTHANDLER_HPP
