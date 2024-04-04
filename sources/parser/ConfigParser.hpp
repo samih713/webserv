@@ -44,7 +44,6 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] might be better to use a map of (code,page) instead of a vector for error pages
 // [ ] check for duplicate server names
 // [ ] check for duplicate listen ports
 // [ ] check for duplicate locations
@@ -52,6 +51,9 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 // [ ] check for duplicate error pages
 // [ ] check for duplicate autoindex (depends on context)
 // [ ] empty root can cause problems even if it's valid
+// [ ] check for duplicate client_max_body_size
+// [ ] handle cgi related directives
+// [ ] add directive to set http methods allowed
 
 const string keywords[9] = {
     "http",
