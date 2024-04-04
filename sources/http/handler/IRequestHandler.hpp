@@ -4,8 +4,6 @@
 #ifndef IRequestHandler_HPP
 #define IRequestHandler_HPP
 
-using namespace webserv::http;
-
 // interface
 class IRequestHandler
 {

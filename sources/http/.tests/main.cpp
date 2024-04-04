@@ -2,8 +2,6 @@
 #include "../response/Response.hpp"
 #include "../includes/webserv.hpp"
 
-using namespace webserv::http;
-
 int main()
 {
 #if 0  // parsing test
@@ -19,7 +17,7 @@ int main()
 #endif // parsing test
 
 #if 0  // basic test
-	HTTP::METHOD m = HTTP::GET;
+	METHOD m = GET;
 	std::string path;
 	std::string version;
 

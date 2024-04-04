@@ -17,8 +17,7 @@ class CachedPages
         CachedPages(const ServerConfig &config)
         {
             // load the error page
-            //! would be better to remove the webserv namespace
-            ifstream notFoundDefault(config.errorPages.at(webserv::http::NOT_FOUND).c_str(), std::ios_base::binary);
+            ifstream notFoundDefault(config.errorPages.at(NOT_FOUND).c_str(), std::ios_base::binary);
             if (notFoundDefault.fail())
             {
                 DEBUG_MSG("404 page failed to load", B);

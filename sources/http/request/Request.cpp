@@ -2,8 +2,6 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-using namespace webserv::http;
-
 Request::Request(const string &rawRequest)
     : rawRequest(rawRequest)
 {
@@ -44,10 +42,6 @@ const string &Request::get_resource() const
     return resource;
 }
 
-namespace webserv
-{
-namespace http
-{
 std::ostream &operator<<(ostream &os, const Request &r)
 {
     os << "Method: " << enumToString(r.method) << std::endl;
@@ -63,8 +57,6 @@ std::ostream &operator<<(ostream &os, const Request &r)
     os << r.body << std::endl;
     return os;
 }
-}; // namespace http
-}; // namespace webserv
 
 // deleted copy assigment
 void Request::operator=(const Request &)

@@ -3,11 +3,6 @@
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP
 
-namespace webserv
-{
-namespace http
-{
-
 /* ------------------------------ const strings ----------------------------- */
 static const string CRLF = "\r\n";
 static const string NEWLINE = "\n";
@@ -399,8 +394,6 @@ static const std::pair<std::string, int> init_values[] = {
 static const map<string, int> fieldNameList(init_values,
                                             init_values + sizeof(init_values) /
                                                               sizeof(init_values[0]));
-}; // namespace http
-}; // namespace webserv
 
 // "GET /docs/tutorials/linux/shellscripts/howto.html HTTP/1.1\r\n" // request-line
 static const std::string sample_request =

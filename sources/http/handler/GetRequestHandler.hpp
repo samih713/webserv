@@ -7,8 +7,6 @@
 #ifndef GETREQUESTHANDLER_HPP
 #define GETREQUESTHANDLER_HPP
 
-using namespace webserv::http;
-
 class GetRequestHandler : public RequestHandlerBase
 {
     public:

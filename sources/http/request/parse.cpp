@@ -2,12 +2,10 @@
 #include "./Request.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-using namespace webserv::http;
-
 // defining the char * array
 #define X(a) ws_tostr(a), // stringify the enum
 template<>
-const char *webserv::enumStrings<METHOD>::data[] = { METHOD_ENUMS };
+const char *enumStrings<METHOD>::data[] = { METHOD_ENUMS };
 #undef X
 
 /**
@@ -86,12 +84,6 @@ static inline bool peek_line_terminator(istream &is, const string &check)
     return true;
 }
 
-
-namespace webserv
-{
-namespace http
-{
-
 /**
  * @brief Extracts a value from a message, leading and trailing whitespace characters are
  * removed before returning it.
@@ -163,6 +155,3 @@ void Request::parse()
     // Body till the end of the message
     std::getline(message, body, '\0');
 }
-
-}; // http
-}; // webserv

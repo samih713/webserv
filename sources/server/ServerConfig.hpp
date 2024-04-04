@@ -4,8 +4,6 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-using webserv::http::STATUS_CODE;
-
 struct Location {
     string path;
     string modifier;

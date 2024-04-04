@@ -4,11 +4,6 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-namespace webserv
-{
-namespace http
-{
-
 // Request class to parse an incoming message
 class Request
 {
@@ -36,9 +31,5 @@ class Request
         // deleted copy assigment
         void operator=(const Request &);
 };
-
-
-}; // namespace http
-}; // namespace webserv
 
 #endif // REQUEST_HPP

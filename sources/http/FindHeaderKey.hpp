@@ -3,12 +3,6 @@
 #ifndef FINDHEADERKEY_HPP
 #define FINDHEADERKEY_HPP
 
-
-namespace webserv
-{
-namespace http
-{
-
 struct FindHeaderKey
 {
         FindHeaderKey(const string &key)
@@ -21,7 +15,5 @@ struct FindHeaderKey
     private:
         const string &key;
 };
-}; // http
-}; // webserv
 
 #endif // FINDHEADERKEY_HPP

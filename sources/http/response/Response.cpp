@@ -2,8 +2,6 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-using namespace webserv::http;
-
 // response codes
 typedef std::map<STATUS_CODE, std::string> StatusCodeMap;
 

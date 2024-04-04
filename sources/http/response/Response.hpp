@@ -5,11 +5,6 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-namespace webserv
-{
-namespace http
-{
-
 class Response
 {
     public:
@@ -29,6 +24,4 @@ class Response
         static const string &version;
 };
 
-};     // http
-};     // webserv
 #endif // RESPONSE_HPP
