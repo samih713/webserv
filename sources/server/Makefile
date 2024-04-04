@@ -4,8 +4,7 @@ include ../../.common.mk
 
 NAME:= libserver.a
 
-HTTP_INCLUDES:= -I../http/ -I../http/request/ -I../http/response/ -I../http/handler/
-INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/  $(HTTP_INCLUDES)
+INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp
 
@@ -14,10 +13,6 @@ OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 # tester mains
 TESTS_DIR:= .tests
 TEST_SOCKET:= $(TESTS_DIR)/SOCKET_main.cpp
-
-# http request/response directory
-LIBHTTPDIR:= ../http/
-LIBHTTP:= ../http/libhttp.a
 
 DEP:= $(OBJS:%.o=%.d)
 
@@ -37,10 +32,6 @@ $(OBJS_DIR):
 debug: CXXFLAGS += $(DEBUGFLAGS)
 debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
-
-# test libs
-$(LIBHTTP):
-	@make -sC $(LIBHTTPDIR) debug
 
 # tests
 client: debug
@@ -72,7 +63,6 @@ fclean: clean
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 	@$(RM) test_socket client
-# @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 
