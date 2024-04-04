@@ -24,6 +24,10 @@
 // [ ] different strategies
 // [ ] testing (with a testing framework)
 
+/* -------------------------------- WARNINGS -------------------------------- */
+// PARSER
+// [ ] maybe there's stuff in the global context that need to be parsed
+
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
@@ -32,7 +36,7 @@
         .str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
-#include "debug.hpp"
+#include "./debug.hpp"
 #include <algorithm>
 #include <cerrno>
 #include <cstddef>
@@ -83,11 +87,6 @@ static std::string ERR_NBIND("Socket: not bound to a port");
 static std::string ERR_LIST("Socket: listen failed");
 static std::string ERR_NLIST("Socket: not listening");
 static std::string ERR_ACCP("Socket: accept failed");
-
-static std::string ERR_OPEN("Parser: cannot open file");
-static std::string ERR_JSON_PARSE("Parser: invalid JSON syntax");
-static std::string ERR_JSON_TYPE("Parser: invalid JSON type");
-static std::string ERR_JSON_QUOTE("Parser: unclosed quote");
 
 static std::string ERR_MEMORY_ALLOC("Memory: allocation failed");
 

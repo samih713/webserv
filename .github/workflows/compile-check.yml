@@ -5,8 +5,8 @@ on:
     branches:
       - main
       - server/*
-      - conf-parser
       - handle_connection 
+      - parsing
 
 jobs:
   build-linux:
