@@ -81,8 +81,6 @@ fclean: clean
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
 	else \
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
-	else \
-		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 	@make fclean -sC $(HTTP_DIR) > /dev/null 2>&1
 	@make fclean -sC $(PARSER_DIR) > /dev/null 2>&1

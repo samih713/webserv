@@ -80,7 +80,6 @@ fclean: clean
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 	@$(RM) test_http
-# @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 
