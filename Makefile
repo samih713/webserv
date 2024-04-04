@@ -16,16 +16,20 @@ HTTP_DIR:= $(SRCS_DIR)/http/
 PARSER_DIR:= $(SRCS_DIR)/parser/
 SERVER_DIR:= $(SRCS_DIR)/server/
 
+LIBHTTP:= $(HTTP_DIR)libhttp.a
+LIBPARSER:= $(PARSER_DIR)libparser.a
+LIBSERVER:= $(SERVER_DIR)libserver.a
+
 LIBRARY_FLAGS:= -L$(SERVER_DIR) -lserver -L$(PARSER_DIR) -lparser -L$(HTTP_DIR) -lhttp
 
 DEP:= $(OBJS:%.o=%.d)
 
-all: libraries $(NAME)
+all: $(NAME)
 
 run: re
 	./$(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(LIBSERVER) $(LIBHTTP) $(LIBPARSER) $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
@@ -51,9 +55,13 @@ tests:
 	@make tests -sC $(SERVER_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
 
-libraries:
+$(LIBHTTP):
 	@make -sC $(HTTP_DIR)
+
+$(LIBPARSER):
 	@make -sC $(PARSER_DIR)
+
+$(LIBSERVER):
 	@make -sC $(SERVER_DIR)
 
 clean:
