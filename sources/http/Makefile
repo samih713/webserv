@@ -4,7 +4,7 @@ include ../../.common.mk
 
 NAME:= libhttp.a
 
-INCLUDES:= -I./ -I../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/ \
+INCLUDES:= -I./ -I../../includes/ -Irequest/ -Iresponse/ -Ihandler/ -I../server/ \
 		   -I../server/socket/ -I../server/connection_manager/
 
 # REQUESTS

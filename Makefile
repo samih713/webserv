@@ -48,7 +48,6 @@ debug:
 	@make -sC ./
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
-# @make -sC tester/ # need to add tests for parser and server
 tests:
 	@make tests -sC $(HTTP_DIR)
 	@make tests -sC $(PARSER_DIR)

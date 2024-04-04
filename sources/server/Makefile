@@ -4,7 +4,7 @@ include ../../.common.mk
 
 NAME:= libserver.a
 
-INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../includes/
+INCLUDES:= -I./ -I./socket/ -I./connection_manager/ -I../../includes/
 
 SRCS:= socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp
 

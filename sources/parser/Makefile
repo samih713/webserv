@@ -4,7 +4,7 @@ include ../../.common.mk
 
 NAME:= libparser.a
 
-INCLUDES:= -I./ -I../includes/
+INCLUDES:= -I./ -I../../includes/
 
 SRCS:= ConfigParser.cpp
 
