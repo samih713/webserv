@@ -55,7 +55,7 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 // [ ] handle cgi related directives
 // [ ] add directive to set http methods allowed
 
-const string keywords[9] = {
+const string keywords[10] = {
     "http",
     "server",
     "listen",
@@ -64,6 +64,7 @@ const string keywords[9] = {
     "root",
     "index",
     "error_page",
+    "client_max_body_size",
     "autoindex"
 };
 
