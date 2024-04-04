@@ -68,6 +68,8 @@ clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	else \
+		echo "$(GREEN)[ CLEAN ]$(RESET) No object files to remove."; \
 	fi
 	@make clean -sC $(HTTP_DIR) > /dev/null 2>&1
 	@make clean -sC $(PARSER_DIR) > /dev/null 2>&1
@@ -77,6 +79,10 @@ fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	else \
+		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
+	else \
+		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 	@make fclean -sC $(HTTP_DIR) > /dev/null 2>&1
 	@make fclean -sC $(PARSER_DIR) > /dev/null 2>&1

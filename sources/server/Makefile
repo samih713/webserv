@@ -14,11 +14,10 @@ OBJS:= $(addprefix $(OBJS_DIR)/, $(SRCS:%.cpp=%.o))
 # tester mains
 TESTS_DIR:= .tests
 TEST_SOCKET:= $(TESTS_DIR)/SOCKET_main.cpp
-TEST_SERVER:= $(TESTS_DIR)/SERVER_main.cpp
 
 # http request/response directory
 LIBHTTPDIR:= ../http/
-LIBHTTP:= -L$(LIBHTTPDIR) -lhttp
+LIBHTTP:= ../http/libhttp.a
 
 DEP:= $(OBJS:%.o=%.d)
 
@@ -40,7 +39,7 @@ debug: $(NAME)
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 # test libs
-libhttp:
+$(LIBHTTP):
 	@make -sC $(LIBHTTPDIR) debug
 
 # tests
@@ -54,31 +53,29 @@ test_socket: $(TEST_SOCKET) client
 	@mv *.d $(OBJS_DIR)
 	@echo "$(BLUE)[ TEST ]$(RESET) Socket is now ready for testing."
 
-test_server: debug libhttp
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(TEST_SERVER) $(NAME) $(LIBHTTP) -o $@
-	@mv *.d $(OBJS_DIR)
-	@echo "$(BLUE)[ TEST ]$(RESET) Server is now ready for testing."
-
-tests: test_socket test_server
+tests: test_socket
 	@echo ""
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	else \
+		echo "$(GREEN)[ CLEAN ]$(RESET) No object files to remove."; \
 	fi
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	else \
+		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
-	@make -sC $(LIBHTTPDIR) fclean
-	@$(RM) test_socket test_server client
+	@$(RM) test_socket client
 # @echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME) and other executables.\n"
 
 -include $(DEP)
 
 re: fclean all
 
-.PHONY: clean fclean all re test_socket test_server debug client tests
+.PHONY: clean fclean all re test_socket debug client tests

@@ -60,12 +60,16 @@ clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+	else \
+		echo "$(GREEN)[ CLEAN ]$(RESET) No object files to remove."; \
 	fi
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+	else \
+		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 	@if [ -f test_parser ]; then \
 		$(RM) test_parser; \
