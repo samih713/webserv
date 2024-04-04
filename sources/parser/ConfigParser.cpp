@@ -202,10 +202,11 @@ bool ConfigParser::_parse_autoindex(void) {
     DEBUG_MSG("Parsing autoindex directive", RE);
 
     ++_itr; // move to on/off
-    if (*_itr != "on" && *_itr != "off")
+    string autoindex = *_itr;
+    if (autoindex != "on" && autoindex != "off")
         throw runtime_error(ERR_INVALID_AUTOINDEX);
     _check_semicolon();
-    return *(_itr - 1) == "on";
+    return autoindex == "on";
 }
 
 ServerConfig ConfigParser::_parse_server_context(void) {
