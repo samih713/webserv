@@ -62,5 +62,9 @@ location [modifier] [URI] {
 
 
 ### References
-- [Nginx Configuration](https://nginx.org/en/docs/beginners_guide.html)
-- [Nginx Configuration](https://nginx.org/en/docs/http/ngx_http_core_module.html)
+- [NGINX Docs](https://nginx.org/en/docs/beginners_guide.html)
+- [NGINX Keywords](https://nginx.org/en/docs/http/ngx_http_core_module.html)
+- [NGINX Explained](https://dev.to/kabilan/understanding-nginx-core-contexts-52o8)
+- [NGINX Structure](https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts)
+- [NGINX Location Explained](https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms)
+- [NGINX Location Examples](https://www.digitalocean.com/community/tutorials/nginx-location-directive)
