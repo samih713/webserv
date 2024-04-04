@@ -40,29 +40,6 @@ ConfigParser::ConfigParser(string const& configFile) {
     file.close();
 }
 
-void ConfigParser::_validate_braces(void) {
-    DEBUG_MSG("Validating braces", RE);
-
-    // check braces
-    stack<string> braces;
-    for (vector<string>::const_iterator itr = _tokens.begin();
-         itr != _tokens.end(); ++itr)
-    {
-        if (*itr == "{") {
-            if (*(itr - 1) != "server" && *(itr - 1) != "http" && *(itr - 2) != "location" && *(itr - 3) != "location")
-                throw runtime_error(ERR_MISSING_CONTEXT);
-            braces.push("{");
-        }
-        else if (*itr == "}") {
-            if (braces.empty()) // missing opening brace
-                throw runtime_error(ERR_OPENINING_BRACE);
-            braces.pop();
-        }
-    }
-    if (!braces.empty()) // missing closing brace
-        throw runtime_error(ERR_CLOSING_BRACE);
-}
-
 void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages, string const& root) {
     DEBUG_MSG("Parsing error_page directive", RE);
 
@@ -268,8 +245,10 @@ ServerConfig ConfigParser::_parse_server_context(void) {
     return _serverConfig;
 }
 
-void ConfigParser::_parse_HTTP_context(void) {
+vector<ServerConfig> ConfigParser::_parse_HTTP_context(void) {
     DEBUG_MSG("Parsing HTTP context", RE);
+
+    vector<ServerConfig> serverConfigs;
 
     // setting values for Config object
     _itr = _tokens.begin();
@@ -281,11 +260,9 @@ void ConfigParser::_parse_HTTP_context(void) {
         throw runtime_error(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
-    while (_itr != _tokens.end()) {
-        if (*_itr == "}")
-            break;
+    while (*_itr != "}") {
         if (*_itr == "server")
-            _serverConfigs.push_back(_parse_server_context());
+            serverConfigs.push_back(_parse_server_context());
         else
             throw runtime_error(ERR_UNEXPECTED_TOKENS_IN);
         ++_itr;
@@ -293,10 +270,11 @@ void ConfigParser::_parse_HTTP_context(void) {
 
     if ((_itr + 1) != _tokens.end())
         throw runtime_error(ERR_UNEXPECTED_TOKENS_OUT);
+
+    return serverConfigs;
 }
 
 vector<ServerConfig> ConfigParser::parse(void) {
-    DEBUG_MSG("Tokenizing content", RE);
     string currentToken;
     for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
         if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
@@ -316,8 +294,25 @@ vector<ServerConfig> ConfigParser::parse(void) {
             currentToken.push_back(*itr); // add character to current token
     }
 
-    _validate_braces();
-    _parse_HTTP_context();
+    // check braces
+    stack<string> braces;
+    for (vector<string>::const_iterator itr = _tokens.begin();
+         itr != _tokens.end(); ++itr)
+    {
+        if (*itr == "{") {
+            if (*(itr - 1) != "server" && *(itr - 1) != "http" && 
+                *(itr - 2) != "location" && *(itr - 3) != "location")
+                throw runtime_error(ERR_MISSING_CONTEXT);
+            braces.push("{");
+        }
+        else if (*itr == "}") {
+            if (braces.empty()) // missing opening brace
+                throw runtime_error(ERR_OPENINING_BRACE);
+            braces.pop();
+        }
+    }
+    if (!braces.empty()) // missing closing brace
+        throw runtime_error(ERR_CLOSING_BRACE);
 
-    return _serverConfigs;
+    return _parse_HTTP_context();
 }

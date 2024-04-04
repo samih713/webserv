@@ -80,20 +80,18 @@ public:
 private:
     string _content;
     vector<string> _tokens;
-    vector<ServerConfig> _serverConfigs;
     vector<string>::const_iterator _itr;
 
-    void _validate_braces(void);
-    void _parse_HTTP_context(void);
-    ServerConfig _parse_server_context(void);
-    Location _parse_location_context(void);
-    vector<string> _parse_index(string const& root);
-    void _parse_error_page(map<STATUS_CODE, string>& errorPages, string const& root);
-    fd _parse_listen(void);
-    void _parse_server_name(vector<string>& serverName);
-    string _parse_root(void);
-    string _parse_client_max_body_size(void);
-    bool _parse_autoindex(void);
+    vector<ServerConfig> _parse_HTTP_context(void);
+    ServerConfig         _parse_server_context(void);
+    Location             _parse_location_context(void);
+    vector<string>       _parse_index(string const& root);
+    void                 _parse_error_page(map<STATUS_CODE, string>& errorPages, string const& root);
+    fd                   _parse_listen(void);
+    void                 _parse_server_name(vector<string>& serverName);
+    string               _parse_root(void);
+    string               _parse_client_max_body_size(void);
+    bool                 _parse_autoindex(void);
 
     bool _is_string_number(const string& str) {
         if (str.find_first_not_of("0123456789") != string::npos)
