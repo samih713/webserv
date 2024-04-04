@@ -55,7 +55,9 @@ static string ERR_UNEXPECTED_TOKENS_IN_LOCATION("Parser: Unexpected tokens found
 // [ ] handle cgi related directives
 // [ ] add directive to set http methods allowed
 
-const string keywords[10] = {
+#define NUM_KEYWORDS 10
+
+const string keywords[NUM_KEYWORDS] = {
     "http",
     "server",
     "listen",
@@ -85,27 +87,27 @@ private:
     void _parse_HTTP_context(void);
     ServerConfig _parse_server_context(void);
     Location _parse_location_context(void);
-    vector<string> _parse_index_directive(string const& root);
-    void _parse_error_page_directive(map<STATUS_CODE, string>& errorPages, string const& root);
-    fd _parse_listen_directive(void);
-    void _parse_server_name_directive(vector<string>& serverName);
-    string _parse_root_directive(void);
-    string _parse_client_max_body_size_directive(void);
-    bool _parse_autoindex_directive(void);
+    vector<string> _parse_index(string const& root);
+    void _parse_error_page(map<STATUS_CODE, string>& errorPages, string const& root);
+    fd _parse_listen(void);
+    void _parse_server_name(vector<string>& serverName);
+    string _parse_root(void);
+    string _parse_client_max_body_size(void);
+    bool _parse_autoindex(void);
 
-    bool _isStringNumber(const string& str) {
+    bool _is_string_number(const string& str) {
         if (str.find_first_not_of("0123456789") != string::npos)
             return false;
         return true;
     }
-    bool _isKeyword(const string& str) {
-        for (size_t i = 0; i < 8; ++i) {
+    bool _is_keyword(const string& str) {
+        for (size_t i = 0; i < NUM_KEYWORDS; ++i) {
             if (str == keywords[i])
                 return true;
         }
         return false;
     }
-    void _checkSemicolon(void) {
+    void _check_semicolon(void) {
         if (*(_itr + 1) != ";")
             throw runtime_error(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
