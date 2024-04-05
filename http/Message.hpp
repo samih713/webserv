@@ -437,7 +437,7 @@ static const std::string sample_response =
     "</html>\r\n";
 
 static const std::string sample_request_cgi =
-    "GET /Users/hmohamed/cc42/webserv/CGI/tester/file.sh?name=hashim&lastname=mohamed HTTP/1.1\r\n" // request-line
+    "GET /Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh?name=hashim&lastname=mohamed HTTP/1.1\r\n" // request-line
     "Host: Linode.com\r\n"                                  // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
     "Gecko/20091102 Firefox/3.5.5 \r\n"
