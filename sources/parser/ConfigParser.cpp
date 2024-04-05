@@ -105,11 +105,12 @@ vector<string> ConfigParser::_parse_index(string const& root) {
 
 Location ConfigParser::_parse_location_context(void) {
     DEBUG_MSG("Parsing location context", RE);
-    Location location;
 
     ++_itr; // move to location modifier/path
     if (*_itr == "{")
         throw runtime_error(ERR_INVALID_LOCATION);
+
+    Location location;
     if (*_itr == "=" || *_itr == "~") {
         location.modifier = *_itr;
         ++_itr; // move to path
@@ -141,7 +142,6 @@ Location ConfigParser::_parse_location_context(void) {
 
 fd ConfigParser::_parse_listen(void) {
     DEBUG_MSG("Parsing listen directive", RE);
-    fd listenerPort;
 
     ++_itr; // move to port number
     if (*(_itr + 1) != ";")
@@ -150,12 +150,11 @@ fd ConfigParser::_parse_listen(void) {
     if (!_is_string_number(*_itr))
         throw runtime_error(ERR_INVALID_LISTEN);
 
-    listenerPort = std::atoi(_itr->c_str());
+    fd listenerPort = std::atoi(_itr->c_str()); //! listen can also handle IP address like 0.0.0.0:80
     if (listenerPort > MAX_PORT || listenerPort < 0)
         throw runtime_error(ERR_INVALID_LISTEN);
-    ++_itr; // move to semicolon
 
-    //! listen can also handle IP address like 0.0.0.0:80
+    _check_semicolon();
     return listenerPort;
 }
 
@@ -177,8 +176,10 @@ string ConfigParser::_parse_root(void) {
     ++_itr; // move to root path
     if (*(_itr + 1) != ";")
         throw runtime_error(ERR_MISSING_SEMICOLON);
+
     string rootPath = *_itr;
     _check_semicolon();
+
     return rootPath;
 }
 
@@ -188,13 +189,15 @@ string ConfigParser::_parse_client_max_body_size(void) {
     ++_itr; // move to max body size
     if (*(_itr + 1) != ";")
         throw runtime_error(ERR_MISSING_SEMICOLON);
-    string maxBodySize = *_itr;
-    //! need to handle suffixes like 1m, 1k, 1g
+
+    string maxBodySize = *_itr; //! need to handle suffixes like 1m, 1k, 1g
     if (maxBodySize.find_first_not_of("0123456789kKmMgG") != string::npos)
         throw runtime_error(ERR_INVALID_BODY_SIZE);
     else if (maxBodySize.find_first_of("0123456789") == string::npos)
         throw runtime_error(ERR_INVALID_BODY_SIZE);
+
     _check_semicolon();
+
     return maxBodySize;
 }
 
@@ -212,15 +215,13 @@ bool ConfigParser::_parse_autoindex(void) {
 ServerConfig ConfigParser::_parse_server_context(void) {
     DEBUG_MSG("Parsing server context", RE);
 
-    ServerConfig _serverConfig;
-
     ++_itr; // move to {
     if (*_itr != "{")
         throw runtime_error(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
-    while (*_itr != "}")
-    {
+    ServerConfig _serverConfig;
+    while (*_itr != "}") {
         if (*_itr == "listen")
             _serverConfig.listenerPort = _parse_listen();
         else if (*_itr == "server_name")
@@ -249,8 +250,6 @@ ServerConfig ConfigParser::_parse_server_context(void) {
 vector<ServerConfig> ConfigParser::_parse_HTTP_context(void) {
     DEBUG_MSG("Parsing HTTP context", RE);
 
-    vector<ServerConfig> serverConfigs;
-
     // setting values for Config object
     _itr = _tokens.begin();
     if (*_itr != "http") //! maybe there's stuff in the global context
@@ -261,6 +260,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void) {
         throw runtime_error(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
+    vector<ServerConfig> serverConfigs;
     while (*_itr != "}") {
         if (*_itr == "server")
             serverConfigs.push_back(_parse_server_context());
