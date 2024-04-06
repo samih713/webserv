@@ -8,6 +8,7 @@ on:
       - conf-parser
       - CGI-Parser
       - handle_connection 
+      - parsing
 
 jobs:
   build-linux:

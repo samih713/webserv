@@ -4,9 +4,6 @@
 #ifndef ENUM_UTILS_HPP
 #define ENUM_UTILS_HPP
 
-namespace webserv
-{
-
 template<typename T>
 struct enumStrings
 {
@@ -75,6 +72,5 @@ enumRefHolder<T> enumFromString(T &enum__)
 {
     return enumRefHolder<T>(enum__);
 }
-}; // namespace webserv
 
 #endif // ENUM_UTILS_HPP
