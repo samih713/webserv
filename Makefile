@@ -30,7 +30,7 @@ run: re
 	./$(NAME)
 
 $(NAME): $(LIBSERVER) $(LIBHTTP) $(LIBPARSER) $(OBJS)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
@@ -40,12 +40,12 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 
-debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: export CXXFLAGS += $(DEBUGFLAGS)
 debug:
-	@make debug -sC $(HTTP_DIR)
-	@make debug -sC $(PARSER_DIR)
-	@make debug -sC $(SERVER_DIR)
-	@make -sC ./
+	@$(MAKE) -seC $(HTTP_DIR)
+	@$(MAKE) -seC $(PARSER_DIR)
+	@$(MAKE) -seC $(SERVER_DIR)
+	@$(MAKE) -seC ./
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 tests:
