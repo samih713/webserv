@@ -29,66 +29,37 @@ SRCS_DIR:= sources
 OBJS_DIR:= objects
 DEPS_DIR:= deps
 TESTS_DIR:= .tests
+PARSER_DIR:= $(SRCS_DIR)/parser
+HTTP_DIR:= $(SRCS_DIR)/http
+SERVER_DIR:= $(SRCS_DIR)/server
 
 NAME:= webserv
-# $(SRCS_DIR)/http/ $(SRCS_DIR)/server/
-MODULES:= parser/
-#$(SRCS_DIR)/http/ $(SRCS_DIR)/server/
 
-INCLUDES:= -I./includes/ $(patsubst %,-I%,$(MODULES))
+MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR)
+
+INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES))
 
 include $(patsubst %,%/module.mk,$(MODULES))
-SRCS += $(addprefix $(MODULES), $(SRCS_LIST))
-SRCS += main.cpp
-# SRCS += $(addprefix $(SRCS_DIR)/, $(SRCS_LIST))
 
-# OBJS_LIST:= $(patsubst %.cpp,%.o,$(SRCS))
-OBJS:= $(patsubst %.cpp,%.o,$(SRCS))
-# OBJS:= $(patsubst $(SRCS_DIR)/%,$(OBJS_DIR)/%,$(OBJS_LIST))
+SRCS_LIST += main.cpp
+SRCS += $(patsubst %,$(SRCS_DIR)/%,$(SRCS_LIST))
 
-# @echo "SOURCES LIST: " $(SRCS_LIST)
-test:
-	@echo "SOURCES: " $(SRCS)
-	@echo "OBJECTS: " $(OBJS)
+OBJS:= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
+SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d))
 
 all: $(NAME)
 
-run: re
-	./$(NAME)
-
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $(OBJS_DIR)
+	@mkdir -p $(OBJS_DIR) $(SUB_DIRS)
 
-debug: export CXXFLAGS += $(DEBUGFLAGS)
-debug:
-	@$(MAKE) -seC $(HTTP_DIR)
-	@$(MAKE) -seC $(PARSER_DIR)
-	@$(MAKE) -seC $(SERVER_DIR)
-	@$(MAKE) -seC ./
-	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
-
-tests:
-	@make tests -sC $(HTTP_DIR)
-	@make tests -sC $(PARSER_DIR)
-	@make tests -sC $(SERVER_DIR)
-	@echo "$(BLUE)[ TEST ]$(RESET) Ready for testing."
-
-$(LIBHTTP):
-	@make -sC $(HTTP_DIR)
-
-$(LIBPARSER):
-	@make -sC $(PARSER_DIR)
-
-$(LIBSERVER):
-	@make -sC $(SERVER_DIR)
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
@@ -106,6 +77,10 @@ fclean: clean
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 
-re: fclean all
+re:
+	@$(MAKE) fclean
+	@$(MAKE) all
+
+-include $(OBJS:.o=.d)
 
 .PHONY: clean fclean all re debug run
