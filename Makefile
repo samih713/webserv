@@ -1,40 +1,67 @@
 # main makefile
 
-include .common.mk
+###	COLORS ####
+BLUE:= \033[1;34m
+GREEN:= \033[1;32m
+MAGENTA:= \033[1;35m
+RED:= \033[1;31m
+YELLOW:= \033[1;33m
+RESET:= \033[0m
+
+### COMPILER SETTINGS ###
+CXX:= c++
+DEPFLAGS:= -MMD -MP
+CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 $(DEPFLAGS)
+DEBUGFLAGS:= -ggdb3 -D__DEBUG__
+SANITIZE:= -fsanitize=address
+
+ifeq ($(shell uname), Linux)
+	CXXFLAGS += -D__LINUX__
+else ifeq ($(shell uname), Darwin)
+	CXXFLAGS += -D__MAC__
+endif
+
+### CLEANING ###
+RM:= rm -rf
+
+### DIRECTORIES ###
+SRCS_DIR:= sources
+OBJS_DIR:= objects
+DEPS_DIR:= deps
+TESTS_DIR:= .tests
 
 NAME:= webserv
+# $(SRCS_DIR)/http/ $(SRCS_DIR)/server/
+MODULES:= parser/
+#$(SRCS_DIR)/http/ $(SRCS_DIR)/server/
 
-INCLUDES:= -I./includes
+INCLUDES:= -I./includes/ $(patsubst %,-I%,$(MODULES))
 
-SRCS_LIST:= main.cpp
-SRCS:= $(addprefix $(SRCS_DIR)/, $(SRCS_LIST))
+include $(patsubst %,%/module.mk,$(MODULES))
+SRCS += $(addprefix $(MODULES), $(SRCS_LIST))
+SRCS += main.cpp
+# SRCS += $(addprefix $(SRCS_DIR)/, $(SRCS_LIST))
 
-OBJS_LIST:= $(SRCS_LIST:%.cpp=%.o)
-OBJS:= $(addprefix $(OBJS_DIR)/, $(OBJS_LIST))
+# OBJS_LIST:= $(patsubst %.cpp,%.o,$(SRCS))
+OBJS:= $(patsubst %.cpp,%.o,$(SRCS))
+# OBJS:= $(patsubst $(SRCS_DIR)/%,$(OBJS_DIR)/%,$(OBJS_LIST))
 
-HTTP_DIR:= $(SRCS_DIR)/http/
-PARSER_DIR:= $(SRCS_DIR)/parser/
-SERVER_DIR:= $(SRCS_DIR)/server/
-
-LIBHTTP:= $(HTTP_DIR)libhttp.a
-LIBPARSER:= $(PARSER_DIR)libparser.a
-LIBSERVER:= $(SERVER_DIR)libserver.a
-
-LIBRARY_FLAGS:= -L$(SERVER_DIR) -lserver -L$(PARSER_DIR) -lparser -L$(HTTP_DIR) -lhttp
-
-DEP:= $(OBJS:%.o=%.d)
+# @echo "SOURCES LIST: " $(SRCS_LIST)
+test:
+	@echo "SOURCES: " $(SRCS)
+	@echo "OBJECTS: " $(OBJS)
 
 all: $(NAME)
 
 run: re
 	./$(NAME)
 
-$(NAME): $(LIBSERVER) $(LIBHTTP) $(LIBPARSER) $(OBJS)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@ $(LIBRARY_FLAGS)
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
@@ -70,9 +97,6 @@ clean:
 	else \
 		echo "$(GREEN)[ CLEAN ]$(RESET) No object files to remove."; \
 	fi
-	@make clean -sC $(HTTP_DIR) > /dev/null 2>&1
-	@make clean -sC $(PARSER_DIR) > /dev/null 2>&1
-	@make clean -sC $(SERVER_DIR) > /dev/null 2>&1
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
@@ -81,12 +105,7 @@ fclean: clean
 	else \
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
-	@make fclean -sC $(HTTP_DIR) > /dev/null 2>&1
-	@make fclean -sC $(PARSER_DIR) > /dev/null 2>&1
-	@make fclean -sC $(SERVER_DIR) > /dev/null 2>&1
-
--include $(DEP)
 
 re: fclean all
 
-.PHONY: clean fclean all re tests debug run
+.PHONY: clean fclean all re debug run
