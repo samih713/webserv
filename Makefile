@@ -64,6 +64,10 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR) $(SUB_DIRS)
 
+# debug rule won't work with make -j
+debug: CXXFLAGS += $(DEBUGFLAGS)
+debug: fclean all
+	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
@@ -81,8 +85,7 @@ fclean: clean
 		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 
-re:
-	@$(MAKE) fclean
+re: fclean
 	@$(MAKE) all
 
 -include $(OBJS:.o=.d)
