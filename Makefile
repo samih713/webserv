@@ -15,6 +15,7 @@ CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 $(DEPFLAGS)
 DEBUGFLAGS:= -ggdb3 -D__DEBUG__
 SANITIZE:= -fsanitize=address
 
+### OS DETECTION ###
 ifeq ($(shell uname), Linux)
 	CXXFLAGS += -D__LINUX__
 else ifeq ($(shell uname), Darwin)
@@ -33,17 +34,20 @@ PARSER_DIR:= $(SRCS_DIR)/parser
 HTTP_DIR:= $(SRCS_DIR)/http
 SERVER_DIR:= $(SRCS_DIR)/server
 
+### EXECUTABLE ###
 NAME:= webserv
 
+### MODULES & INCLUDES ###
 MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR)
-
 INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES))
 
+### SOURCES ###
+SRCS:=
 include $(patsubst %,%/module.mk,$(MODULES))
-
 SRCS_LIST += main.cpp
 SRCS += $(patsubst %,$(SRCS_DIR)/%,$(SRCS_LIST))
 
+### OBJECTS & SUBDIRS ###
 OBJS:= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
 SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d))
 
