@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/03/21 01:33:54 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/06 04:41:57 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,11 @@ string getStingQuery(string res)
 
 	qu = res.find('?', 0); 
 	length = res.length();
-	resn = res.substr(qu + 1, length);
+	cout<< "the ?  :" << qu <<endl;
+    cout << "lingth:" << length << endl;
+    resn = res.substr(qu + 1, length);
 	//result = const_cast<char *>(res.substr(0,qu).c_str());
 	cout << resn << endl;
-	cout<< "test" << qu <<endl;
     return (resn);
 }
 
@@ -99,6 +100,7 @@ Cgi::Cgi(const Request &request)
 	environment = headersToEnv(headers);
 	//filePath = const_cast<char *>(geturi(request.get_resource())->c_str());
 	filePath = (geturi(res));
+	queryString = getStingQuery(res);
     //filePath = const_cast<char *> (request.get_resource().c_str());
     // // Check if the Python script exists
     // if (access(filePath, X_OK) == -1)

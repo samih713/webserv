@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:42:45 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/06 04:22:54 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/06 04:41:25 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ class Cgi {
 
     private:
         vsp    headers;
-        string  filePath;
+        string queryString;
+		string filePath;
         char **arguments;
         char **environment;
 	
