@@ -42,13 +42,11 @@ MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR)
 INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES))
 
 ### SOURCES ###
-SRCS:=
-include $(patsubst %,%/module.mk,$(MODULES))
-SRCS_LIST += main.cpp
-SRCS += $(patsubst %,$(SRCS_DIR)/%,$(SRCS_LIST))
+SRCS:= $(SRCS_DIR)/main.cpp
 
 ### OBJECTS & SUBDIRS ###
-OBJS:= $(SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
+include $(patsubst %,%/module.mk,$(MODULES))
+OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)/%.o,$(SRCS))
 SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d))
 
 all: $(NAME)
