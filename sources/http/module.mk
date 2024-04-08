@@ -1,6 +1,9 @@
 # http makefile
 
-SRCS += $(HTTP_DIR)/request/parse.cpp $(HTTP_DIR)/request/Request.cpp $(HTTP_DIR)/response/Response.cpp $(HTTP_DIR)/handler/GetRequestHandler.cpp
+HTTP_SRCS:= $(HTTP_DIR)/request/parse.cpp $(HTTP_DIR)/request/Request.cpp $(HTTP_DIR)/response/Response.cpp $(HTTP_DIR)/handler/GetRequestHandler.cpp
+HTTP_OBJS:= $(HTTP_SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
+OBJS += $(HTTP_OBJS)
 
 # tester mains
-TEST_HTTP:= $(TESTS_DIR)/main.cpp
+TEST_HTTP:= $(HTTP_DIR)/test_http
+TEST_HTTP_SRC:= $(HTTP_DIR)/$(TESTS_DIR)/test_http.cpp
