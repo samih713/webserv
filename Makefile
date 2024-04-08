@@ -11,7 +11,7 @@ RESET:= \033[0m
 ### COMPILER SETTINGS ###
 CXX:= c++
 DEPFLAGS:= -MMD -MP
-CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 $(DEPFLAGS)
+CXXFLAGS:= -Wall -Wextra -Werror -std=c++98
 DEBUGFLAGS:= -ggdb3 -D__DEBUG__
 SANITIZE:= -fsanitize=address
 
