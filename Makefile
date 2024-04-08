@@ -54,14 +54,15 @@ SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $@
+	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCLUDES) $(OBJS) -o $@
 	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
+	@mkdir -p $@ $(SUB_DIRS)
 
 run: re
 	./$(NAME) configs/webserv.conf
