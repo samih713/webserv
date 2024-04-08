@@ -64,9 +64,9 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR) $(SUB_DIRS)
 
-# debug rule won't work with make -j
-debug: CXXFLAGS += $(DEBUGFLAGS)
-debug: fclean all
+debug: export CXXFLAGS += $(DEBUGFLAGS)
+debug: fclean
+	@$(MAKE) -se all
 	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 clean:
