@@ -62,7 +62,9 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $(OBJS_DIR) $(SUB_DIRS)
+
+run: re
+	./$(NAME) configs/webserv.conf
 
 debug: export CXXFLAGS += $(DEBUGFLAGS)
 debug: fclean
