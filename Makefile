@@ -74,21 +74,35 @@ clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
-	else \
-		echo "$(GREEN)[ CLEAN ]$(RESET) No object files to remove."; \
+	fi
+	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SERVER) ]; then \
+		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SERVER); \
+		echo "$(GREEN)[ CLEAN ]$(RESET) Removed testers."; \
 	fi
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
-	else \
-		echo "$(GREEN)[ FCLEAN ]$(RESET) No $(NAME) to remove."; \
 	fi
 
 re: fclean
 	@$(MAKE) all
 
+test_parser:
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(PARSER_SRCS) $(TEST_PARSER_SRC) -o $(TEST_PARSER)
+	@echo "$(BLUE)[ TEST ]$(RESET) Parser ready for testing."
+
+test_http:
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
+	@echo "$(BLUE)[ TEST ]$(RESET) HTTP ready for testing."
+
+#! SOCKET_main.cpp has a compile error so this test has been commented out
+# test_socket:
+# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client
+# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
+# 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
+
 -include $(OBJS:.o=.d)
 
-.PHONY: clean fclean all re debug run
+.PHONY: clean fclean all re debug run test_parser test_http test_socket
