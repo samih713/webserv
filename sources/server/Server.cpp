@@ -85,12 +85,13 @@ bool Server::handle_connection(fd recvSocket)
         if (bytesReceived == 0)
             return CLOSE_CONNECTION;
 
-        string  message(&buffer[0], &buffer[0] + bytesReceived);
-        Request request(message);
+        string           message(&buffer[0], &buffer[0] + bytesReceived);
+        Request          request(message);
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request, cachedPages, config);
-        response.write_response(recvSocket);
+
+        response.send_response(recvSocket);
         delete handler;
     }
     catch (std::runtime_error &e)

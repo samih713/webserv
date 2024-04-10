@@ -38,27 +38,41 @@ Response::Response(const Response &other)
     DEBUG_MSG("Copy constructor called\n", Y);
 }
 
-
-//! needs to be adjusted dont use write? for now only doing to test with cout
-void Response::write_response(fd recv_socket) const
+inline void Response::load_status_line(ostringstream &os) const
 {
-    ostringstream os;
-    // status line
     os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
-    // headers
+}
+
+inline void Response::load_headers(ostringstream &os) const
+{
     vsp::const_iterator begin = headers.begin();
     vsp::const_iterator end = headers.end();
     for (vsp::const_iterator it = begin; it != end; it++)
         os << it->first << ": " << it->second << CRLF;
     os << CRLF;
+}
 
+void Response::send_response(fd recv_socket) const
+{
+    ostringstream os;
+    size_t        bytesSent = 0;
+    int           result = 0;
+
+    load_status_line(os);
+    load_headers(os);
     string headerString = os.str();
     // add the header
     vector<char> message(headerString.begin(), headerString.end());
     // add the body
     message.insert(message.end(), body.begin(), body.end());
     // send all
-    ::send(recv_socket, message.data(), message.size(), 0);
+    while (bytesSent < message.size())
+    {
+        result = send(recv_socket, &message[bytesSent], message.size() - bytesSent, 0);
+        if (result == -1)
+            throw std::runtime_error(strerror(errno));
+        bytesSent += result;
+    }
 }
 
 // deleted copy assignment
