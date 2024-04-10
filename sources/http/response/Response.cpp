@@ -1,6 +1,7 @@
 #include "Response.hpp"
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
+#include "../../server/Server.hpp"
 
 // response codes
 typedef std::map<STATUS_CODE, std::string> StatusCodeMap;
@@ -15,9 +16,6 @@ StatusCodeMap createStatusCodeMap()
 }
 
 StatusCodeMap status_codes_map = createStatusCodeMap();
-
-// default header the name of the server
-const string &Response::server_header_value = "The Wired";
 
 const string &Response::version = "HTTP/1.1";
 
