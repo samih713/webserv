@@ -1,12 +1,7 @@
 # main makefile
 
 ###	COLORS ####
-BLUE:= \033[1;34m
-GREEN:= \033[1;32m
-MAGENTA:= \033[1;35m
-RED:= \033[1;31m
-YELLOW:= \033[1;33m
-RESET:= \033[0m
+include .colors
 
 ### COMPILER SETTINGS ###
 CXX:= c++
@@ -75,9 +70,9 @@ clean:
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
 	fi
-	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SERVER) ]; then \
-		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SERVER); \
-		echo "$(GREEN)[ CLEAN ]$(RESET) Removed testers."; \
+	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SOCKET) ]; then \
+		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SOCKET); \
+		echo "$(GREEN)[ DELETE ]$(RESET) Removed testers."; \
 	fi
 
 fclean: clean
@@ -87,7 +82,7 @@ fclean: clean
 	fi
 
 re: fclean
-	@$(MAKE) all
+	@$(MAKE) -s all
 
 test_parser:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(PARSER_SRCS) $(TEST_PARSER_SRC) -o $(TEST_PARSER)
