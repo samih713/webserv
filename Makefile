@@ -1,7 +1,7 @@
 # main makefile
 
 ###	COLORS ####
-include .colors
+include .colors.mk
 
 ### COMPILER SETTINGS ###
 CXX:= c++
