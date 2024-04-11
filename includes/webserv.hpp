@@ -71,6 +71,7 @@ using std::ofstream;
 using std::ostream;
 using std::ostringstream;
 using std::pair;
+using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;
