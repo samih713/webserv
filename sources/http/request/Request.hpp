@@ -17,7 +17,7 @@ class Request
         friend ostream &operator<<(ostream &os, const Request &r);
 
     private:
-        void          parse();
+        void          parse_request();
         const string &rawRequest;
         // request-line   = method SP request-target SP HTTP-version
         METHOD method;

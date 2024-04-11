@@ -7,7 +7,7 @@ Request::Request(const string &rawRequest)
 {
     try
     {
-        parse();
+        parse_request();
     }
     catch (std::ios_base::failure &f)
     {
