@@ -1,9 +1,13 @@
+#include "../../../includes/webserv.hpp"
 #include "../Message.hpp"
 #include "../request/Request.hpp"
-#include "../../../includes/webserv.hpp"
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
+
+typedef std::map<STATUS_CODE, std::string> StatusCodeMap;
+
+static const string ERR_SEND_FAIL("Response: Failed to send: ");
 
 class Response
 {
