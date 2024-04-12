@@ -98,6 +98,14 @@ test_http:
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
 # 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
 
+format:
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Formatting code..."
+	@find ./$(SRCS_DIR) -name "*.cpp" -o -name "*.hpp" \
+		-exec clang-format -i {} +
+	@find ./includes -name "*.hpp" \
+		-exec clang-format -i {} +
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Code has been formatted."
+
 -include $(OBJS:.o=.d)
 
 .PHONY: clean fclean all re debug run test_parser test_http test_socket
