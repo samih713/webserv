@@ -127,29 +127,26 @@ void Request::parse_content_length(const string &contentLength)
     if (!length.eof())
         length.setstate(std::ios::failbit);
 }
+
+// TODO headers to parse multiple line field-values, and multi-line
+void Request::parse_header()
 {
     stringstream message(rawRequest);
     string       fieldName;
     string       fieldValue;
 
     message.exceptions(std::ios::failbit | std::ios::badbit);
-
     // Request Line
     message >> enumFromString(method) >> resource >> http_version;
     check_line_terminator(message, CRLF);
-	// replace %20 with space
-	replace_spaces(resource);
+    // replace %20 with space
+    replace_spaces(resource);
     // Headers
-    static map<string, int>::const_iterator fieldNameListEnd = fieldNameList.end();
     while (true)
     {
         std::getline(message, fieldName, ':');
-        if (fieldName.find(' ') != string::npos ||
-            fieldNameList.find(fieldName) == fieldNameListEnd)
-        {
-            // DEBUGASSERT("The header check is wrong, brave sends some weird headers or
-            // maybe all browsers do idk" && false);
-        }
+        if (fieldName.find(' ') != string::npos)
+            message.setstate(std::ios::failbit);
         fieldValue = find_value(message);
         header_fields.push_back(std::make_pair(fieldName, fieldValue));
         if (fieldName == "Content-length")
@@ -159,8 +156,18 @@ void Request::parse_content_length(const string &contentLength)
         if (peek_line_terminator(message, CRLF))
             break;
     }
+    headerEnd = message.tellg();
+}
 
-    // Body till the end of the message
+// [ ] handle chunked encoding
+void Request::parse_body()
+{
+    stringstream message;
+
+    message.exceptions(std::ios::failbit | std::ios::badbit);
+
+    if (headerEnd != string::npos && headerEnd < rawRequest.size())
+        message << rawRequest.substr(headerEnd);
     std::getline(message, body, '\0');
     if (expectedBodySize != NOT_SET && expectedBodySize != NOT_SPECIFIED)
         body = body.substr(0, expectedBodySize);
