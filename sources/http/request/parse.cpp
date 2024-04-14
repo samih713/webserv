@@ -1,6 +1,9 @@
+#include "../../../includes/enum_utils.hpp"
 #include "../Message.hpp"
 #include "./Request.hpp"
-#include "../../../includes/enum_utils.hpp"
+#include <cmath>
+#include <ios>
+#include <sstream>
 
 // defining the char * array
 #define X(a) ws_tostr(a), // stringify the enum
@@ -108,21 +111,22 @@ inline static string find_value(stringstream &message)
  * @brief Replaces all occurrences of "%20" in the resource string with a space character.
  *
  * @param resource The resource string to replace "%20" with a space character.
-*/
+ */
 static void replace_spaces(string &resource)
 {
-	size_t pos;
-	while ((pos = resource.find("%20")) != std::string::npos)
-		resource.replace(pos, 3, " ");
+    size_t pos;
+    while ((pos = resource.find("%20")) != std::string::npos)
+        resource.replace(pos, 3, " ");
 }
 
-/**
- * @brief Parses the raw request data into method, resource, HTTP version, headers, and
- * body.
- *
- * @throws std::ios_base::failure if there is a failure in parsing the raw request data
- */
-void Request::parse()
+void Request::parse_content_length(const string &contentLength)
+{
+    stringstream length(contentLength);
+    length.exceptions(std::ios::failbit | std::ios::badbit);
+    length >> expectedBodySize;
+    if (!length.eof())
+        length.setstate(std::ios::failbit);
+}
 {
     stringstream message(rawRequest);
     string       fieldName;
@@ -148,10 +152,18 @@ void Request::parse()
         }
         fieldValue = find_value(message);
         header_fields.push_back(std::make_pair(fieldName, fieldValue));
+        if (fieldName == "Content-length")
+            parse_content_length(fieldValue);
+        else
+            expectedBodySize = NOT_SPECIFIED;
         if (peek_line_terminator(message, CRLF))
             break;
     }
 
     // Body till the end of the message
     std::getline(message, body, '\0');
+    if (expectedBodySize != NOT_SET && expectedBodySize != NOT_SPECIFIED)
+        body = body.substr(0, expectedBodySize);
+    // discards the rest, if implement pipe-lining
+    // it would need to be handled
 }
