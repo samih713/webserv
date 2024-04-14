@@ -2,15 +2,9 @@
 #include "./ServerConfig.hpp"
 #include "./connection_manager/ConnectionManager.hpp"
 #include "./socket/TCPSocket.hpp"
-#include "../../includes/debug.hpp"
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
-
-static const int BUFFER_SIZE = 4096;
-
-#define CLOSE_CONNECTION 1
-#define KEEP_ALIVE       0
 
 enum polling_strat
 {
@@ -30,7 +24,8 @@ static const int SELECTWAITTIME(5);
 class Server
 {
     public:
-        static Server &get_instance(const ServerConfig &config, int backLog = DEFAULT_BACKLOG);
+        static Server &get_instance(const ServerConfig &config,
+                                    int                 backLog = DEFAULT_BACKLOG);
         ~Server();
         void start(enum polling_strat);
 
@@ -38,11 +33,11 @@ class Server
         Server(const ServerConfig &config, int backLog);
 
     private:
-        TCPSocket     listener;
+        TCPSocket           listener;
         const ServerConfig &config;
-        CachedPages  *cachedPages;
+        CachedPages        *cachedPages;
 
-        bool handle_connection(fd recvSocket);
+        void handle_connection(fd incoming, fd_set &activeSockets);
         /* polling strats */
         void select_strat();
         // void kqueue_strat();

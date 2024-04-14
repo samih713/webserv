@@ -1,7 +1,7 @@
 #include "../../server/Server.hpp"
 #include "Request.hpp"
 
-int Request::recv(fd socket)
+CONNECT_STATUS Request::recv(fd socket)
 {
     char buffer[BUFFER_SIZE] = { 0 };
     int  bytesReceived;

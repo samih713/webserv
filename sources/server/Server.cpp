@@ -1,10 +1,10 @@
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "./Server.hpp"
+#include "../../includes/debug.hpp"
 #include "../http/handler/GetRequestHandler.hpp"
 #include "../http/handler/IRequestHandler.hpp"
-#include "../http/request/Request.hpp"
 #include "../http/handler/RequestHandlerFactory.hpp"
-#include "../../includes/debug.hpp"
+#include "../http/request/Request.hpp"
 #include <algorithm>
 #include <sys/select.h>
 #include <utility>
@@ -59,46 +59,61 @@ Server::~Server()
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
 // TODO [ ] hanlde partial sends and recieves
+//		- better naming for manager and set activeSockets in class
 
-/**
- * Handles a connection on the given socket.
- *
- * This function reads data from the socket, creates an HTTP request object,
- * determines the appropriate request handler based on the request method,
- * and generates an HTTP response. The response is then written back to the socket.
- *
- * @param recvSocket The file descriptor of the socket to handle the connection on.
- *
- * @throws std::runtime_error if an error occurs while receiving data from the socket.
- */
-bool Server::handle_connection(fd recvSocket)
+void Server::handle_connection(fd incoming, fd_set &activeSockets)
 {
-    char buffer[BUFFER_SIZE] = { 0 };
-    int  bytesReceived;
+    // recieve the incoming connection
+    Request *r;
+
+    if (!ConnectionManager::check_connection(incoming))
+    {
+        ConnectionManager::remove_connection(incoming, activeSockets);
+        return;
+    }
+    else
+    {
+        r = &(ConnectionManager::add_connection(incoming, activeSockets)).first->second;
+        r->timer.update_time();
+        if (r->recv(incoming) == CLOSE_CONNECTION)
+        {
+            ConnectionManager::remove_connection(incoming, activeSockets);
+            return;
+        }
+    }
+
+    // parse headers
+    if (r->header_ready() && r->expected_body_size() == NOT_SET)
+    {
+        try
+        {
+            r->parse_header();
+            if (r->expected_body_size() != NOT_SPECIFIED)
+                r->parse_body();
+        }
+        catch (std::ios_base::failure &f)
+        {
+            DEBUG_MSG(f.what(), R);
+            ConnectionManager::remove_connection(incoming, activeSockets);
+            // TODO need to form proper error response in case of parsing failure
+            return;
+        }
+    }
+
     try
     {
-        bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
-
-        if (bytesReceived == -1)
-            throw std::runtime_error(strerror(errno));
-
-        if (bytesReceived == 0)
-            return CLOSE_CONNECTION;
-
-        string           message(&buffer[0], &buffer[0] + bytesReceived);
-        Request          request(message);
         IRequestHandler *handler =
-            RequestHandlerFactory::MakeRequestHandler(request.get_method());
-        Response response = handler->handle_request(request, cachedPages, config);
+            RequestHandlerFactory::MakeRequestHandler(r->get_method());
+        Response response = handler->handle_request(*r, cachedPages, config);
 
-        response.send_response(recvSocket);
+        response.send_response(incoming);
+        r->setCompleted();
         delete handler;
     }
     catch (std::runtime_error &e)
     {
         DEBUG_MSG(e.what(), R);
     }
-    return KEEP_ALIVE;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -114,7 +129,7 @@ void Server::select_strat()
 {
     struct timeval selectTimeOut = { .tv_sec = SELECTWAITTIME, .tv_usec = 0 };
 
-    fd       newConnection;
+    fd       incoming;
     const fd listenerFd = listener.get_fd();
 
     fd_set activeSockets;
@@ -143,19 +158,13 @@ void Server::select_strat()
             {
                 if (currentSocket == listenerFd)
                 {
-                    newConnection = listener.accept();
-                    ConnectionManager::add_connection(newConnection, activeSockets);
-                    maxSocketDescriptor = std::max(maxSocketDescriptor, newConnection);
+                    incoming = listener.accept();
+                    maxSocketDescriptor = std::max(maxSocketDescriptor, incoming);
                 }
                 else
-                {
-                    DEBUG_MSG("reading from connection", M);
-                    if (handle_connection(currentSocket) != CLOSE_CONNECTION)
-                        ConnectionManager::update_connection(currentSocket);
-                    else
-                        ConnectionManager::remove_connection(currentSocket,
-                                                             activeSockets);
-                }
+                    incoming = currentSocket;
+                DEBUG_MSG("reading from connection", M);
+                handle_connection(incoming, activeSockets);
             }
         }
     }
