@@ -2,28 +2,31 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-Request::Request(const string &rawRequest)
-    : rawRequest(rawRequest)
-{
-    try
-    {
-        parse();
-    }
-    catch (std::ios_base::failure &f)
-    {
-        throw std::runtime_error("Invalid request\n");
-    }
-}
+
+Request::Request()
+    : headerEnd(0)
+    , headerReady(false)
+    , parsed(false)
+    , completed(false)
+    , expectedBodySize(NOT_SET)
+{}
 
 Request::~Request()
 {}
 
 Request::Request(const Request &other)
     : rawRequest(other.rawRequest)
+    , headerEnd(other.headerEnd)
+    , headerReady(other.headerReady)
+    , parsed(other.parsed)
+    , completed(other.completed)
+    , expectedBodySize(other.expectedBodySize)
     , method(other.method)
     , resource(other.resource)
     , http_version(other.http_version)
     , header_fields(other.header_fields)
+    , trailer_fields(other.trailer_fields)
+
 {}
 
 
