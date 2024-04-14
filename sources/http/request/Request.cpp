@@ -45,6 +45,31 @@ const string &Request::get_resource() const
     return resource;
 }
 
+bool Request::header_ready()
+{
+    return headerReady;
+}
+
+bool Request::isParsed()
+{
+    return parsed;
+}
+
+void Request::setCompleted()
+{
+    completed = true;
+}
+
+bool Request::isCompleted()
+{
+    return completed;
+}
+
+int Request::expected_body_size()
+{
+    return expectedBodySize;
+}
+
 std::ostream &operator<<(ostream &os, const Request &r)
 {
     os << "Method: " << enumToString(r.method) << std::endl;
