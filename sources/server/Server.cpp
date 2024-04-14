@@ -58,7 +58,7 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-// TODO [ ] hanlde partial sends and recieves
+// TODO [x] hanlde partial sends and recieves
 //		- better naming for manager and set activeSockets in class
 
 void Server::handle_connection(fd incoming, fd_set &activeSockets)
