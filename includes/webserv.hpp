@@ -21,6 +21,7 @@
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
 // REQUEST
+// [ ] why getting method not implemented in debug mode (run server to replicate)
 // [ ] headers to parse multiple line field-values, and multi-line
 // [ ] need to form proper error response in case of parsing failure
 // [ ] handle chunked encoding
