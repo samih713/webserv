@@ -1,4 +1,5 @@
 #include "Socket.hpp"
+#include "../../../includes/webserv.hpp"
 
 /* ------------------------------- Constructor ------------------------------ */
 
@@ -29,9 +30,9 @@ Socket::Socket(int family, int type, int protocol, int flags)
     flags |= fcntl(socketFD, F_GETFL, 0);
     fcntl(socketFD, F_SETFL, flags);
 #endif // conditional
-	// TODO - better option handling
-	int option = 1;
-	setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    // TODO - better option handling
+    int option = 1;
+    setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if (socketFD == invalidFD)
         throw Socket::Exception(ERR_CREAT);
 
@@ -194,6 +195,6 @@ const char *Socket::Exception::what() const throw()
 std::string Socket::Exception::compose_msg(const std::string &message)
 {
     std::stringstream _msg;
-    _msg << message << (errno ? ": " + std::string(std::strerror(errno)) : "");
+    _msg << message << (errno ? ": " + string(strerror(errno)) : "");
     return _msg.str();
 }
