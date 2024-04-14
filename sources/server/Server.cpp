@@ -100,6 +100,8 @@ void Server::handle_connection(fd incoming, fd_set &activeSockets)
         }
     }
 
+    if (!r->isParsed())
+        return;
     try
     {
         IRequestHandler *handler =
