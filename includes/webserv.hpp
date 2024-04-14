@@ -20,6 +20,13 @@
 // [x] set the stream to throw exception on fail
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
+// REQUEST
+// [ ] headers to parse multiple line field-values, and multi-line
+// [ ] need to form proper error response in case of parsing failure
+// [ ] handle chunked encoding
+// [ ] parsing needs to be reviewed for white space parsing
+
+
 // [ ] logging
 // [ ] split-up function implementations into their own files
 // [ ] different strategies
