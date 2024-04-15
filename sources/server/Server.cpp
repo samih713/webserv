@@ -7,7 +7,6 @@
 #include "../http/request/Request.hpp"
 #include <algorithm>
 #include <sys/select.h>
-#include <utility>
 /* -------------------------------- INCLUDES -------------------------------- */
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
