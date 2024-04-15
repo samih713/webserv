@@ -30,20 +30,18 @@ class Request
         const string &get_resource() const;
         const vsp    &get_headers() const;
 
-        void parse_body();
-        void parse_header();
+        bool parse();
 
-        bool header_ready();
-        bool isParsed();
         bool isCompleted();
         void setCompleted();
-        int  expected_body_size();
 
         TimeOut timer;
 
         friend ostream &operator<<(ostream &os, const Request &r);
 
     private:
+        void   parse_body();
+        void   parse_header();
         void   parse_content_length(const string &contentLength);
         string rawRequest;
 
