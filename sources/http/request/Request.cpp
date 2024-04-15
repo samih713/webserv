@@ -4,7 +4,7 @@
 
 
 Request::Request()
-    : headerEnd(0)
+    : message("")
     , headerReady(false)
     , parsed(false)
     , completed(false)
@@ -16,7 +16,6 @@ Request::~Request()
 
 Request::Request(const Request &other)
     : rawRequest(other.rawRequest)
-    , headerEnd(other.headerEnd)
     , headerReady(other.headerReady)
     , parsed(other.parsed)
     , completed(other.completed)

@@ -4,7 +4,7 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-static const int BUFFER_SIZE(40);
+static const int BUFFER_SIZE(4096);
 
 // should be mask bits
 static const int NOT_SET(-1);
@@ -46,7 +46,6 @@ class Request
         void   parse_content_length(const string &contentLength);
         string rawRequest;
 
-        size_t headerEnd;
         bool   headerReady;
         bool   parsed;
         bool   completed;
