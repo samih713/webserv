@@ -20,9 +20,14 @@ CONNECTION_STATUS Request::recv(fd socket)
         return CONNECTION_ERROR;
     }
 
-    rawRequest.append(buffer, bytesReceived);
+    if (!message.str().empty())
+        message.str().append(buffer, bytesReceived);
+    else
+        message.str((string(buffer).substr(0, bytesReceived)));
+    // message.str().append(0); // this situation
+    // message.str((string(buffer).substr(0, bytesReceived)));
 
-    if (rawRequest.find(CRLF + CRLF) != string::npos)
+    if (message.str().find(CRLF + CRLF) != string::npos)
         headerReady = true;
 
     return KEEP_ALIVE;
