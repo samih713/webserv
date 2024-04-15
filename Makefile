@@ -28,12 +28,13 @@ TESTS_DIR:= .tests
 PARSER_DIR:= $(SRCS_DIR)/parser
 HTTP_DIR:= $(SRCS_DIR)/http
 SERVER_DIR:= $(SRCS_DIR)/server
+CGI_DIR:= $(SRCS_DIR)/CGI
 
 ### EXECUTABLE ###
 NAME:= webserv
 
 ### MODULES & INCLUDES ###
-MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR)
+MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR) $(CGI_DIR)
 INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES))
 
 ### SOURCES ###
@@ -97,6 +98,12 @@ test_http:
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
 # 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
+
+# test_cgi: fclean debug
+# 	@make -C ../sources/HTTP
+# 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(libhttp) $(TEST_CGI) $(NAME) -o $@
+# 	@mv *.d $(OBJS_DIR)
+# 	@echo "$(BLUE)[ TEST ]$(RESET) CGI is now ready for testing."
 
 -include $(OBJS:.o=.d)
 

@@ -211,7 +211,7 @@ void Cgi::execute(const std::string& outputFile)
         res_body.append(buffer, bytesRead);
     }
     // Save the response to a file
-    std::ofstream outFile(outputFile);
+    std::ofstream outFile(outputFile.c_str());
     if (outFile.is_open()) {
         outFile << res_body;
         outFile.close();
