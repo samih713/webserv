@@ -103,6 +103,14 @@ test_cgi:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
 	@echo "$(BLUE)[ TEST ]$(RESET) CGI ready for testing."
 
+format:
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Formatting code..."
+	@find ./$(SRCS_DIR) -name "*.cpp" -o -name "*.hpp" \
+		-exec clang-format -i {} +
+	@find ./includes -name "*.hpp" \
+		-exec clang-format -i {} +
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Code has been formatted."
+
 -include $(OBJS:.o=.d)
 
 .PHONY: clean fclean all re debug run test_parser test_http test_socket test_cgi
