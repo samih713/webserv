@@ -24,8 +24,6 @@ CONNECTION_STATUS Request::recv(fd socket)
         message.str().append(buffer, bytesReceived);
     else
         message.str((string(buffer).substr(0, bytesReceived)));
-    // message.str().append(0); // this situation
-    // message.str((string(buffer).substr(0, bytesReceived)));
 
     if (message.str().find(CRLF + CRLF) != string::npos)
         headerReady = true;
