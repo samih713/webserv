@@ -90,7 +90,7 @@ test_parser:
 	@echo "$(BLUE)[ TEST ]$(RESET) Parser ready for testing."
 
 test_http:
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(CGI_SRCS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
 	@echo "$(BLUE)[ TEST ]$(RESET) HTTP ready for testing."
 
 #! SOCKET_main.cpp has a compile error so this test has been commented out

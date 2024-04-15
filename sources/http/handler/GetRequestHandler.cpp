@@ -2,6 +2,7 @@
 #include "../../../includes/debug.hpp"
 #include "../FileType.hpp"
 #include "../server/CachedPages.hpp"
+#include "../../CGI/Cgi.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -23,6 +24,17 @@ inline const string find_resource_type(const string &resource)
     else
         file_extension = "";
     return (fileTypes.find(file_extension)->second);
+}
+
+bool check_cgi_request(const string &res)
+{
+	string filetype;
+
+	filetype = find_resource_type(res);
+	if(filetype == "bash" || filetype == "python")
+		return true;
+	else
+		return false;
 }
 
 
@@ -72,7 +84,16 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
         }
         else
         {
-            body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
+			if(check_cgi_request(resource))
+			{
+                Cgi cgi(request);
+				string strv;
+
+				strv = cgi.execute();
+                body = vector<char>(strv.begin(), strv.end());
+			}
+			else
+				body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                                 std::istreambuf_iterator<char>());
 
             // content type

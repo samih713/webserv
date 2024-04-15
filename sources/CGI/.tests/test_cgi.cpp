@@ -53,6 +53,8 @@ int main(int argc, char** argv, char** envp)
 
 	//const std::string outputFile;
 
+	string res;
+
     try
     {
         Request request(sample_request_cgi);
@@ -69,7 +71,10 @@ int main(int argc, char** argv, char** envp)
 
         Cgi     cgi(request);
 
-       cgi.execute("stds");
+		res = cgi.execute();
+		cout << "this return exce CGI : " <<res << endl;
+
+       //cgi.execute("stds");
     }
     catch (std::runtime_error &e)
     {

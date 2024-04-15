@@ -23,7 +23,10 @@ static const std::pair<std::string, std::string> init_filetypes[] = {
     std::make_pair("mp3", "audio/mpeg"),
     std::make_pair("wav", "audio/wav"),
     std::make_pair("webp", "image/webp"),
-    std::make_pair("ico", "image/x-icon")
+    std::make_pair("ico", "image/x-icon"),
+    std::make_pair("sh", "bash"),
+    std::make_pair("py", "python"),
+
 };
 
 static const map<string, string> fileTypes(init_filetypes,
