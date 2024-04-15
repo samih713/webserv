@@ -7,22 +7,21 @@
 // defining the METHOD char * array
 #define X(a) ws_tostr(a), // stringify the enum
 template<>
-const char *enumStrings<METHOD>::data[] = { METHOD_ENUMS };
+const char* enumStrings<METHOD>::data[] = { METHOD_ENUMS };
 #undef X
 
 // helper functions
-static void   check_line_terminator(istream &is, const string &check);
-static void   replace_spaces(string &resource);
-static bool   peek_line_terminator(istream &is, const string &check);
-static string find_value(stringstream &message);
+static void   check_line_terminator(istream& is, const string& check);
+static void   replace_spaces(string& resource);
+static bool   peek_line_terminator(istream& is, const string& check);
+static string find_value(stringstream& message);
 
 // throws ios failure
-bool Request::parse()
+bool Request::parse_request()
 {
     message.exceptions(std::ios::failbit | std::ios::badbit);
 
-    if (headerReady && expectedBodySize == NOT_SET)
-    {
+    if (headerReady && expectedBodySize == NOT_SET) {
         parse_header();
         if (expectedBodySize != NOT_SPECIFIED)
             parse_body();
@@ -30,7 +29,7 @@ bool Request::parse()
     return parsed;
 }
 
-void Request::parse_content_length(const string &contentLength)
+void Request::parse_content_length(const string& contentLength)
 {
     stringstream length(contentLength);
     length.exceptions(std::ios::failbit | std::ios::badbit);
@@ -51,8 +50,7 @@ void Request::parse_header()
     // replace %20 with space
     replace_spaces(resource);
     // Headers
-    while (true)
-    {
+    while (true) {
         std::getline(message, fieldName, ':');
         if (fieldName.find(' ') != string::npos)
             message.setstate(std::ios::failbit);
@@ -95,21 +93,17 @@ void Request::parse_body()
  *
  * @throws None
  */
-static void check_line_terminator(istream &is, const string &check)
+static void check_line_terminator(istream& is, const string& check)
 {
     string line_terminator;
     std::noskipws(is);
 
     string::const_iterator check_end = check.end();
     for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
-    {
         line_terminator += is.get();
-    }
 
     if (line_terminator != check)
-    {
         is.setstate(std::ios::failbit);
-    }
 
     std::skipws(is);
 }
@@ -130,7 +124,7 @@ static void check_line_terminator(istream &is, const string &check)
  *
  * @throws None
  */
-static bool peek_line_terminator(istream &is, const string &check)
+static bool peek_line_terminator(istream& is, const string& check)
 {
     string         line_terminator;
     std::streampos initialPos = is.tellg();
@@ -138,17 +132,13 @@ static bool peek_line_terminator(istream &is, const string &check)
 
     string::const_iterator check_end = check.end();
     for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
-    {
         line_terminator += is.get();
-    }
 
     is.clear();
     is.seekg(initialPos, std::ios::beg);
 
     if (line_terminator != check)
-    {
         return false;
-    }
 
     std::skipws(is);
     return true;
@@ -161,12 +151,12 @@ static bool peek_line_terminator(istream &is, const string &check)
  * @param message The stringstream from which to extract the value.
  * @return The extracted value as a string.
  */
-static string find_value(stringstream &message)
+static string find_value(stringstream& message)
 {
     string fieldValue;
     std::getline(message, fieldValue);
     string::size_type begin = fieldValue.find_first_not_of(" ");
-    string::size_type end = fieldValue.find_last_not_of(CRLF);
+    string::size_type end   = fieldValue.find_last_not_of(CRLF);
     if (begin != std::string::npos && end != std::string::npos)
         fieldValue = fieldValue.substr(begin, end - begin + 1);
     else if (begin != std::string::npos)
@@ -179,7 +169,7 @@ static string find_value(stringstream &message)
  *
  * @param resource The resource string to replace "%20" with a space character.
  */
-static void replace_spaces(string &resource)
+static void replace_spaces(string& resource)
 {
     size_t pos;
     while ((pos = resource.find("%20")) != std::string::npos)

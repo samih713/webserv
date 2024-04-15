@@ -16,3 +16,5 @@ client
 test_http
 *.d
 ubuntu_tester
+*.dSYM
+stds

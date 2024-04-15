@@ -20,7 +20,7 @@ class RequestHandlerFactory
             switch (m)
             {
                 case GET: return new GetRequestHandler;
-                default: throw std::runtime_error("Request Method not implemented\n");
+                default: THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
             }
         }
 };

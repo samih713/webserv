@@ -115,7 +115,7 @@ void Response::send_response(fd recv_socket) const
     {
         result = send(recv_socket, &message[bytesSent], message.size() - bytesSent, 0);
         if (result == -1)
-            throw std::runtime_error(ERR_SEND_FAIL + strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(ERR_SEND_FAIL + strerror(errno));
         bytesSent += result;
     }
 }

@@ -10,7 +10,7 @@ int main()
         Request request(sample_request);
         std::cout << request;
     }
-    catch (std::runtime_error &e)
+    catch (runtime_error &e)
     {
         std::cerr << e.what() << std::endl;
     }

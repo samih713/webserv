@@ -10,58 +10,50 @@ static const int BUFFER_SIZE(4096);
 static const int NOT_SET(-1);
 static const int NOT_SPECIFIED(0);
 
-enum CONNECTION_STATUS
-{
-    CLOSE_CONNECTION = 0,
-    KEEP_ALIVE = 1,
-    CONNECTION_ERROR = 2
-};
-
 // Request class to parse an incoming message
-class Request
-{
-    public:
-        Request();
-        ~Request();
-        Request(const Request &other);
+class Request {
+public:
+    Request();
+    ~Request();
+    Request(const Request& other);
 
-        CONNECTION_STATUS recv(fd socket);
+    void recv(fd socket);
 
-        METHOD        get_method() const;
-        const string &get_resource() const;
-        const vsp    &get_headers() const;
+    METHOD        get_method() const;
+    const string& get_resource() const;
+    const vsp&    get_headers() const;
 
-        bool parse();
+    bool parse_request();
 
-        bool isCompleted();
-        void setCompleted();
+    bool isCompleted();
+    void setCompleted();
 
-        TimeOut timer;
+    TimeOut timer;
 
-        friend ostream &operator<<(ostream &os, const Request &r);
+    friend ostream& operator<<(ostream& os, const Request& r);
 
-    private:
-        void parse_body();
-        void parse_header();
-        void parse_content_length(const string &contentLength);
+private:
+    void parse_body();
+    void parse_header();
+    void parse_content_length(const string& contentLength);
 
-        stringstream message;
+    stringstream message;
 
-        bool headerReady;
-        bool parsed;
-        bool completed;
-        int  expectedBodySize;
+    bool headerReady;
+    bool parsed;
+    bool completed;
+    int  expectedBodySize;
 
-        METHOD method;
-        string resource;
-        string http_version;
+    METHOD method;
+    string resource;
+    string http_version;
 
-        vsp         header_fields;
-        vsp         trailer_fields;
-        std::string body;
+    vsp         header_fields;
+    vsp         trailer_fields;
+    std::string body;
 
-        // deleted copy assigment
-        void operator=(const Request &);
+    // deleted copy assigment
+    void operator=(const Request&);
 };
 
 #endif // REQUEST_HPP

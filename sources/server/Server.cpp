@@ -21,7 +21,7 @@
  * @param backLog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server &Server::get_instance(const ServerConfig &config, int backLog)
+Server& Server::get_instance(const ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
     return instance;
@@ -38,10 +38,9 @@ Server &Server::get_instance(const ServerConfig &config, int backLog)
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
-Server::Server(const ServerConfig &config, int backLog)
-    : listener(config.listenerPort, backLog)
-    , config(config)
-    , cachedPages(new CachedPages(config))
+Server::Server(const ServerConfig& config, int backLog)
+    : listener(config.listenerPort, backLog), config(config),
+      cachedPages(new CachedPages(config))
 {
     DEBUG_MSG("Server was created successfully", B);
 }
@@ -58,52 +57,20 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-// TODO [x] hanlde partial sends and recieves
-//		- better naming for manager and set activeSockets in class
-
-void Server::handle_connection(fd incoming, fd_set &activeSockets)
+void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-    // recieve the incoming connection
-    Request *r;
-
-    if (!ConnectionManager::check_connection(incoming))
-    {
-        ConnectionManager::remove_connection(incoming, activeSockets);
+    ConnectionManager::check_connection(incoming);
+    Request& r = ConnectionManager::add_connection(incoming, activeSockets);
+    r.recv(incoming);
+    if (!r.parse_request())
         return;
-    }
-    else
-    {
-        r = &(ConnectionManager::add_connection(incoming, activeSockets)).first->second;
-        r->timer.update_time();
-        if (r->recv(incoming) == CLOSE_CONNECTION)
-        {
-            ConnectionManager::remove_connection(incoming, activeSockets);
-            return;
-        }
-    }
 
-    try
-    {
-        if (!r->parse())
-            return;
-        IRequestHandler *handler =
-            RequestHandlerFactory::MakeRequestHandler(r->get_method());
-        Response response = handler->handle_request(*r, cachedPages, config);
+    IRequestHandler* handler  = RequestHandlerFactory::MakeRequestHandler(r.get_method());
+    Response         response = handler->handle_request(r, cachedPages, config);
 
-        response.send_response(incoming);
-        r->setCompleted();
-        delete handler;
-    }
-    catch (std::ios_base::failure &f)
-    {
-        DEBUG_MSG(f.what(), R);
-        ConnectionManager::remove_connection(incoming, activeSockets);
-        // TODO need to form proper error response in case of parsing failure
-    }
-    catch (std::runtime_error &e)
-    {
-        DEBUG_MSG(e.what(), R);
-    }
+    response.send_response(incoming);
+    r.setCompleted();
+    delete handler;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -131,30 +98,32 @@ void Server::select_strat()
     // Initialize with listenerFd
     fd maxSocketDescriptor = listenerFd;
 
-    while (true)
-    {
+    while (true) {
         DEBUG_MSG(WAIT_MESSAGE, L);
 
         ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-            throw std::runtime_error(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
 
         for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
         {
-            if (FD_ISSET(currentSocket, &readytoRead))
-            {
-                if (currentSocket == listenerFd)
-                {
-                    incoming = listener.accept();
+            if (FD_ISSET(currentSocket, &readytoRead)) {
+                if (currentSocket == listenerFd) {
+                    incoming            = listener.accept();
                     maxSocketDescriptor = std::max(maxSocketDescriptor, incoming);
                 }
                 else
                     incoming = currentSocket;
                 DEBUG_MSG("reading from connection", M);
-                handle_connection(incoming, activeSockets);
+                try {
+                    handle_connection(incoming, activeSockets);
+                } catch (std::exception& e) {
+                    ConnectionManager::remove_connection(incoming, activeSockets);
+                    DEBUG_MSG(e.what(), R);
+                }
             }
         }
     }
@@ -170,12 +139,11 @@ void Server::select_strat()
  */
 void Server::start(enum polling_strat strategy)
 {
-    switch (strategy)
-    {
+    switch (strategy) {
         case SELECT: select_strat(); break;
         // case KQUEUE: kqueue_strat(); break;
         // case POLL: poll_strat(); break;
         // case EPOLL: epoll_strat(); break;
-        default: throw std::runtime_error("Invalid strategy"); break;
+        default: THROW_EXCEPTION_WITH_INFO("Invalid strategy"); break;
     }
 }
