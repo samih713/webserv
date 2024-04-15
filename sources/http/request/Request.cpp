@@ -15,7 +15,7 @@ Request::~Request()
 {}
 
 Request::Request(const Request &other)
-    : rawRequest(other.rawRequest)
+    : message(other.message.str())
     , headerReady(other.headerReady)
     , parsed(other.parsed)
     , completed(other.completed)

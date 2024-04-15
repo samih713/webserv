@@ -19,6 +19,8 @@ static string find_value(stringstream &message);
 // throws ios failure
 bool Request::parse()
 {
+    message.exceptions(std::ios::failbit | std::ios::badbit);
+
     if (headerReady && expectedBodySize == NOT_SET)
     {
         parse_header();
@@ -40,11 +42,9 @@ void Request::parse_content_length(const string &contentLength)
 // TODO headers to parse multiple line field-values, and multi-line
 void Request::parse_header()
 {
-    stringstream message(rawRequest);
-    string       fieldName;
-    string       fieldValue;
+    string fieldName;
+    string fieldValue;
 
-    message.exceptions(std::ios::failbit | std::ios::badbit);
     // Request Line
     message >> enumFromString(method) >> resource >> http_version;
     check_line_terminator(message, CRLF);
@@ -67,24 +67,16 @@ void Request::parse_header()
     }
     if (expectedBodySize == NOT_SPECIFIED)
         parsed = true;
-    headerEnd = message.tellg();
 }
 
 // TODO handle chunked encoding
 void Request::parse_body()
 {
-    stringstream message;
-
-    message.exceptions(std::ios::failbit | std::ios::badbit);
-
-    if (headerEnd != string::npos && headerEnd < rawRequest.size())
-        message << rawRequest.substr(headerEnd);
-    std::getline(message, body, '\0');
+    if (!message.eof())
+        std::getline(message, body, '\0');
     if (expectedBodySize != NOT_SET && expectedBodySize != NOT_SPECIFIED)
         body = body.substr(0, expectedBodySize);
     parsed = true;
-    // discards the rest, if implement pipe-lining
-    // it would need to be handled
 }
 
 /**

@@ -41,16 +41,15 @@ class Request
         friend ostream &operator<<(ostream &os, const Request &r);
 
     private:
-        void   parse_body();
-        void   parse_header();
-        void   parse_content_length(const string &contentLength);
-        string rawRequest;
+        void         parse_body();
+        void         parse_header();
+        void         parse_content_length(const string &contentLength);
+        stringstream message;
 
-        bool   headerReady;
-        bool   parsed;
-        bool   completed;
-        int    expectedBodySize;
-
+        bool headerReady;
+        bool parsed;
+        bool completed;
+        int  expectedBodySize;
 
         METHOD method;
         string resource;
