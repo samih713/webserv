@@ -122,7 +122,7 @@ static void replace_spaces(string &resource)
  *
  * @throws std::ios_base::failure if there is a failure in parsing the raw request data
  */
-void Request::parse()
+void Request::parse_request()
 {
     stringstream message(rawRequest);
     string       fieldName;

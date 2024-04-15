@@ -1,7 +1,7 @@
 #include "./GetRequestHandler.hpp"
-#include "../server/CachedPages.hpp"
-#include "../FileType.hpp"
 #include "../../../includes/debug.hpp"
+#include "../FileType.hpp"
+#include "../server/CachedPages.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -26,8 +26,8 @@ inline const string find_resource_type(const string &resource)
 }
 
 
-const vector<char> GetRequestHandler::get_resource(const Request     &request,
-                                                   const CachedPages *cachedPages,
+const vector<char> GetRequestHandler::get_resource(const Request      &request,
+                                                   const CachedPages  *cachedPages,
                                                    const ServerConfig &config)
 {
     vsp          requestHeaders = request.get_headers();
@@ -35,7 +35,7 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
     vector<char> body;
 
 
-    // default headers
+    // TODO find a better way to include server name
     add_header(std::make_pair<string, string>("Server", "The Wired"));
 
     /* need to build resource location from the
@@ -100,8 +100,8 @@ const vector<char> GetRequestHandler::get_resource(const Request     &request,
 }
 
 
-Response GetRequestHandler::handle_request(const Request     &request,
-                                           const CachedPages *cachedPages,
+Response GetRequestHandler::handle_request(const Request      &request,
+                                           const CachedPages  *cachedPages,
                                            const ServerConfig &config)
 {
     DEBUG_MSG("Handling get request ... ", B);

@@ -11,6 +11,7 @@
 // [ ] strict space parsing (only 1 space)
 // [ ] Address sanitizer error when testing with ./test_server
 // [ ] ensure that the backlog isn't greater than 1024
+// [ ] find a better way to include server name
 // [x] solve linkage issue (with data)
 // [x] Server constructor needs to handle socket creation failure
 // [x] handle keep alive, currently not closing the scoket
@@ -70,6 +71,7 @@ using std::ofstream;
 using std::ostream;
 using std::ostringstream;
 using std::pair;
+using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;

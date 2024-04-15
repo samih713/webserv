@@ -7,11 +7,11 @@ Request::Request(const string &rawRequest)
 {
     try
     {
-        parse();
+        parse_request();
     }
     catch (std::ios_base::failure &f)
     {
-        throw std::runtime_error("Invalid request\n");
+        throw runtime_error("Invalid request\n");
     }
 }
 

@@ -80,20 +80,21 @@ bool Server::handle_connection(fd recvSocket)
         bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
 
         if (bytesReceived == -1)
-            throw std::runtime_error(strerror(errno));
+            throw runtime_error(strerror(errno));
 
         if (bytesReceived == 0)
             return CLOSE_CONNECTION;
 
-        string  message(&buffer[0], &buffer[0] + bytesReceived);
-        Request request(message);
+        string           message(&buffer[0], &buffer[0] + bytesReceived);
+        Request          request(message);
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
         Response response = handler->handle_request(request, cachedPages, config);
-        response.write_response(recvSocket);
+
+        response.send_response(recvSocket);
         delete handler;
     }
-    catch (std::runtime_error &e)
+    catch (runtime_error &e)
     {
         DEBUG_MSG(e.what(), R);
     }
@@ -133,7 +134,7 @@ void Server::select_strat()
         readytoRead = activeSockets;
 
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-            throw std::runtime_error(strerror(errno));
+            throw runtime_error(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
 
         for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
@@ -176,6 +177,6 @@ void Server::start(enum polling_strat strategy)
         // case KQUEUE: kqueue_strat(); break;
         // case POLL: poll_strat(); break;
         // case EPOLL: epoll_strat(); break;
-        default: throw std::runtime_error("Invalid strategy"); break;
+        default: throw runtime_error("Invalid strategy"); break;
     }
 }
