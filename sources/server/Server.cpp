@@ -82,28 +82,10 @@ void Server::handle_connection(fd incoming, fd_set &activeSockets)
         }
     }
 
-    // parse headers
-    if (r->header_ready() && r->expected_body_size() == NOT_SET)
-    {
-        try
-        {
-            r->parse_header();
-            if (r->expected_body_size() != NOT_SPECIFIED)
-                r->parse_body();
-        }
-        catch (std::ios_base::failure &f)
-        {
-            DEBUG_MSG(f.what(), R);
-            ConnectionManager::remove_connection(incoming, activeSockets);
-            // TODO need to form proper error response in case of parsing failure
-            return;
-        }
-    }
-
-    if (!r->isParsed())
-        return;
     try
     {
+        if (!r->parse())
+            return;
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(r->get_method());
         Response response = handler->handle_request(*r, cachedPages, config);
@@ -111,6 +93,12 @@ void Server::handle_connection(fd incoming, fd_set &activeSockets)
         response.send_response(incoming);
         r->setCompleted();
         delete handler;
+    }
+    catch (std::ios_base::failure &f)
+    {
+        DEBUG_MSG(f.what(), R);
+        ConnectionManager::remove_connection(incoming, activeSockets);
+        // TODO need to form proper error response in case of parsing failure
     }
     catch (std::runtime_error &e)
     {

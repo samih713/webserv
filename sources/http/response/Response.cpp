@@ -120,7 +120,6 @@ void Response::send_response(fd recv_socket) const
     }
 }
 
-
 // deleted copy assignment
 void Response::operator=(const Response &)
 {
