@@ -15,4 +15,4 @@ test_socket
 client
 test_http
 *.d
-.dSYM
+*.dSYM
