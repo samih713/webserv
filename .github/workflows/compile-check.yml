@@ -3,7 +3,7 @@ name: Compilation Check
 on:
   push:
     branches:
-      - '***'
+      - '**'
 
 jobs:
   build-linux:
