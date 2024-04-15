@@ -10,10 +10,11 @@ static const int BUFFER_SIZE(40);
 static const int NOT_SET(-1);
 static const int NOT_SPECIFIED(0);
 
-enum CONNECT_STATUS
+enum CONNECTION_STATUS
 {
     CLOSE_CONNECTION = 0,
-    KEEP_ALIVE = 1
+    KEEP_ALIVE = 1,
+    CONNECTION_ERROR = 2
 };
 
 // Request class to parse an incoming message
@@ -24,7 +25,7 @@ class Request
         ~Request();
         Request(const Request &other);
 
-        CONNECT_STATUS recv(fd socket);
+        CONNECTION_STATUS recv(fd socket);
 
         METHOD        get_method() const;
         const string &get_resource() const;
