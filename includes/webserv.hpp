@@ -73,6 +73,7 @@ using std::endl;
 using std::fstream;
 using std::ifstream;
 using std::istream;
+using std::istringstream;
 using std::map;
 using std::ofstream;
 using std::ostream;
