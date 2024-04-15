@@ -429,4 +429,27 @@ static const std::string sample_response =
     "<body><h1>Hello, World!</h1><p>This is a sample webpage.</p></body>\r\n"
     "</html>\r\n";
 
+static const std::string sample_request_cgi =
+    "GET /Users/hashim/Desktop/42curses/webserv/sources/CGI/.tests/file.sh?name=hashim&lastname=mohamed HTTP/1.1\r\n" // request-line
+    "Host: Linode.com\r\n"                                  // headers fields
+    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
+    "Gecko/20091102 Firefox/3.5.5 \r\n"
+    "Accept-Encoding: gzip,deflate\r\n"
+    "Accept-Charset: ISO-8859-1,utf-8\r\n"
+    "Cache-Control: no-cache\r\n"
+    "\r\n" //
+    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit\r\n"
+    "enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet.\r\n"
+    "Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem\r\n"
+    "est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud\r\n"
+    "officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat "
+    "reprehenderit\r\n"
+    "commodo officia dolor Lorem duis laboris cupidatat officia voluptate.\r\n"
+    "Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia "
+    "eiusmod.\r\n"
+    "Aliqua reprehenderit commodo ex non excepteur duis sunt velit enim.\r\n"
+    "Voluptate laboris sint cupidatat ullamco ut ea consectetur et est culpa et culpa "
+    "duis.\r\n"
+    "\r\n";
+
 #endif // MESSAGE_HPP

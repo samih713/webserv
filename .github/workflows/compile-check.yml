@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - server/*
+      - conf-parser
+      - CGI-Parser
       - handle_connection 
       - parsing
 
