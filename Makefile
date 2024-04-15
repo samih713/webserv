@@ -42,7 +42,7 @@ SRCS:= $(SRCS_DIR)/main.cpp
 
 ### OBJECTS & SUBDIRS ###
 include $(patsubst %,%/module.mk,$(MODULES))
-OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)/%.o,$(SRCS))
+OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
 SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d))
 
 all: $(NAME)
@@ -71,8 +71,8 @@ clean:
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
 	fi
-	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SOCKET) ]; then \
-		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SOCKET); \
+	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SOCKET) ] || [ -f $(TEST_CGI) ]; then \
+		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SOCKET) $(TEST_CGI); \
 		echo "$(GREEN)[ DELETE ]$(RESET) Removed testers."; \
 	fi
 
@@ -99,12 +99,10 @@ test_http:
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
 # 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
 
-# test_cgi: fclean debug
-# 	@make -C ../sources/HTTP
-# 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) $(SANITIZE) $(INCLUDES) $(libhttp) $(TEST_CGI) $(NAME) -o $@
-# 	@mv *.d $(OBJS_DIR)
-# 	@echo "$(BLUE)[ TEST ]$(RESET) CGI is now ready for testing."
+test_cgi:
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
+	@echo "$(BLUE)[ TEST ]$(RESET) CGI ready for testing."
 
 -include $(OBJS:.o=.d)
 
-.PHONY: clean fclean all re debug run test_parser test_http test_socket
+.PHONY: clean fclean all re debug run test_parser test_http test_socket test_cgi
