@@ -15,3 +15,4 @@ test_socket
 client
 test_http
 *.d
+ubuntu_tester
