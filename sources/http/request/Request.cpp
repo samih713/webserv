@@ -11,7 +11,7 @@ Request::Request(const string &rawRequest)
     }
     catch (std::ios_base::failure &f)
     {
-        throw runtime_error("Invalid request\n");
+        THROW_EXCEPTION_WITH_INFO("Invalid request\n");
     }
 }
 

@@ -99,7 +99,7 @@ private:
     }
     void _check_semicolon(void) {
         if (*(_itr + 1) != ";")
-            throw runtime_error(ERR_MISSING_SEMICOLON);
+            THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
     }
 };
