@@ -6,24 +6,21 @@
 
 typedef map<fd, Request> ConnectionMap;
 
-class ConnectionManager
-{
-    public:
-        static void            remove_expired(fd_set &activeSockets);
-        static inline void     update_connection(fd currentSocket);
-        static inline Request &find_request(fd currentSocket);
-        static bool            check_connection(fd currentSocket);
-        static inline void     remove_connection(fd currentSocket, fd_set &activeSockets);
-        static inline std::pair<ConnectionMap::iterator, bool> add_connection(
-            fd      newConnection,
-            fd_set &activeSockets);
+class ConnectionManager {
+public:
+    static void            remove_expired(fd_set& activeSockets);
+    static inline void     update_connection(fd currentSocket);
+    static inline Request& find_request(fd currentSocket);
+    static void            check_connection(fd currentSocket);
+    static inline void     remove_connection(fd currentSocket, fd_set& activeSockets);
+    static inline Request& add_connection(fd newConnection, fd_set& activeSockets);
 
-    private:
-        static ConnectionMap connectionMap;
-        ConnectionManager();
+private:
+    static ConnectionMap connectionMap;
+    ConnectionManager();
 };
 
-inline Request &ConnectionManager::find_request(fd currentSocket)
+inline Request& ConnectionManager::find_request(fd currentSocket)
 {
     return connectionMap.find(currentSocket)->second;
 }
@@ -51,7 +48,7 @@ inline void ConnectionManager::update_connection(fd currentSocket)
  *
  * @return void
  */
-inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &activeSockets)
+inline void ConnectionManager::remove_connection(fd currentSocket, fd_set& activeSockets)
 {
     FD_CLR(currentSocket, &activeSockets);
     close(currentSocket);
@@ -59,21 +56,29 @@ inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &activ
     DEBUG_MSG("Connection closed", L);
 }
 
-
-inline pair<ConnectionMap::iterator, bool> ConnectionManager::add_connection(
-    fd      newConnection,
-    fd_set &activeSockets)
+/**
+ * @brief Adds a connection to the connection map by updating the
+ * activeSockets set and creating a new Request object or returns an existing one.
+ * If the Request object for the connection is already completed remove it
+ * and create a new one.
+ *
+ * @param newConnection The file descriptor of the new connection to be added
+ * @param activeSockets The set of active file descriptors for the connections
+ *
+ * @return A reference to the Request object
+ */
+inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& activeSockets)
 {
     FD_SET(newConnection, &activeSockets);
-    pair<ConnectionMap::iterator, bool> result =
-        connectionMap.insert(std::make_pair(newConnection, Request()));
-    if (result.first->second.isCompleted())
-    {
+    Request& r =
+        connectionMap.insert(std::make_pair(newConnection, Request())).first->second;
+    if (r.isCompleted()) {
         connectionMap.erase(newConnection);
-        result = connectionMap.insert(std::make_pair(newConnection, Request()));
+        return (
+            connectionMap.insert(std::make_pair(newConnection, Request())).first->second);
     }
-    return (result);
+    r.timer.update_time();
+    return (r);
 }
-
 
 #endif // CONNECTION_MANAGER_HPP
