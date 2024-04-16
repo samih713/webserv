@@ -1,7 +1,7 @@
 #include "./GetRequestHandler.hpp"
 #include "../../../includes/debug.hpp"
+#include "../../server/CachedPages.hpp"
 #include "../FileType.hpp"
-#include "../server/CachedPages.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -14,7 +14,7 @@ GetRequestHandler::~GetRequestHandler()
 };
 
 // parse accepted formats
-inline const string find_resource_type(const string &resource)
+inline const string find_resource_type(const string& resource)
 {
     size_t extension_index = resource.find_last_of('.');
     string file_extension;
@@ -26,12 +26,11 @@ inline const string find_resource_type(const string &resource)
 }
 
 
-const vector<char> GetRequestHandler::get_resource(const Request      &request,
-                                                   const CachedPages  *cachedPages,
-                                                   const ServerConfig &config)
+const vector<char> GetRequestHandler::get_resource(const Request& request,
+    const CachedPages* cachedPages, const ServerConfig& config)
 {
     vsp          requestHeaders = request.get_headers();
-    string       resource = request.get_resource();
+    string       resource       = request.get_resource();
     vector<char> body;
 
 
@@ -44,36 +43,32 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 
     ifstream resource_file;
     size_t   resource_size = 0;
-    status = OK;
-    if (resource == "/")
-    {
+    status                 = OK;
+    if (resource == "/") {
         body = cachedPages->home.data;
         add_header(std::make_pair<string, string>("Content-Type",
-                                                  cachedPages->home.contentType));
+            cachedPages->home.contentType));
 
         // remove
         resource_size = cachedPages->home.contentLength;
 
-        add_header(std::make_pair<string, string>(
-            "Content-Length", ws_itoa(cachedPages->home.contentLength)));
+        add_header(std::make_pair<string, string>("Content-Length",
+            ws_itoa(cachedPages->home.contentLength)));
     }
-    else
-    {
+    else {
         resource = config.serverRoot + resource;
         resource_file.open(resource.c_str(), std::ios_base::binary);
-        if (resource_file.fail())
-        {
+        if (resource_file.fail()) {
             status = NOT_FOUND;
             add_header(std::make_pair<string, string>("Content-Type",
-                                                      cachedPages->notFound.contentType));
-            add_header(std::make_pair<string, string>(
-                "Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
+                cachedPages->notFound.contentType));
+            add_header(std::make_pair<string, string>("Content-Length",
+                ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
         }
-        else
-        {
+        else {
             body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
-                                std::istreambuf_iterator<char>());
+                std::istreambuf_iterator<char>());
 
             // content type
             string resource_type = find_resource_type(resource);
@@ -100,13 +95,12 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 }
 
 
-Response GetRequestHandler::handle_request(const Request      &request,
-                                           const CachedPages  *cachedPages,
-                                           const ServerConfig &config)
+Response GetRequestHandler::handle_request(const Request& request,
+    const CachedPages* cachedPages, const ServerConfig& config)
 {
     DEBUG_MSG("Handling get request ... ", B);
 
     vsp request_headers = request.get_headers();
-    body = get_resource(request, cachedPages, config);
+    body                = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

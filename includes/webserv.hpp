@@ -39,8 +39,7 @@
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
-    static_cast<const std::ostringstream &>(                                             \
-        (std::ostringstream() << std::dec << number))                                    \
+    static_cast<const std::ostringstream&>((std::ostringstream() << std::dec << number)) \
         .str()
 
 /* -------------------------------- INCLUDES -------------------------------- */
@@ -90,11 +89,11 @@ typedef vector<pair<string, string> > vsp;
 // socket_descriptor type
 typedef int fd;
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
-#define THROW_EXCEPTION_WITH_INFO(msg) \
-    do { \
-        std::ostringstream oss; \
-        oss << __FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE << (msg); \
-        throw std::runtime_error(oss.str()); \
+#define THROW_EXCEPTION_WITH_INFO(msg)                                                   \
+    do {                                                                                 \
+        std::ostringstream oss;                                                          \
+        oss << __FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE << (msg);     \
+        throw std::runtime_error(oss.str());                                             \
     } while (0)
 
 static std::string ERR_NULL("Socket: null ptr error");
