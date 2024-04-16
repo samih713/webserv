@@ -11,21 +11,19 @@
  *x-terminal-emulator
  * @class TCPSocket
  */
-class TCPSocket : public Socket
-{
+class TCPSocket: public Socket {
+public:
+    TCPSocket(int port, int backlog);
+    ~TCPSocket() throw();
 
-    public:
-        TCPSocket(int port, int backlog);
-        ~TCPSocket() throw();
+private:
+    static const int family = AF_INET;     ///< The address family for the socket (IPv4)
+    static const int type   = SOCK_STREAM; ///< The socket type (stream-oriented)
 
-    private:
-        static const int family = AF_INET;   ///< The address family for the socket (IPv4)
-        static const int type = SOCK_STREAM; ///< The socket type (stream-oriented)
-
-        /* @brief Copy constructor for TCPSocket (private and not implemented) */
-        TCPSocket(const TCPSocket &);
-        /* @brief Assignment operator for TCPSocket (private and not implemented) */
-        TCPSocket &operator=(const TCPSocket &);
+    /* @brief Copy constructor for TCPSocket (private and not implemented) */
+    TCPSocket(const TCPSocket&);
+    /* @brief Assignment operator for TCPSocket (private and not implemented) */
+    TCPSocket& operator=(const TCPSocket&);
 };
 
 #endif // TCPSOCKET_HPP

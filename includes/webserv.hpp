@@ -7,8 +7,7 @@
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
 // [ ] finish up the resource handling for get-requests
-// [ ] strict space parsing (only 1 space)
-// [ ] ensure that the backlog isn't greater than 1024
+// [ ] ensure that the backlog isn't greater than 1024 due to select limitation
 // [x] find a better way to include server name
 // [x] Address sanitizer error when testing with ./test_server
 // [x] hanlde partial sends and recieves (Server::handle_connection)
@@ -44,9 +43,7 @@
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "./debug.hpp"
-#include <algorithm>
 #include <cerrno>
-#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
