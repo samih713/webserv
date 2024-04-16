@@ -1,6 +1,6 @@
-#include "../Message.hpp"
-#include "./Request.hpp"
-#include "../../../includes/enum_utils.hpp"
+#include "Message.hpp"
+#include "Request.hpp"
+#include "enum_utils.hpp"
 
 // defining the char * array
 #define X(a) ws_tostr(a), // stringify the enum

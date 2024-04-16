@@ -1,11 +1,12 @@
-#include "./server/Server.hpp"
-#include "./parser/ConfigParser.hpp"
-#include "./server/ServerConfig.hpp"
-#include "../includes/webserv.hpp"
+#include "Server.hpp"
+#include "ConfigParser.hpp"
+#include "ServerConfig.hpp"
+#include "webserv.hpp"
 
 int main(int argc, char **argv) {
-    if (argc > 2) {
-        std::cerr << "Usage: " << argv[0] << " [<config_file>]" << std::endl;
+    if (argc > 2)
+    {
+        cerr << "Usage: " << argv[0] << " [<config_file>]" << endl;
         exit(1);
     }
 
@@ -18,8 +19,8 @@ int main(int argc, char **argv) {
         Server &webserv = Server::get_instance(configs[0], 10);
         webserv.start(SELECT);
     }
-    catch (std::exception &e)
+    catch (std::exception &error)
     {
-        std::cerr << e.what();
+        cerr << error.what() << endl;
     }
 }

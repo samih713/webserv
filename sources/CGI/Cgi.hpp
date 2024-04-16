@@ -13,7 +13,6 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 
-//#include "../../includes/webserv.hpp"
 #include <iostream>
 #include <cstring>
 #include <string>
@@ -21,7 +20,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "webserv.hpp"
-#include "../sources/http/request/Request.hpp"
+#include "Request.hpp"
 
 class Cgi {
 	public:

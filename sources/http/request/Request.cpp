@@ -1,6 +1,6 @@
-#include "./Request.hpp"
-#include "../../../includes/debug.hpp"
-#include "../../../includes/enum_utils.hpp"
+#include "Request.hpp"
+#include "debug.hpp"
+#include "enum_utils.hpp"
 
 Request::Request(const string &rawRequest)
     : rawRequest(rawRequest)
@@ -11,7 +11,7 @@ Request::Request(const string &rawRequest)
     }
     catch (std::ios_base::failure &f)
     {
-        throw runtime_error("Invalid request\n");
+        THROW_EXCEPTION_WITH_INFO("Invalid request\n");
     }
 }
 
