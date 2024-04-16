@@ -58,18 +58,26 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-    ConnectionManager::check_connection(incoming);
-    Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-    r.recv(incoming);
-    if (!r.parse_request())
-        return;
+    try {
+        ConnectionManager::check_connection(incoming);
+        Request& r = ConnectionManager::add_connection(incoming, activeSockets);
+        r.recv(incoming);
+        if (!r.parse_request())
+            return;
 
-    IRequestHandler* handler  = RequestHandlerFactory::MakeRequestHandler(r.get_method());
-    Response         response = handler->handle_request(r, cachedPages, config);
+        IRequestHandler* handler =
+            RequestHandlerFactory::MakeRequestHandler(r.get_method());
+        Response response = handler->handle_request(r, cachedPages, config);
 
-    response.send_response(incoming);
-    r.setCompleted();
-    delete handler;
+        response.send_response(incoming);
+        r.setCompleted();
+        delete handler;
+    } catch (std::ios_base::failure& f) {
+        DEBUG_MSG(ERR_PARSE, R);
+    } catch (std::exception& e) {
+        ConnectionManager::remove_connection(incoming, activeSockets);
+        DEBUG_MSG(e.what(), R);
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -117,12 +125,7 @@ void Server::select_strat()
                 else
                     incoming = currentSocket;
                 DEBUG_MSG("reading from connection", M);
-                try {
-                    handle_connection(incoming, activeSockets);
-                } catch (std::exception& e) {
-                    ConnectionManager::remove_connection(incoming, activeSockets);
-                    DEBUG_MSG(e.what(), R);
-                }
+                handle_connection(incoming, activeSockets);
             }
         }
     }
