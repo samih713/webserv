@@ -26,6 +26,7 @@ inline const string find_resource_type(const string& resource)
 }
 
 
+// TODO resource handling for get-requests, is broken
 const vector<char> GetRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
@@ -47,9 +48,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
         body = cachedPages->home.data;
         add_header(std::make_pair<string, string>("Content-Type",
             cachedPages->home.contentType));
-
-        // remove
-        resource_size = cachedPages->home.contentLength;
 
         add_header(std::make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
@@ -82,7 +80,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
         }
     }
     /* authentication function goes here for the requested resource */
-    DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
+
     /* caching control */
 
     /* compression/encoding
