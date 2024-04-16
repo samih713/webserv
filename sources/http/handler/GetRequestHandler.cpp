@@ -34,8 +34,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     vector<char> body;
 
 
-    // TODO find a better way to include server name
-    add_header(std::make_pair<string, string>("Server", "The Wired"));
+    add_header(std::make_pair<string, string>("Server", config.serverName));
 
     /* need to build resource location from the
      * root directory in server configuration

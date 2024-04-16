@@ -8,9 +8,9 @@
 // [ ] add vector<page> to CachedPages
 // [ ] finish up the resource handling for get-requests
 // [ ] strict space parsing (only 1 space)
-// [ ] Address sanitizer error when testing with ./test_server
 // [ ] ensure that the backlog isn't greater than 1024
-// [ ] find a better way to include server name
+// [x] find a better way to include server name
+// [x] Address sanitizer error when testing with ./test_server
 // [x] hanlde partial sends and recieves (Server::handle_connection)
 // [x] solve linkage issue (with data)
 // [x] Server constructor needs to handle socket creation failure

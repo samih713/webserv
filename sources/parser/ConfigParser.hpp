@@ -79,12 +79,13 @@ private:
     vector<string>       _parse_index(string const &root);
     void                 _parse_error_page(map<STATUS_CODE, string> &errorPages, string const &root);
     fd                   _parse_listen(void);
-    void                 _parse_server_name(vector<string> &serverName);
     string               _parse_root(void);
     string               _parse_client_max_body_size(void);
     bool                 _parse_autoindex(void);
 
-    bool _is_string_number(const string &str) {
+    void   _parse_server_name(string& serverName);
+    bool _is_string_number(const string& str)
+    {
         if (str.find_first_not_of("0123456789") != string::npos)
             return false;
         return true;

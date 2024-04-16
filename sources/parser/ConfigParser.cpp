@@ -1,6 +1,7 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(string const& configFile) {
+ConfigParser::ConfigParser(const string& configFile)
+{
     DEBUG_MSG("Parsing " << W << configFile, RE);
 
     // checking file extension
@@ -158,16 +159,15 @@ fd ConfigParser::_parse_listen(void) {
     return listenerPort;
 }
 
-void ConfigParser::_parse_server_name(vector<string>& serverName) {
+void ConfigParser::_parse_server_name(string& serverName)
+{
     DEBUG_MSG("Parsing server_name directive", RE);
 
     ++_itr; // move to server name
-    while (*_itr != ";") {
-        if (_is_keyword(*_itr))
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
-        serverName.push_back(*_itr);
-        ++_itr;
-    }
+    if (_is_keyword(*_itr))
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
+    serverName = *_itr;
+    ++_itr;
 }
 
 string ConfigParser::_parse_root(void) {
