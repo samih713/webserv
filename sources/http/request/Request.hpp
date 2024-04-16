@@ -10,6 +10,8 @@ static const int BUFFER_SIZE(4096);
 static const int NOT_SET(-1);
 static const int NOT_SPECIFIED(0);
 
+static const string ERR_PARSE("Request_parser: failed to parse request");
+
 // Request class to parse an incoming message
 class Request {
 public:

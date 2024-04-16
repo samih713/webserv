@@ -50,7 +50,9 @@ void Request::parse_header()
     // replace %20 with space
     replace_spaces(resource);
     // Headers
-    while (true) {
+    while (true && !message.eof()) {
+        if (peek_line_terminator(message, CRLF))
+            break;
         std::getline(message, fieldName, ':');
         if (fieldName.find(' ') != string::npos)
             message.setstate(std::ios::failbit);
@@ -60,8 +62,6 @@ void Request::parse_header()
             parse_content_length(fieldValue);
         else
             expectedBodySize = NOT_SPECIFIED;
-        if (peek_line_terminator(message, CRLF))
-            break;
     }
     if (expectedBodySize == NOT_SPECIFIED)
         parsed = true;
