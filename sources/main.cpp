@@ -1,7 +1,7 @@
-#include "./server/Server.hpp"
-#include "./parser/ConfigParser.hpp"
-#include "./server/ServerConfig.hpp"
-#include "../includes/webserv.hpp"
+#include "Server.hpp"
+#include "ConfigParser.hpp"
+#include "ServerConfig.hpp"
+#include "webserv.hpp"
 
 int main(int argc, char **argv) {
     if (argc > 2)

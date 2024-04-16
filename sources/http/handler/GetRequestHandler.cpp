@@ -1,7 +1,7 @@
-#include "./GetRequestHandler.hpp"
-#include "../../../includes/debug.hpp"
-#include "../FileType.hpp"
-#include "../server/CachedPages.hpp"
+#include "GetRequestHandler.hpp"
+#include "debug.hpp"
+#include "FileType.hpp"
+#include "CachedPages.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {

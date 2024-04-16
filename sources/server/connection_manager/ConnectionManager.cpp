@@ -1,4 +1,4 @@
-#include "./ConnectionManager.hpp"
+#include "ConnectionManager.hpp"
 
 void ConnectionManager::remove_expired(fd_set &currentSockets)
 {

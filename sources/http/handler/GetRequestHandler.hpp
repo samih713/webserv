@@ -1,8 +1,8 @@
-#include "../request/Request.hpp"
-#include "./RequestHandlerBase.hpp"
-#include "../response/Response.hpp"
-#include "../../server/Server.hpp"
-#include "../../../includes/webserv.hpp"
+#include "Request.hpp"
+#include "RequestHandlerBase.hpp"
+#include "Response.hpp"
+#include "Server.hpp"
+#include "webserv.hpp"
 
 #ifndef GETREQUESTHANDLER_HPP
 #define GETREQUESTHANDLER_HPP
