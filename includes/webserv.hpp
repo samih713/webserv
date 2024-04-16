@@ -4,9 +4,9 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
+// [ ] resource handling for get-requests, is broken
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
-// [ ] finish up the resource handling for get-requests
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
 // [x] find a better way to include server name
 // [x] Address sanitizer error when testing with ./test_server
@@ -20,6 +20,7 @@
 // [x] sometimes segfaults when parsing, keep repeating to reproduce
 
 // REQUEST
+// [ ] better error messages, stream throws no way to know where is error
 // [ ] headers to parse multiple line field-values, and multi-line
 // [ ] need to form proper error response in case of parsing failure
 // [ ] handle chunked encoding
