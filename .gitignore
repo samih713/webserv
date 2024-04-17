@@ -17,3 +17,4 @@ test_http
 *.d
 *.dSYM
 stds
+ubuntu_tester
