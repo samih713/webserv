@@ -84,28 +84,34 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
         }
         else
         {
-			if(check_cgi_request(resource))
-			{
-                Cgi cgi(request);
-				string strv;
-
-				strv = cgi.execute();
-                body = vector<char>(strv.begin(), strv.end());
-			}
-			else
-				body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
-                                std::istreambuf_iterator<char>());
-
-            // content type
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(std::make_pair<string, string>("Content-Type", resource_type));
-            // content length
+
+            if(resource_type == "bash" || resource_type == "python")
+			{
+                Cgi cgi(request);
+				string result;
+
+				result = cgi.execute();
+                body = vector<char>(result.begin(), result.end());
+                add_header(
+                    std::make_pair<string, string>("Content-Length", ws_itoa(body.size())));
+
+			}
+			else
+            {
+				body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
+                                std::istreambuf_iterator<char>());
             resource_file.seekg(0, std::ios_base::end);
             resource_size = resource_file.tellg();
             add_header(
                 std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
-            resource_file.seekg(0, std::ios_base::beg);
+                resource_file.seekg(0, std::ios_base::beg);}
+            // content type
+            
+            // content length
+            
         }
     }
     /* authentication function goes here for the requested resource */
