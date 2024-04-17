@@ -13,13 +13,11 @@ class GetRequestHandler : public RequestHandlerBase
         GetRequestHandler();
         ~GetRequestHandler();
         Response handle_request(const Request     &request,
-                                const CachedPages *cachedPages,
-                                const ServerConfig &config);
+                                const CachedPages *cachedPages);
 
     private:
         const vector<char> get_resource(const Request     &request,
-                                        const CachedPages *cached,
-                                        const ServerConfig &config);
+                                        const CachedPages *cached);
 };
 
 #endif // GETREQUESTHANDLER_HPP

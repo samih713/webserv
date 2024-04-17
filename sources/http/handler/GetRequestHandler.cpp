@@ -39,12 +39,11 @@ bool check_cgi_request(const string &res)
 
 
 const vector<char> GetRequestHandler::get_resource(const Request      &request,
-                                                   const CachedPages  *cachedPages,
-                                                   const ServerConfig &config)
+                                                   const CachedPages  *cachedPages)
 {
     vsp          requestHeaders = request.get_headers();
     string       resource = request.get_resource();
-    vector<char> body;
+;
 
 
     // TODO find a better way to include server name
@@ -71,7 +70,6 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
     }
     else
     {
-        resource = config.serverRoot + resource;
         resource_file.open(resource.c_str(), std::ios_base::binary);
         if (resource_file.fail())
         {
@@ -103,10 +101,10 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
             {
 				body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                                 std::istreambuf_iterator<char>());
-            resource_file.seekg(0, std::ios_base::end);
-            resource_size = resource_file.tellg();
-            add_header(
-                std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
+                resource_file.seekg(0, std::ios_base::end);
+                resource_size = resource_file.tellg();
+                add_header(
+                    std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
                 resource_file.seekg(0, std::ios_base::beg);}
             // content type
             
@@ -128,12 +126,11 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 
 
 Response GetRequestHandler::handle_request(const Request      &request,
-                                           const CachedPages  *cachedPages,
-                                           const ServerConfig &config)
+                                           const CachedPages  *cachedPages)
 {
     DEBUG_MSG("Handling get request ... ", B);
 
     vsp request_headers = request.get_headers();
-    body = get_resource(request, cachedPages, config);
+    body = get_resource(request, cachedPages);
     return Response(status, response_headers, body);
 }

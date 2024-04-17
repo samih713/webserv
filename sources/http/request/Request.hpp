@@ -1,5 +1,6 @@
 #include "../Message.hpp"
 #include "../../../includes/webserv.hpp"
+#include "../../server/ServerConfig.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
@@ -8,7 +9,7 @@
 class Request
 {
     public:
-        Request(const string &rawRequest);
+        Request(const string &rawRequest, const ServerConfig& config);
         ~Request();
         Request(const Request &other);
         METHOD          get_method() const;
@@ -19,9 +20,11 @@ class Request
     private:
         void          parse_request();
         const string &rawRequest;
+        const ServerConfig& config;
         // request-line   = method SP request-target SP HTTP-version
         METHOD method;
         string resource;
+        string cgiResource;
         string http_version;
         // field-line   = field-name ":" OWS field-value OWS
         vsp header_fields;

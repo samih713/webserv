@@ -2,8 +2,9 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-Request::Request(const string &rawRequest)
+Request::Request(const string &rawRequest, const ServerConfig& config)
     : rawRequest(rawRequest)
+    , config(config)
 {
     try
     {
@@ -20,6 +21,7 @@ Request::~Request()
 
 Request::Request(const Request &other)
     : rawRequest(other.rawRequest)
+    , config(other.config)
     , method(other.method)
     , resource(other.resource)
     , http_version(other.http_version)

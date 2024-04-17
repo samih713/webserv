@@ -86,10 +86,10 @@ bool Server::handle_connection(fd recvSocket)
             return CLOSE_CONNECTION;
 
         string           message(&buffer[0], &buffer[0] + bytesReceived);
-        Request          request(message);
+        Request          request(message, config);
         IRequestHandler *handler =
             RequestHandlerFactory::MakeRequestHandler(request.get_method());
-        Response response = handler->handle_request(request, cachedPages, config);
+        Response response = handler->handle_request(request, cachedPages);
 
         response.send_response(recvSocket);
         delete handler;
