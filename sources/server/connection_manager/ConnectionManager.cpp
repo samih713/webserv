@@ -1,13 +1,20 @@
 #include "./ConnectionManager.hpp"
 
-void ConnectionManager::remove_expired(fd_set &currentSockets)
+/**
+ * Removes expired connections from the connection map.
+ *
+ * @param currentSockets The set of file descriptors representing the current active
+ * sockets.
+ *
+ * @return void
+ *
+ * @throws None
+ */
+void ConnectionManager::remove_expired(fd_set& currentSockets)
 {
     ConnectionMap::iterator it = connectionMap.begin();
-    // this has to be a while loop since we are erasing
     while (it != connectionMap.end())
-    {
-        if (it->second.is_timeout())
-        {
+        if (it->second.timer.is_timeout()) {
             DEBUG_MSG("Connection closed after select", L);
             FD_CLR(it->first, &currentSockets);
             close(it->first);
@@ -15,5 +22,19 @@ void ConnectionManager::remove_expired(fd_set &currentSockets)
         }
         else
             it++;
-    }
+}
+
+/**
+ * @brief checks if the connection in the connection map has timed out. If the
+ * connection has timed out, an exception is thrown with information about the timeout.
+ *
+ * @param currentSocket The file descriptor of the socket to check the connection status
+ * for.
+ * @throws ConnectionTimeoutException if the connection has timed out.
+ */
+void ConnectionManager::check_connection(fd currentSocket)
+{
+    ConnectionMap::iterator it = connectionMap.find(currentSocket);
+    if (it != connectionMap.end() && it->second.timer.is_timeout())
+        THROW_EXCEPTION_WITH_INFO(L "Connection Timed out" RE);
 }

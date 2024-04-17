@@ -3,12 +3,7 @@ name: Compilation Check
 on:
   push:
     branches:
-      - main
-      - server/*
-      - conf-parser
-      - CGI-Parser
-      - handle_connection 
-      - parsing
+      - '**'
 
 jobs:
   build-linux:

@@ -1,8 +1,8 @@
 #include "./GetRequestHandler.hpp"
 #include "../../../includes/debug.hpp"
+#include "../../server/CachedPages.hpp"
 #include "../FileType.hpp"
 #include "../server/CachedPages.hpp"
-#include "../../CGI/Cgi.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -15,7 +15,7 @@ GetRequestHandler::~GetRequestHandler()
 };
 
 // parse accepted formats
-inline const string find_resource_type(const string &resource)
+inline const string find_resource_type(const string& resource)
 {
     size_t extension_index = resource.find_last_of('.');
     string file_extension;
@@ -26,58 +26,39 @@ inline const string find_resource_type(const string &resource)
     return (fileTypes.find(file_extension)->second);
 }
 
-bool check_cgi_request(const string &res)
-{
-	string filetype;
 
-	filetype = find_resource_type(res);
-	if(filetype == "bash" || filetype == "python")
-		return true;
-	else
-		return false;
-}
-
-
+// TODO resource handling for get-requests, is broken
 const vector<char> GetRequestHandler::get_resource(const Request      &request,
                                                    const CachedPages  *cachedPages)
 {
     vsp          requestHeaders = request.get_headers();
-    string       resource = request.get_resource();
-;
+    string       resource       = request.get_resource();
+    vector<char> body;
 
 
-    // TODO find a better way to include server name
-    add_header(std::make_pair<string, string>("Server", "The Wired"));
+    add_header(std::make_pair<string, string>("Server", config.serverName));
 
-    /* need to build resource location from the
-     * root directory in server configuration
-     * */
 
     ifstream resource_file;
     size_t   resource_size = 0;
-    status = OK;
-    if (resource == "/")
-    {
+    status                 = OK;
+    if (resource == "/") {
         body = cachedPages->home.data;
         add_header(std::make_pair<string, string>("Content-Type",
-                                                  cachedPages->home.contentType));
+            cachedPages->home.contentType));
 
-        // remove
-        resource_size = cachedPages->home.contentLength;
-
-        add_header(std::make_pair<string, string>(
-            "Content-Length", ws_itoa(cachedPages->home.contentLength)));
+        add_header(std::make_pair<string, string>("Content-Length",
+            ws_itoa(cachedPages->home.contentLength)));
     }
     else
     {
         resource_file.open(resource.c_str(), std::ios_base::binary);
-        if (resource_file.fail())
-        {
+        if (resource_file.fail()) {
             status = NOT_FOUND;
             add_header(std::make_pair<string, string>("Content-Type",
-                                                      cachedPages->notFound.contentType));
-            add_header(std::make_pair<string, string>(
-                "Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
+                cachedPages->notFound.contentType));
+            add_header(std::make_pair<string, string>("Content-Length",
+                ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
         }
         else
@@ -113,7 +94,7 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
         }
     }
     /* authentication function goes here for the requested resource */
-    DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
+
     /* caching control */
 
     /* compression/encoding

@@ -7,7 +7,7 @@
  * This constant string represents the HTTP version "HTTP/1.1" that is used in the
  * Response class. It is a static member of the Response class and cannot be modified.
  */
-const string &Response::version = "HTTP/1.1";
+const string& Response::version = "HTTP/1.1";
 
 /**
  * @brief Creates a map of status codes and their corresponding string representations.
@@ -40,10 +40,8 @@ const StatusCodeMap status_codes_map = createStatusCodeMap();
  * @param headers The headers of the response
  * @param body The body of the response
  */
-Response::Response(STATUS_CODE status, const vsp &headers, const vector<char> &body)
-    : status(status)
-    , headers(headers)
-    , body(body)
+Response::Response(STATUS_CODE status, const vsp& headers, const vector<char>& body)
+    : status(status), headers(headers), body(body)
 {
     DEBUG_MSG("Response called\n", Y);
 }
@@ -53,8 +51,7 @@ Response::Response(STATUS_CODE status, const vsp &headers, const vector<char> &b
  *
  * This destructor cleans up any resources used by the Response object.
  */
-Response::~Response()
-{}
+Response::~Response() {}
 
 /**
  * @brief Copy constructor for Response class
@@ -64,25 +61,23 @@ Response::~Response()
  *
  * @param other The Response object to be copied
  */
-Response::Response(const Response &other)
-    : status(other.status)
-    , headers(other.headers)
-    , body(other.body)
+Response::Response(const Response& other)
+    : status(other.status), headers(other.headers), body(other.body)
 {
     DEBUG_MSG("Copy constructor called\n", Y);
 }
 
 
 // TODO move to its own file
-inline void Response::load_status_line(ostringstream &os) const
+inline void Response::load_status_line(ostringstream& os) const
 {
     os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
 }
 
-inline void Response::load_headers(ostringstream &os) const
+inline void Response::load_headers(ostringstream& os) const
 {
     vsp::const_iterator begin = headers.begin();
-    vsp::const_iterator end = headers.end();
+    vsp::const_iterator end   = headers.end();
     for (vsp::const_iterator it = begin; it != end; it++)
         os << it->first << ": " << it->second << CRLF;
     os << CRLF;
@@ -101,7 +96,7 @@ void Response::send_response(fd recv_socket) const
 {
     ostringstream os;
     size_t        bytesSent = 0;
-    int           result = 0;
+    int           result    = 0;
 
     load_status_line(os);
     load_headers(os);
@@ -111,18 +106,16 @@ void Response::send_response(fd recv_socket) const
     // add the body
     message.insert(message.end(), body.begin(), body.end());
     // send all
-    while (bytesSent < message.size())
-    {
+    while (bytesSent < message.size()) {
         result = send(recv_socket, &message[bytesSent], message.size() - bytesSent, 0);
         if (result == -1)
-            throw runtime_error(ERR_SEND_FAIL + strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(ERR_SEND_FAIL + strerror(errno));
         bytesSent += result;
     }
 }
 
-
 // deleted copy assignment
-void Response::operator=(const Response &)
+void Response::operator=(const Response&)
 {
     DEBUGASSERT("call to deleted 'Response' copy assignment");
 }

@@ -2,30 +2,19 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-Request::Request(const string &rawRequest, const ServerConfig& config)
-    : rawRequest(rawRequest)
-    , config(config)
-{
-    try
-    {
-        parse_request();
-    }
-    catch (std::ios_base::failure &f)
-    {
-        throw runtime_error("Invalid request\n");
-    }
-}
-
-Request::~Request()
+Request::Request(const ServerConfig& config)
+    : message(""), config(config), headerReady(false), parsed(false), completed(false),
+      expectedBodySize(NOT_SET)
 {}
 
-Request::Request(const Request &other)
-    : rawRequest(other.rawRequest)
-    , config(other.config)
-    , method(other.method)
-    , resource(other.resource)
-    , http_version(other.http_version)
-    , header_fields(other.header_fields)
+Request::~Request() {}
+
+Request::Request(const Request& other)
+    : message(other.message.str()), config(other.config), headerReady(other.headerReady), parsed(other.parsed),
+      completed(other.completed), expectedBodySize(other.expectedBodySize),
+      method(other.method), resource(other.resource), http_version(other.http_version),
+      header_fields(other.header_fields), trailer_fields(other.trailer_fields)
+
 {}
 
 
@@ -34,24 +23,33 @@ METHOD Request::get_method() const
     return method;
 }
 
-const vsp &Request::get_headers() const
+const vsp& Request::get_headers() const
 {
     return header_fields;
 }
 
-const string &Request::get_resource() const
+const string& Request::get_resource() const
 {
     return resource;
 }
 
-std::ostream &operator<<(ostream &os, const Request &r)
+void Request::setCompleted()
+{
+    completed = true;
+}
+
+bool Request::isCompleted()
+{
+    return completed;
+}
+
+std::ostream& operator<<(ostream& os, const Request& r)
 {
     os << "Method: " << enumToString(r.method) << std::endl;
     os << "Request-Target: " << r.resource << std::endl;
     os << "HTTP-Version: " << r.http_version << std::endl;
     os << "************ fields *************\n";
-    for (size_t i = 0; i < r.header_fields.size(); i++)
-    {
+    for (size_t i = 0; i < r.header_fields.size(); i++) {
         os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
            << std::endl;
     }
@@ -61,7 +59,7 @@ std::ostream &operator<<(ostream &os, const Request &r)
 }
 
 // deleted copy assigment
-void Request::operator=(const Request &)
+void Request::operator=(const Request&)
 {
     DEBUGASSERT("call to deleted 'Request' copy assignment");
 }

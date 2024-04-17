@@ -15,6 +15,6 @@ test_socket
 client
 test_http
 *.d
+ubuntu_tester
 *.dSYM
 stds
-ubuntu_tester

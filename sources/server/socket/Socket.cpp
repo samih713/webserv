@@ -1,4 +1,5 @@
 #include "Socket.hpp"
+#include "../../../includes/webserv.hpp"
 
 /* ------------------------------- Constructor ------------------------------ */
 
@@ -17,11 +18,8 @@
  * @return None
  */
 Socket::Socket(int family, int type, int protocol, int flags)
-    : socketFD(invalidFD)
-    , isBound(false)
-    , isListening(false)
+    : socketFD(invalidFD), isBound(false), isListening(false)
 {
-
 #if defined(__LINUX__)
     socketFD = socket(family, type | flags, protocol);
 #elif defined(__MAC__)
@@ -29,9 +27,9 @@ Socket::Socket(int family, int type, int protocol, int flags)
     flags |= fcntl(socketFD, F_GETFL, 0);
     fcntl(socketFD, F_SETFL, flags);
 #endif // conditional
-	// TODO - better option handling
-	int option = 1;
-	setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    // TODO - better option handling
+    int option = 1;
+    setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if (socketFD == invalidFD)
         throw Socket::Exception(ERR_CREAT);
 
@@ -50,9 +48,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
  */
 Socket::~Socket() throw()
 {
-
-    if (socketFD != invalidFD)
-    {
+    if (socketFD != invalidFD) {
         DEBUG_MSG("socket fd[" << socketFD << "] closed!!", R);
         close(socketFD);
         socketFD = invalidFD;
@@ -79,7 +75,7 @@ void Socket::set_port(int port)
         throw Socket::Exception("Invalid Socket descriptor\n");
 
     // cast address to socketaddr_in and set sin_port
-    ((struct sockaddr_in *)(&address))->sin_port = htons(port);
+    ((struct sockaddr_in*) (&address))->sin_port = htons(port);
 }
 
 
@@ -98,7 +94,7 @@ fd Socket::get_fd() const throw()
  */
 void Socket::bind() const
 {
-    if (::bind(socketFD, (struct sockaddr *)&address, sizeof(address)) == -1)
+    if (::bind(socketFD, (struct sockaddr*) &address, sizeof(address)) == -1)
         throw Socket::Exception(ERR_BIND);
     isBound = true;
 }
@@ -146,8 +142,7 @@ fd Socket::accept()
     // it extracts the first pending connection request in the backlog que form listen.
     fd newSocket;
     newSocket = ::accept(socketFD, &peerInfo, &peerLength);
-    if (newSocket == invalidFD)
-    {
+    if (newSocket == invalidFD) {
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
         if (errno != EAGAIN && errno != EWOULDBLOCK)
             throw Socket::Exception(ERR_ACCP);
@@ -168,7 +163,7 @@ fd Socket::accept()
  *
  * @throws None
  */
-Socket::Exception::Exception(const std::string &error_message)
+Socket::Exception::Exception(const std::string& error_message)
 {
     this->error_message = compose_msg(error_message);
 };
@@ -179,7 +174,7 @@ Socket::Exception::Exception(const std::string &error_message)
  *
  * @return const char* a C-style string containing the error message.
  */
-const char *Socket::Exception::what() const throw()
+const char* Socket::Exception::what() const throw()
 {
     return error_message.c_str();
 }
@@ -191,9 +186,9 @@ const char *Socket::Exception::what() const throw()
  * @param message The message to be included in the error message.
  * @return A string containing the composed error message.
  */
-std::string Socket::Exception::compose_msg(const std::string &message)
+std::string Socket::Exception::compose_msg(const std::string& message)
 {
     std::stringstream _msg;
-    _msg << message << (errno ? ": " + std::string(std::strerror(errno)) : "");
+    _msg << message << (errno ? ": " + string(strerror(errno)) : "");
     return _msg.str();
 }
