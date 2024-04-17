@@ -132,6 +132,8 @@ void Request::parse_request()
 
     // Request Line
     message >> enumFromString(method) >> resource >> http_version;
+    resource = config.serverRoot + resource;
+    cgiResource = config.serverRoot + resource; // change to cgi root
     check_line_terminator(message, CRLF);
 	// replace %20 with space
 	replace_spaces(resource);
