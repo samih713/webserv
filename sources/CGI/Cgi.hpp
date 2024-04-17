@@ -25,7 +25,6 @@
 
 class Cgi {
 	public:
-   // Cgi(char* filePath, char** arguments, char** environment);
         Cgi(const Request &request);
         ~Cgi();
         void execute(const std::string &outputFile);

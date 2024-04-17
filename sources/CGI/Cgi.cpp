@@ -18,12 +18,13 @@
 	
 // }
 
-char **headersToEnv(vsp &headers)
+char **headersToEnv(const vsp &headers)
 {
     std::vector<char *> envVector;
 
     // Iterate through headers
-    for (vsp::iterator it = headers.begin(); it != headers.end(); ++it)
+    vsp::const_iterator end = headers.end();
+    for (vsp::const_iterator it = headers.begin(); it != end; ++it)
     {
         size_t len = it->first.size() + it->second.size() + 2;
         char *envEntry = new char[len];
@@ -69,8 +70,6 @@ string geturi(string res)
 	qu = res.find('?', 0); 
 	resn = res.substr(0, qu);
 	//result = const_cast<char *>(res.substr(0,qu).c_str());
-	cout << resn << endl;
-	cout<< "test" << qu <<endl;
     return (resn);
 }
 
@@ -93,14 +92,14 @@ string getStingQuery(string res)
 
 Cgi::Cgi(const Request &request)
 {
-	string res;
+	string resource;
 
-	res = const_cast<char *>(request.get_resource().c_str());
+	resource = request.get_resource();
 	headers = request.get_headers();
 	environment = headersToEnv(headers);
 	//filePath = const_cast<char *>(geturi(request.get_resource())->c_str());
-	filePath = (geturi(res));
-	queryString = getStingQuery(res);
+	filePath = (geturi(resource));
+	queryString = getStingQuery(resource);
     //filePath = const_cast<char *> (request.get_resource().c_str());
     // // Check if the Python script exists
     // if (access(filePath, X_OK) == -1)
