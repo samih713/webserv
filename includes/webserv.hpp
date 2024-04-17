@@ -8,16 +8,6 @@
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
-// [x] find a better way to include server name
-// [x] Address sanitizer error when testing with ./test_server
-// [x] hanlde partial sends and recieves (Server::handle_connection)
-// [x] solve linkage issue (with data)
-// [x] Server constructor needs to handle socket creation failure
-// [x] handle keep alive, currently not closing the scoket
-// [x] 404 page loading needs to happen once in the server/serve the css page aswell
-// [x] Implement response
-// [x] set the stream to throw exception on fail
-// [x] sometimes segfaults when parsing, keep repeating to reproduce
 
 // REQUEST
 // [ ] better error messages, stream throws no way to know where is error
@@ -26,13 +16,15 @@
 // [ ] handle chunked encoding
 // [ ] parsing needs to be reviewed for white space parsing
 
-
+// CGI
+// [ ] fix forking here for sleep
 // [ ] logging
 // [ ] split-up function implementations into their own files
 // [ ] different strategies
 // [ ] testing (with a testing framework)
 
 /* -------------------------------- WARNINGS -------------------------------- */
+
 // PARSER
 // [ ] maybe there's stuff in the global context that need to be parsed
 
