@@ -17,17 +17,18 @@ static bool   peek_line_terminator(istream& is, const string& check);
 static string find_value(stringstream& message);
 
 // throws ios failure
-bool Request::parse_request()
+bool Request::parse_request(const ServerConfig &config)
 {
     message.exceptions(std::ios::failbit | std::ios::badbit);
-
     if (headerReady && expectedBodySize == NOT_SET) {
         parse_header();
+        apply_config(config);
         if (expectedBodySize != NOT_SPECIFIED)
             parse_body();
     }
     return parsed;
 }
+
 
 void Request::parse_content_length(const string& contentLength)
 {
@@ -49,8 +50,6 @@ void Request::parse_header()
     check_line_terminator(message, CRLF);
     // replace %20 with space
     replace_spaces(resource);
-    resource = config.serverRoot + resource;
-    cgiResource = config.serverRoot + resource; // change to cgi root
     // Headers
     while (true && !message.eof()) {
         if (peek_line_terminator(message, CRLF))
@@ -67,6 +66,13 @@ void Request::parse_header()
     }
     if (expectedBodySize == NOT_SPECIFIED)
         parsed = true;
+}
+
+// applies the configuration parameters to the request
+void Request::apply_config(const ServerConfig& config)
+{
+    resource = config.serverRoot + resource;
+    cgiResource = config.serverRoot + resource; // change to cgi root
 }
 
 // TODO handle chunked encoding

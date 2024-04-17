@@ -16,7 +16,7 @@ static const string ERR_PARSE("Request_parser: failed to parse request");
 // Request class to parse an incoming message
 class Request {
 public:
-    Request(const ServerConfig& config);
+    Request();
     ~Request();
     Request(const Request& other);
 
@@ -26,7 +26,7 @@ public:
     const string& get_resource() const;
     const vsp&    get_headers() const;
 
-    bool parse_request();
+    bool parse_request(const ServerConfig &config);
 
     bool isCompleted();
     void setCompleted();
@@ -38,10 +38,10 @@ public:
 private:
     void parse_body();
     void parse_header();
+    void apply_config(const ServerConfig& config);
     void parse_content_length(const string& contentLength);
 
     stringstream message;
-    const ServerConfig& config;
 
     bool headerReady;
     bool parsed;
@@ -50,6 +50,7 @@ private:
 
     METHOD method;
     string resource;
+    string cgiResource;
     string http_version;
 
     vsp         header_fields;

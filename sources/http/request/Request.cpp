@@ -2,15 +2,15 @@
 #include "../../../includes/debug.hpp"
 #include "../../../includes/enum_utils.hpp"
 
-Request::Request(const ServerConfig& config)
-    : message(""), config(config), headerReady(false), parsed(false), completed(false),
+Request::Request()
+    : message(""), headerReady(false), parsed(false), completed(false),
       expectedBodySize(NOT_SET)
 {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : message(other.message.str()), config(other.config), headerReady(other.headerReady), parsed(other.parsed),
+    : message(other.message.str()), headerReady(other.headerReady), parsed(other.parsed),
       completed(other.completed), expectedBodySize(other.expectedBodySize),
       method(other.method), resource(other.resource), http_version(other.http_version),
       header_fields(other.header_fields), trailer_fields(other.trailer_fields)

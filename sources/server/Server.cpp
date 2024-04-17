@@ -62,12 +62,12 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
         r.recv(incoming);
-        if (!r.parse_request())
+        if (!r.parse_request(config))
             return;
 
         IRequestHandler* handler =
             RequestHandlerFactory::MakeRequestHandler(r.get_method());
-        Response response = handler->handle_request(r, cachedPages);
+        Response response = handler->handle_request(r, cachedPages, config);
 
         response.send_response(incoming);
         r.setCompleted();
