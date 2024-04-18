@@ -1,6 +1,6 @@
-#include "../FindHeaderKey.hpp"
-#include "./GetRequestHandler.hpp"
-#include "./IRequestHandler.hpp"
+#include "FindHeaderKey.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
 
 #ifndef REQUESTHANDLERFACTORY_HPP
 #define REQUESTHANDLERFACTORY_HPP
@@ -20,7 +20,7 @@ class RequestHandlerFactory
             switch (m)
             {
                 case GET: return new GetRequestHandler;
-                default: throw runtime_error("Request Method not implemented\n");
+                default: THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
             }
         }
 };

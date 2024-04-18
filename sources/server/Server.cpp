@@ -1,10 +1,10 @@
 /* -------------------------------- INCLUDES -------------------------------- */
-#include "./Server.hpp"
-#include "../http/handler/GetRequestHandler.hpp"
-#include "../http/handler/IRequestHandler.hpp"
-#include "../http/request/Request.hpp"
-#include "../http/handler/RequestHandlerFactory.hpp"
-#include "../../includes/debug.hpp"
+#include "Server.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
+#include "Request.hpp"
+#include "RequestHandlerFactory.hpp"
+#include "debug.hpp"
 #include <algorithm>
 #include <sys/select.h>
 #include <utility>
@@ -80,7 +80,7 @@ bool Server::handle_connection(fd recvSocket)
         bytesReceived = recv(recvSocket, &buffer[0], BUFFER_SIZE, 0);
 
         if (bytesReceived == -1)
-            throw runtime_error(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(strerror(errno));
 
         if (bytesReceived == 0)
             return CLOSE_CONNECTION;
@@ -134,7 +134,7 @@ void Server::select_strat()
         readytoRead = activeSockets;
 
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-            throw runtime_error(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
 
         for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
@@ -177,6 +177,6 @@ void Server::start(enum polling_strat strategy)
         // case KQUEUE: kqueue_strat(); break;
         // case POLL: poll_strat(); break;
         // case EPOLL: epoll_strat(); break;
-        default: throw runtime_error("Invalid strategy"); break;
+        default: THROW_EXCEPTION_WITH_INFO("Invalid strategy"); break;
     }
 }

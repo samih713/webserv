@@ -35,7 +35,8 @@ NAME:= webserv
 
 ### MODULES & INCLUDES ###
 MODULES:= $(PARSER_DIR) $(HTTP_DIR) $(SERVER_DIR) $(CGI_DIR)
-INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES))
+SUB_DIRS:= $(shell find $(SRCS_DIR) -type d -name $(TESTS_DIR) -prune -o -type d -print)
+INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES)) $(patsubst %,-I./%,$(SUB_DIRS))
 
 ### SOURCES ###
 SRCS:= $(SRCS_DIR)/main.cpp
@@ -43,7 +44,6 @@ SRCS:= $(SRCS_DIR)/main.cpp
 ### OBJECTS & SUBDIRS ###
 include $(patsubst %,%/module.mk,$(MODULES))
 OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
-SUB_DIRS:= $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(shell find $(SRCS_DIR) -type d))
 
 all: $(NAME)
 
@@ -56,7 +56,7 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $@ $(SUB_DIRS)
+	@mkdir -p $@ $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
 
 run: re
 	./$(NAME) configs/webserv.conf
@@ -103,6 +103,14 @@ test_cgi:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
 	@echo "$(BLUE)[ TEST ]$(RESET) CGI ready for testing."
 
+format:
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Formatting code..."
+	@find ./$(SRCS_DIR) -name "*.cpp" -o -name "*.hpp" \
+		-exec clang-format -i {} +
+	@find ./includes -name "*.hpp" \
+		-exec clang-format -i {} +
+	@echo "$(BLUE)[ FORMAT ]$(RESET) Code has been formatted."
+
 -include $(OBJS:.o=.d)
 
-.PHONY: clean fclean all re debug run test_parser test_http test_socket test_cgi
+.PHONY: clean fclean all re debug run test_parser test_http test_socket test_cgi format

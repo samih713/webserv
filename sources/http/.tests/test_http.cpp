@@ -1,6 +1,6 @@
-#include "../request/Request.hpp"
-#include "../response/Response.hpp"
-#include "../includes/webserv.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
+#include "webserv.hpp"
 
 int main()
 {

@@ -1,7 +1,7 @@
 #include "Response.hpp"
-#include "../../../includes/debug.hpp"
-#include "../../../includes/enum_utils.hpp"
-#include "../../server/Server.hpp"
+#include "debug.hpp"
+#include "enum_utils.hpp"
+#include "Server.hpp"
 
 /**
  * This constant string represents the HTTP version "HTTP/1.1" that is used in the
@@ -115,7 +115,7 @@ void Response::send_response(fd recv_socket) const
     {
         result = send(recv_socket, &message[bytesSent], message.size() - bytesSent, 0);
         if (result == -1)
-            throw runtime_error(ERR_SEND_FAIL + strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(ERR_SEND_FAIL + strerror(errno));
         bytesSent += result;
     }
 }

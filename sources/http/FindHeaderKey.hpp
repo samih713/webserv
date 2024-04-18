@@ -1,4 +1,4 @@
-#include "../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 #ifndef FINDHEADERKEY_HPP
 #define FINDHEADERKEY_HPP

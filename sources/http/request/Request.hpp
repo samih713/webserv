@@ -1,5 +1,5 @@
-#include "../Message.hpp"
-#include "../../../includes/webserv.hpp"
+#include "Message.hpp"
+#include "webserv.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP

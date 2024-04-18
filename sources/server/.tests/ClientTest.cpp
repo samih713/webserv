@@ -1,6 +1,6 @@
-#include "../../http/Message.hpp"
-#include "../Server.hpp"
-#include "../../../includes/webserv.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
+#include "webserv.hpp"
 #include <arpa/inet.h>
 
 int main()
