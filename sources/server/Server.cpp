@@ -161,6 +161,18 @@ void Server::select_strat()
     }
 }
 
+#ifdef __MAC__
+void Server::kqueue_strat()
+{
+    const fd kq = kqueue();
+    if (kq == -1)
+        THROW_EXCEPTION_WITH_INFO("kqueue init failed");
+
+
+    close(kq);
+}
+#endif
+
 /* ---------------------------------- START --------------------------------- */
 
 /**
@@ -174,7 +186,7 @@ void Server::start(enum polling_strat strategy)
     switch (strategy)
     {
         case SELECT: select_strat(); break;
-        // case KQUEUE: kqueue_strat(); break;
+        case KQUEUE: kqueue_strat(); break;
         // case POLL: poll_strat(); break;
         // case EPOLL: epoll_strat(); break;
         default: THROW_EXCEPTION_WITH_INFO("Invalid strategy"); break;

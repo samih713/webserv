@@ -59,6 +59,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
+#ifdef __MAC__
+#include <sys/event.h>
+#endif
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
 using std::cout;

@@ -45,7 +45,7 @@ class Server
         bool handle_connection(fd recvSocket);
         /* polling strats */
         void select_strat();
-        // void kqueue_strat();
+        void kqueue_strat();
         // void poll_strat();
         // void epoll_strat();
 
