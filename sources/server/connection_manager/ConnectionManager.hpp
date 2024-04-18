@@ -1,5 +1,6 @@
 #include "TimeOut.hpp"
 #include "webserv.hpp"
+#include "Request.hpp"
 
 #ifndef CONNECTION_MANAGER_HPP
 #define CONNECTION_MANAGER_HPP

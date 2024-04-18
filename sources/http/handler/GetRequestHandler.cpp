@@ -2,6 +2,7 @@
 #include "debug.hpp"
 #include "FileType.hpp"
 #include "CachedPages.hpp"
+#include "Cgi.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {

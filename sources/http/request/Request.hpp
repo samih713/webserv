@@ -1,5 +1,7 @@
 #include "Message.hpp"
 #include "webserv.hpp"
+#include "ServerConfig.hpp"
+#include "TimeOut.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
