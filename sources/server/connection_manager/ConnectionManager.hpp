@@ -72,11 +72,11 @@ inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& acti
 {
     FD_SET(newConnection, &activeSockets);
     Request& r =
-        connectionMap.insert(std::make_pair(newConnection, Request())).first->second;
+        connectionMap.insert(make_pair(newConnection, Request())).first->second;
     if (r.isCompleted()) {
         connectionMap.erase(newConnection);
         return (
-            connectionMap.insert(std::make_pair(newConnection, Request())).first->second);
+            connectionMap.insert(make_pair(newConnection, Request())).first->second);
     }
     r.timer.update_time();
     return (r);

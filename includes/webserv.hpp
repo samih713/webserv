@@ -73,6 +73,7 @@ using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;
+using std::make_pair;
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;

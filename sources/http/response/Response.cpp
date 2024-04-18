@@ -21,7 +21,7 @@ const string& Response::version = "HTTP/1.1";
 static StatusCodeMap createStatusCodeMap()
 {
     StatusCodeMap map;
-#define X(a) map.insert(std::make_pair(a, #a));
+#define X(a) map.insert(make_pair(a, #a));
     STATUS_CODE_LIST
 #undef X
     return map;

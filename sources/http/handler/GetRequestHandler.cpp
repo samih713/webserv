@@ -1,3 +1,4 @@
+#include "webserv.hpp"
 #include "GetRequestHandler.hpp"
 #include "debug.hpp"
 #include "FileType.hpp"
@@ -37,7 +38,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     vector<char> body;
 
 
-    add_header(std::make_pair<string, string>("Server", config.serverName));
+    add_header(make_pair<string, string>("Server", config.serverName));
 
 
     ifstream resource_file;
@@ -45,26 +46,26 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     status                 = OK;
     if (resource == defaultPage) {
         body = cachedPages->home.data;
-        add_header(std::make_pair<string, string>("Content-Type",
+        add_header(make_pair<string, string>("Content-Type",
             cachedPages->home.contentType));
 
-        add_header(std::make_pair<string, string>("Content-Length",
+        add_header(make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
     }
     else {
         resource_file.open(resource.c_str(), std::ios_base::binary);
         if (resource_file.fail()) {
             status = NOT_FOUND;
-            add_header(std::make_pair<string, string>("Content-Type",
+            add_header(make_pair<string, string>("Content-Type",
                 cachedPages->notFound.contentType));
-            add_header(std::make_pair<string, string>("Content-Length",
+            add_header(make_pair<string, string>("Content-Length",
                 ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
         }
         else {
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
-                add_header(std::make_pair<string, string>("Content-Type", resource_type));
+                add_header(make_pair<string, string>("Content-Type", resource_type));
 
             if (resource_type == "bash" || resource_type == "python") {
                 Cgi    cgi(request);
@@ -72,7 +73,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 
                 result = cgi.execute();
                 body   = vector<char>(result.begin(), result.end());
-                add_header(std::make_pair<string, string>("Content-Length",
+                add_header(make_pair<string, string>("Content-Length",
                     ws_itoa(body.size())));
             }
             else {
@@ -80,7 +81,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
                     std::istreambuf_iterator<char>());
                 resource_file.seekg(0, std::ios_base::end);
                 resource_size = resource_file.tellg();
-                add_header(std::make_pair<string, string>("Content-Length",
+                add_header(make_pair<string, string>("Content-Length",
                     ws_itoa(resource_size)));
                 resource_file.seekg(0, std::ios_base::beg);
             }
