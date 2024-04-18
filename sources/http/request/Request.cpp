@@ -43,7 +43,7 @@ bool Request::isCompleted()
     return completed;
 }
 
-std::ostream& operator<<(ostream& os, const Request& r)
+ostream& operator<<(ostream& os, const Request& r)
 {
     os << "Method: " << enumToString(r.method) << std::endl;
     os << "Request-Target: " << r.resource << std::endl;

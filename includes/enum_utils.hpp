@@ -1,3 +1,4 @@
+#include "webserv.hpp"
 #include <iostream>
 #include <vector>
 
@@ -21,12 +22,11 @@ struct enumConstRefHolder {
     enumConstRefHolder(const T& enum__) : enum_(enum__) {}
 };
 
-typedef std::vector<std::string>::const_iterator enumStringsIterator;
 
 template<typename T>
-std::istream& operator>>(std::istream& str, const enumRefHolder<T>& data)
+istream& operator>>(istream& str, const enumRefHolder<T> data)
 {
-    std::string value;
+    string value;
     str >> value;
 
     char** begin = (char**) enumStrings<T>::data;
@@ -43,7 +43,7 @@ std::istream& operator>>(std::istream& str, const enumRefHolder<T>& data)
 
 
 template<typename T>
-std::ostream& operator<<(std::ostream& str, const enumConstRefHolder<T>& data)
+ostream& operator<<(ostream& str, const enumConstRefHolder<T>& data)
 {
     // TODO: Fix object instantiation error for Mac Compilation
     return str << enumStrings<T>::data[static_cast<size_t>(data.enum_)];
