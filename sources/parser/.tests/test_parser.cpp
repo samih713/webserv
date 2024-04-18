@@ -1,4 +1,4 @@
-#include "../ConfigParser.hpp"
+#include "ConfigParser.hpp"
 
 int main(int argc, char **argv) {
     if (argc != 2) {

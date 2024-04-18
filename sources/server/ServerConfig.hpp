@@ -1,5 +1,5 @@
-#include "../../includes/webserv.hpp"
-#include "../http/Message.hpp"
+#include "webserv.hpp"
+#include "Message.hpp"
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP

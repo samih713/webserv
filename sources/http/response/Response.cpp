@@ -1,7 +1,7 @@
 #include "Response.hpp"
-#include "../../../includes/debug.hpp"
-#include "../../../includes/enum_utils.hpp"
-#include "../../server/Server.hpp"
+#include "debug.hpp"
+#include "enum_utils.hpp"
+#include "Server.hpp"
 
 /**
  * This constant string represents the HTTP version "HTTP/1.1" that is used in the

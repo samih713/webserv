@@ -1,4 +1,4 @@
-#include "./ConnectionManager.hpp"
+#include "ConnectionManager.hpp"
 
 /**
  * Removes expired connections from the connection map.

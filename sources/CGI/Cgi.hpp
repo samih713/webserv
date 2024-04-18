@@ -13,7 +13,7 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 
-#include "../sources/http/request/Request.hpp"
+#include "Request.hpp"
 #include "webserv.hpp"
 
 class Cgi {

@@ -1,4 +1,4 @@
-#include "../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 #ifndef MESSAGE_HPP
 #define MESSAGE_HPP

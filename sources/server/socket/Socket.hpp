@@ -1,4 +1,4 @@
-#include "../../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP

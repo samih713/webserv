@@ -1,6 +1,5 @@
-#include "../../server/ServerConfig.hpp"
-#include "../Message.hpp"
-#include "../TimeOut.hpp"
+#include "Message.hpp"
+#include "webserv.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP

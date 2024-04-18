@@ -1,5 +1,6 @@
-#include "../../http/Message.hpp"
-#include "../socket/TCPSocket.hpp"
+#include "Message.hpp"
+#include "Server.hpp"
+#include "webserv.hpp"
 #include <arpa/inet.h>
 #include <unistd.h>
 

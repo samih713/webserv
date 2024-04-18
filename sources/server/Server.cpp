@@ -1,10 +1,10 @@
 /* -------------------------------- INCLUDES -------------------------------- */
-#include "./Server.hpp"
-#include "../../includes/debug.hpp"
-#include "../http/handler/GetRequestHandler.hpp"
-#include "../http/handler/IRequestHandler.hpp"
-#include "../http/handler/RequestHandlerFactory.hpp"
-#include "../http/request/Request.hpp"
+#include "Server.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
+#include "Request.hpp"
+#include "RequestHandlerFactory.hpp"
+#include "debug.hpp"
 #include <algorithm>
 #include <sys/select.h>
 /* -------------------------------- INCLUDES -------------------------------- */

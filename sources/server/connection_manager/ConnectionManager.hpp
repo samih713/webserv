@@ -1,5 +1,5 @@
-#include "../../../includes/webserv.hpp"
-#include "../../http/request/Request.hpp"
+#include "TimeOut.hpp"
+#include "webserv.hpp"
 
 #ifndef CONNECTION_MANAGER_HPP
 #define CONNECTION_MANAGER_HPP

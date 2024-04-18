@@ -1,6 +1,6 @@
-#include "../../../includes/webserv.hpp"
-#include "../Message.hpp"
-#include "../request/Request.hpp"
+#include "webserv.hpp"
+#include "Message.hpp"
+#include "Request.hpp"
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP

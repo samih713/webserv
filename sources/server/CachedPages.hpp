@@ -1,5 +1,5 @@
-#include "../../includes/webserv.hpp"
-#include "./ServerConfig.hpp"
+#include "ServerConfig.hpp"
+#include "webserv.hpp"
 
 #ifndef CACHED_PAGES_HPP
 #define CACHED_PAGES_HPP

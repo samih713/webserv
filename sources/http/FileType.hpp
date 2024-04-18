@@ -1,4 +1,4 @@
-#include "../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 #ifndef FILETYPE_HPP
 #define FILETYPE_HPP

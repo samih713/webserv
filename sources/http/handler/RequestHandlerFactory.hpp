@@ -1,6 +1,6 @@
-#include "../FindHeaderKey.hpp"
-#include "./GetRequestHandler.hpp"
-#include "./IRequestHandler.hpp"
+#include "FindHeaderKey.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
 
 #ifndef REQUESTHANDLERFACTORY_HPP
 #define REQUESTHANDLERFACTORY_HPP

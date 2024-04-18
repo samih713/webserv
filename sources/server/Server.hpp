@@ -1,7 +1,7 @@
-#include "./CachedPages.hpp"
-#include "./ServerConfig.hpp"
-#include "./connection_manager/ConnectionManager.hpp"
-#include "./socket/TCPSocket.hpp"
+#include "CachedPages.hpp"
+#include "ServerConfig.hpp"
+#include "ConnectionManager.hpp"
+#include "TCPSocket.hpp"
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
