@@ -6,11 +6,11 @@ static string get_query_string(string res);
 
 Cgi::Cgi(const Request& request)
 {
-    string resource    = request.get_resource();
-    headers     = request.get_headers();
-    environment = headers_to_env(headers);
-    filePath    = get_uri(resource);
-    queryString = get_query_string(resource);
+    string resource = request.get_resource();
+    headers         = request.get_headers();
+    environment     = headers_to_env(headers);
+    filePath        = get_uri(resource);
+    queryString     = get_query_string(resource);
 
     arguments    = new char*[2];
     arguments[0] = const_cast<char*>(filePath.c_str());
