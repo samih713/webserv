@@ -2,11 +2,86 @@
 #include "Request.hpp"
 #include "enum_utils.hpp"
 
-// defining the char * array
+// defining the METHOD char * array
 #define X(a) ws_tostr(a), // stringify the enum
 template<>
-const char *enumStrings<METHOD>::data[] = { METHOD_ENUMS };
+const char* enumStrings<METHOD>::data[] = { METHOD_ENUMS };
 #undef X
+
+// helper functions
+static void   check_line_terminator(istream& is, const string& check);
+static void   replace_spaces(string& resource);
+static bool   peek_line_terminator(istream& is, const string& check);
+static string find_value(stringstream& message);
+
+// throws ios failure
+bool Request::parse_request(const ServerConfig &config)
+{
+    message.exceptions(std::ios::failbit | std::ios::badbit);
+    if (headerReady && expectedBodySize == NOT_SET) {
+        parse_header();
+        apply_config(config);
+        if (expectedBodySize != NOT_SPECIFIED)
+            parse_body();
+    }
+    return parsed;
+}
+
+
+void Request::parse_content_length(const string& contentLength)
+{
+    stringstream length(contentLength);
+    length.exceptions(std::ios::failbit | std::ios::badbit);
+    length >> expectedBodySize;
+    if (!length.eof())
+        length.setstate(std::ios::failbit);
+}
+
+// TODO headers to parse multiple line field-values, and multi-line
+void Request::parse_header()
+{
+    string fieldName;
+    string fieldValue;
+
+    // Request Line
+    message >> enumFromString(method) >> resource >> http_version;
+    check_line_terminator(message, CRLF);
+    // replace %20 with space
+    replace_spaces(resource);
+    // Headers
+    while (true && !message.eof()) {
+        if (peek_line_terminator(message, CRLF))
+            break;
+        std::getline(message, fieldName, ':');
+        if (fieldName.find(' ') != string::npos)
+            message.setstate(std::ios::failbit);
+        fieldValue = find_value(message);
+        header_fields.push_back(make_pair(fieldName, fieldValue));
+        if (fieldName == "Content-length")
+            parse_content_length(fieldValue);
+        else
+            expectedBodySize = NOT_SPECIFIED;
+    }
+    if (expectedBodySize == NOT_SPECIFIED)
+        parsed = true;
+}
+
+// applies the configuration parameters to the request
+void Request::apply_config(const ServerConfig& config)
+{
+    resource = config.serverRoot + resource;
+    cgiResource = config.serverRoot + resource; // change to cgi root
+}
+
+// TODO handle chunked encoding
+void Request::parse_body()
+{
+    if (!message.eof())
+        std::getline(message, body, '\0');
+    if (expectedBodySize != NOT_SET && expectedBodySize != NOT_SPECIFIED)
+        body = body.substr(0, expectedBodySize);
+    parsed = true;
+}
 
 /**
  * @brief Checks if the input stream has the specified line terminator.
@@ -24,43 +99,38 @@ const char *enumStrings<METHOD>::data[] = { METHOD_ENUMS };
  *
  * @throws None
  */
-static inline void check_line_terminator(istream &is, const string &check)
+static void check_line_terminator(istream& is, const string& check)
 {
     string line_terminator;
     std::noskipws(is);
 
     string::const_iterator check_end = check.end();
     for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
-    {
         line_terminator += is.get();
-    }
 
     if (line_terminator != check)
-    {
         is.setstate(std::ios::failbit);
-    }
 
     std::skipws(is);
 }
-
 
 /**
  * Check if the next characters in the input stream match a given string.
  *
  * This function reads characters from the input stream `is` and compares them to the
  * characters in the `check` string. If the characters in the input stream match the
- * characters in the `check` string, the function returns true. If the characters do not
- * match, the function returns false.
+ * characters in the `check` string, the function returns true. If the characters do
+ * not match, the function returns false.
  *
  * @param is The input stream to read characters from.
  * @param check The string to compare the characters read from the input stream to.
  *
- * @return true if the characters in the input stream match the characters in the `check`
- * string, false otherwise.
+ * @return true if the characters in the input stream match the characters in the
+ * `check` string, false otherwise.
  *
  * @throws None
  */
-static inline bool peek_line_terminator(istream &is, const string &check)
+static bool peek_line_terminator(istream& is, const string& check)
 {
     string         line_terminator;
     std::streampos initialPos = is.tellg();
@@ -68,17 +138,13 @@ static inline bool peek_line_terminator(istream &is, const string &check)
 
     string::const_iterator check_end = check.end();
     for (string::const_iterator it = check.begin(); it != check_end && is.good(); it++)
-    {
         line_terminator += is.get();
-    }
 
     is.clear();
     is.seekg(initialPos, std::ios::beg);
 
     if (line_terminator != check)
-    {
         return false;
-    }
 
     std::skipws(is);
     return true;
@@ -91,12 +157,12 @@ static inline bool peek_line_terminator(istream &is, const string &check)
  * @param message The stringstream from which to extract the value.
  * @return The extracted value as a string.
  */
-inline static string find_value(stringstream &message)
+static string find_value(stringstream& message)
 {
     string fieldValue;
     std::getline(message, fieldValue);
     string::size_type begin = fieldValue.find_first_not_of(" ");
-    string::size_type end = fieldValue.find_last_not_of(CRLF);
+    string::size_type end   = fieldValue.find_last_not_of(CRLF);
     if (begin != std::string::npos && end != std::string::npos)
         fieldValue = fieldValue.substr(begin, end - begin + 1);
     else if (begin != std::string::npos)
@@ -108,50 +174,10 @@ inline static string find_value(stringstream &message)
  * @brief Replaces all occurrences of "%20" in the resource string with a space character.
  *
  * @param resource The resource string to replace "%20" with a space character.
-*/
-static void replace_spaces(string &resource)
-{
-	size_t pos;
-	while ((pos = resource.find("%20")) != std::string::npos)
-		resource.replace(pos, 3, " ");
-}
-
-/**
- * @brief Parses the raw request data into method, resource, HTTP version, headers, and
- * body.
- *
- * @throws std::ios_base::failure if there is a failure in parsing the raw request data
  */
-void Request::parse_request()
+static void replace_spaces(string& resource)
 {
-    stringstream message(rawRequest);
-    string       fieldName;
-    string       fieldValue;
-
-    message.exceptions(std::ios::failbit | std::ios::badbit);
-
-    // Request Line
-    message >> enumFromString(method) >> resource >> http_version;
-    check_line_terminator(message, CRLF);
-	// replace %20 with space
-	replace_spaces(resource);
-    // Headers
-    static map<string, int>::const_iterator fieldNameListEnd = fieldNameList.end();
-    while (true)
-    {
-        std::getline(message, fieldName, ':');
-        if (fieldName.find(' ') != string::npos ||
-            fieldNameList.find(fieldName) == fieldNameListEnd)
-        {
-            // DEBUGASSERT("The header check is wrong, brave sends some weird headers or
-            // maybe all browsers do idk" && false);
-        }
-        fieldValue = find_value(message);
-        header_fields.push_back(std::make_pair(fieldName, fieldValue));
-        if (peek_line_terminator(message, CRLF))
-            break;
-    }
-
-    // Body till the end of the message
-    std::getline(message, body, '\0');
+    size_t pos;
+    while ((pos = resource.find("%20")) != std::string::npos)
+        resource.replace(pos, 3, " ");
 }

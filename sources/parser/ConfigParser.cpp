@@ -1,6 +1,7 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(string const& configFile) {
+ConfigParser::ConfigParser(const string& configFile)
+{
     DEBUG_MSG("Parsing " << W << configFile, RE);
 
     // checking file extension
@@ -40,7 +41,9 @@ ConfigParser::ConfigParser(string const& configFile) {
     file.close();
 }
 
-void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages, string const& root) {
+void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
+    const string&                                              root)
+{
     DEBUG_MSG("Parsing error_page directive", RE);
 
     if (root.empty())
@@ -60,8 +63,7 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages, strin
 
     string errorPath = *_itr;
     if (errorPath.find(".html") == string::npos &&
-        errorPath.find(".htm") == string::npos &&
-        errorPath.find(".txt") == string::npos)
+        errorPath.find(".htm") == string::npos && errorPath.find(".txt") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
     if (errorPath.find("/") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
@@ -72,7 +74,9 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages, strin
             THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
     }
 
-    for (vector<STATUS_CODE>::const_iterator itr = codes.begin(); itr != codes.end(); ++itr) {
+    for (vector<STATUS_CODE>::const_iterator itr = codes.begin(); itr != codes.end();
+         ++itr)
+    {
         string page = root + errorPath;
         size_t xPos = page.find("x");
         if (xPos != string::npos) {
@@ -85,7 +89,8 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages, strin
     _check_semicolon();
 }
 
-vector<string> ConfigParser::_parse_index(string const& root) {
+vector<string> ConfigParser::_parse_index(const string& root)
+{
     DEBUG_MSG("Parsing index directive", RE);
     vector<string> indexFiles;
 
@@ -103,7 +108,8 @@ vector<string> ConfigParser::_parse_index(string const& root) {
     return indexFiles;
 }
 
-Location ConfigParser::_parse_location_context(void) {
+Location ConfigParser::_parse_location_context(void)
+{
     DEBUG_MSG("Parsing location context", RE);
 
     ++_itr; // move to location modifier/path
@@ -140,7 +146,8 @@ Location ConfigParser::_parse_location_context(void) {
     return location;
 }
 
-fd ConfigParser::_parse_listen(void) {
+fd ConfigParser::_parse_listen(void)
+{
     DEBUG_MSG("Parsing listen directive", RE);
 
     ++_itr; // move to port number
@@ -150,7 +157,8 @@ fd ConfigParser::_parse_listen(void) {
     if (!_is_string_number(*_itr))
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LISTEN);
 
-    fd listenerPort = std::atoi(_itr->c_str()); //! listen can also handle IP address like 0.0.0.0:80
+    fd listenerPort =
+        std::atoi(_itr->c_str()); //! listen can also handle IP address like 0.0.0.0:80
     if (listenerPort > MAX_PORT || listenerPort < 0)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LISTEN);
 
@@ -158,19 +166,19 @@ fd ConfigParser::_parse_listen(void) {
     return listenerPort;
 }
 
-void ConfigParser::_parse_server_name(vector<string>& serverName) {
+void ConfigParser::_parse_server_name(string& serverName)
+{
     DEBUG_MSG("Parsing server_name directive", RE);
 
     ++_itr; // move to server name
-    while (*_itr != ";") {
-        if (_is_keyword(*_itr))
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
-        serverName.push_back(*_itr);
-        ++_itr;
-    }
+    if (_is_keyword(*_itr))
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
+    serverName = *_itr;
+    ++_itr;
 }
 
-string ConfigParser::_parse_root(void) {
+string ConfigParser::_parse_root(void)
+{
     DEBUG_MSG("Parsing root directive", RE);
 
     ++_itr; // move to root path
@@ -183,7 +191,8 @@ string ConfigParser::_parse_root(void) {
     return rootPath;
 }
 
-string ConfigParser::_parse_client_max_body_size(void) {
+string ConfigParser::_parse_client_max_body_size(void)
+{
     DEBUG_MSG("Parsing client_max_body_size directive", RE);
 
     ++_itr; // move to max body size
@@ -201,7 +210,8 @@ string ConfigParser::_parse_client_max_body_size(void) {
     return maxBodySize;
 }
 
-bool ConfigParser::_parse_autoindex(void) {
+bool ConfigParser::_parse_autoindex(void)
+{
     DEBUG_MSG("Parsing autoindex directive", RE);
 
     ++_itr; // move to on/off
@@ -212,7 +222,8 @@ bool ConfigParser::_parse_autoindex(void) {
     return autoindex == "on";
 }
 
-ServerConfig ConfigParser::_parse_server_context(void) {
+ServerConfig ConfigParser::_parse_server_context(void)
+{
     DEBUG_MSG("Parsing server context", RE);
 
     ++_itr; // move to {
@@ -233,7 +244,7 @@ ServerConfig ConfigParser::_parse_server_context(void) {
         else if (*_itr == "client_max_body_size")
             _serverConfig.maxBodySize = _parse_client_max_body_size();
         else if (*_itr == "index")
-            _serverConfig.indexFiles =_parse_index(_serverConfig.serverRoot);
+            _serverConfig.indexFiles = _parse_index(_serverConfig.serverRoot);
         else if (*_itr == "location")
             _serverConfig.locations.push_back(_parse_location_context());
         else if (*_itr == "autoindex")
@@ -247,7 +258,8 @@ ServerConfig ConfigParser::_parse_server_context(void) {
     return _serverConfig;
 }
 
-vector<ServerConfig> ConfigParser::_parse_HTTP_context(void) {
+vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
+{
     DEBUG_MSG("Parsing HTTP context", RE);
 
     // setting values for Config object
@@ -275,7 +287,8 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void) {
     return serverConfigs;
 }
 
-vector<ServerConfig> ConfigParser::parse(void) {
+vector<ServerConfig> ConfigParser::parse(void)
+{
     string currentToken;
     for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
         if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
@@ -297,11 +310,11 @@ vector<ServerConfig> ConfigParser::parse(void) {
 
     // check braces
     stack<string> braces;
-    for (vector<string>::const_iterator itr = _tokens.begin();
-         itr != _tokens.end(); ++itr)
+    for (vector<string>::const_iterator itr = _tokens.begin(); itr != _tokens.end();
+         ++itr)
     {
         if (*itr == "{") {
-            if (*(itr - 1) != "server" && *(itr - 1) != "http" && 
+            if (*(itr - 1) != "server" && *(itr - 1) != "http" &&
                 *(itr - 2) != "location" && *(itr - 3) != "location")
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
             braces.push("{");

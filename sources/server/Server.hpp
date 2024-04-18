@@ -2,18 +2,11 @@
 #include "ServerConfig.hpp"
 #include "ConnectionManager.hpp"
 #include "TCPSocket.hpp"
-#include "debug.hpp"
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-static const int BUFFER_SIZE = 4096;
-
-#define CLOSE_CONNECTION 1
-#define KEEP_ALIVE       0
-
-enum polling_strat
-{
+enum polling_strat {
     KQUEUE,
     SELECT,
     POLL,
@@ -27,31 +20,31 @@ static const int DEFAULT_BACKLOG(16);
 // default select wait
 static const int SELECTWAITTIME(5);
 
-class Server
-{
-    public:
-        static Server &get_instance(const ServerConfig &config, int backLog = DEFAULT_BACKLOG);
-        ~Server();
-        void start(enum polling_strat);
+class Server {
+public:
+    static Server& get_instance(const ServerConfig& config,
+        int                                         backLog = DEFAULT_BACKLOG);
+    ~Server();
+    void start(enum polling_strat);
 
-    protected:
-        Server(const ServerConfig &config, int backLog);
+protected:
+    Server(const ServerConfig& config, int backLog);
 
-    private:
-        TCPSocket     listener;
-        const ServerConfig &config;
-        CachedPages  *cachedPages;
+private:
+    TCPSocket           listener;
+    const ServerConfig& config;
+    CachedPages*        cachedPages;
 
-        bool handle_connection(fd recvSocket);
-        /* polling strats */
-        void select_strat();
-        // void kqueue_strat();
-        // void poll_strat();
-        // void epoll_strat();
+    void handle_connection(fd incoming, fd_set& activeSockets);
+    /* polling strats */
+    void select_strat();
+    // void kqueue_strat();
+    // void poll_strat();
+    // void epoll_strat();
 
-        // deleted
-        Server(const Server &);
-        Server &operator=(const Server &);
+    // deleted
+    Server(const Server&);
+    Server& operator=(const Server&);
 };
 
 #endif // SERVER_HPP

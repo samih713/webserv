@@ -95,9 +95,12 @@ test_http:
 
 #! SOCKET_main.cpp has a compile error so this test has been commented out
 # test_socket:
-# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client
-# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
+# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client @$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
 # 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
+
+client: $(TEST_CLIENT_SRC)
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(TEST_CLIENT_SRC) $(SERVER_DIR)/socket/Socket.cpp $(SERVER_DIR)/socket/TCPSocket.cpp -o $@
+	@echo "$(BLUE)[ TEST ]$(RESET) Client is ready."
 
 test_cgi:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
