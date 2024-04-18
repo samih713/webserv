@@ -30,8 +30,6 @@ static const std::pair<std::string, std::string> init_filetypes[] = {
 };
 
 static const map<string, string> fileTypes(init_filetypes,
-                                           init_filetypes +
-                                               sizeof(init_filetypes) /
-                                                   sizeof(init_filetypes[0]));
+    init_filetypes + sizeof(init_filetypes) / sizeof(init_filetypes[0]));
 
 #endif // FILETYPE_HPP

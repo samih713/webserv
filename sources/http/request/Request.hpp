@@ -1,6 +1,6 @@
+#include "../../server/ServerConfig.hpp"
 #include "../Message.hpp"
 #include "../TimeOut.hpp"
-#include "../../server/ServerConfig.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
@@ -26,7 +26,7 @@ public:
     const string& get_resource() const;
     const vsp&    get_headers() const;
 
-    bool parse_request(const ServerConfig &config);
+    bool parse_request(const ServerConfig& config);
 
     bool isCompleted();
     void setCompleted();

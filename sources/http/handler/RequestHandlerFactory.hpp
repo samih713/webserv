@@ -12,17 +12,15 @@
  * @return A pointer to the newly created request handler.
  * @throws std::runtime_error if the specified HTTP method is not implemented.
  */
-class RequestHandlerFactory
-{
-    public:
-        static IRequestHandler *MakeRequestHandler(METHOD m)
-        {
-            switch (m)
-            {
-                case GET: return new GetRequestHandler;
-                default: THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
-            }
+class RequestHandlerFactory {
+public:
+    static IRequestHandler* MakeRequestHandler(METHOD m)
+    {
+        switch (m) {
+            case GET: return new GetRequestHandler;
+            default:  THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
         }
+    }
 };
 
 #endif // REQUESTHANDLERFACTORY_HPP

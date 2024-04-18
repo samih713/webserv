@@ -13,31 +13,22 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 
-//#include "../../includes/webserv.hpp"
-#include <iostream>
-#include <cstring>
-#include <string>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include "webserv.hpp"
 #include "../sources/http/request/Request.hpp"
+#include "webserv.hpp"
 
 class Cgi {
-	public:
-        Cgi(const Request &request);
-        ~Cgi();
-        void execute(const std::string &outputFile);
-        string execute(void);
+public:
+    Cgi(const Request& request);
+    ~Cgi();
+    void   execute(const std::string& outputFile);
+    string execute(void);
 
-    private:
-        vsp    headers;
-        string queryString;
-		string filePath;
-        char **arguments;
-        char **environment;
-	
+private:
+    vsp    headers;
+    string queryString;
+    string filePath;
+    char** arguments;
+    char** environment;
 };
 
 #endif
-
