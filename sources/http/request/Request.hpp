@@ -13,6 +13,7 @@ class Request
         Request(const Request &other);
         METHOD          get_method() const;
         const string   &get_resource() const;
+		const string   &get_body() const;
         const vsp      &get_headers() const;
         friend ostream &operator<<(ostream &os, const Request &r);
 

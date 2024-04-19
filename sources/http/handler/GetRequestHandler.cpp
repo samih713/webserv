@@ -91,12 +91,22 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 
 				strv = cgi.execute();
                 body = vector<char>(strv.begin(), strv.end());
+				  // content type
+	            string resource_type = find_resource_type(resource);
+	            if (resource_type.length() != 0)
+	                add_header(std::make_pair<string, string>("Content-Type", resource_type));
+	            // content length
+	            resource_file.seekg(0, std::ios_base::end);
+	            resource_size = strv.size();
+	            add_header(
+	                std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
+	            resource_file.seekg(0, std::ios_base::beg);
 			}
 			else
+			{
 				body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                                 std::istreambuf_iterator<char>());
-
-            // content type
+				  // content type
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(std::make_pair<string, string>("Content-Type", resource_type));
@@ -106,6 +116,8 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
             add_header(
                 std::make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
             resource_file.seekg(0, std::ios_base::beg);
+			}
+          
         }
     }
     /* authentication function goes here for the requested resource */

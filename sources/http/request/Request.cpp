@@ -42,6 +42,11 @@ const string &Request::get_resource() const
     return resource;
 }
 
+const string &Request::get_body() const
+{
+    return body;
+}
+
 std::ostream &operator<<(ostream &os, const Request &r)
 {
     os << "Method: " << enumToString(r.method) << std::endl;

@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/19 22:37:01 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 02:23:34 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,24 @@ char **headersToEnv(vsp &headers)
         std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
         envVector.push_back(envEntry);
     }
+
+	envVector.push_back("GATEWAY_INTERFACE=CGI/1.1");
+
+
+	// "REQUEST_METHOD"
+	// "CONTENT_LENGTH"
+	// "CONTENT_TYPE"
+	// "PATH_INFO"
+	// "PATH_TRANSLATED"
+	// "QUERY_STRING"
+	// "REMOTEaddr"
+	// "REMOTE_IDENT"
+	// "REMOTE_USER"
+	// "REQUEST_URI"
+	// "SERVER_NAME"
+	// "SERVER_PORT"
+	// "SERVER_PROTOCOL" = "HTTP/1.1";
+	// "SERVER_SOFTWARE"
 
     // Allocate memory for char* array
     char **envp = new char *[envVector.size() + 1]; 
@@ -85,7 +103,7 @@ string getStingQuery(string res)
 }
 
 
-Cgi::Cgi(const Request &request, const ServerConfig &config)
+Cgi::Cgi(const Request &request, const ServerConfig &config): body(request.get_body())
 {
 	string res;
 
@@ -221,9 +239,9 @@ string Cgi::execute(void)
     waitpid(id, &status, 0);
 
     // Read the response from the pipe
-    char    buffer[91];
+    char    buffer[1024];
     ssize_t bytesRead;
-    while ((bytesRead = read(fd[0], buffer, 90)) > 0)
+    while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
     {
         res_body.append(buffer, bytesRead);
     }
