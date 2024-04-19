@@ -189,40 +189,46 @@ void Server::kqueue_strat()
     EV_SET(&changeList, socketFD, EVFILT_READ, EV_ADD, 0, 0, 0);
 
     // adding changeList containing only socketFD to kqueue
-    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1)
+    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
+        close(kq);
         THROW_EXCEPTION_WITH_INFO(strerror(errno));
+    }
 
     int numEvents = 0;
     while (true) // event loop
     {
         DEBUG_MSG(WAIT_MESSAGE, L);
 
-        numEvents = kevent(kq, NULL, 0, eventList, 1, &kqueueTimeOut);
-        if (numEvents == -1)
+        numEvents = kevent(kq, NULL, 0, eventList, MAX_EVENTS, &kqueueTimeOut);
+        if (numEvents == -1) {
+            close(kq);
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
+        }
         else if (numEvents == 0) // timeout
             continue;
-        else
+
+        for (int i = 0; i < numEvents; i++)
         {
-            for (int i = 0; i < numEvents; i++)
+            if (eventList[i].ident == static_cast<uintptr_t>(socketFD))
             {
-                if (eventList[i].ident == static_cast<uintptr_t>(socketFD))
-                {
-                    // add new connection to kqueue
-                    fd newConnection = listener.accept();
-                    EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);
-                    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1)
-                        THROW_EXCEPTION_WITH_INFO(strerror(errno));
+                // add new connection to kqueue
+                fd newConnection = listener.accept();
+                EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);
+                if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
+                    close(kq);
+                    THROW_EXCEPTION_WITH_INFO(strerror(errno));
                 }
-                else
+            }
+            else
+            {
+                DEBUG_MSG("reading from connection", M);
+                if (handle_connection(eventList[i].ident) == CLOSE_CONNECTION)
                 {
-                    DEBUG_MSG("reading from connection", M);
-                    if (handle_connection(eventList[i].ident) == CLOSE_CONNECTION)
-                    {
-                        // remove connection from kqueue
-                        EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
-                        if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1)
-                            THROW_EXCEPTION_WITH_INFO(strerror(errno));
+                    // remove connection from kqueue
+                    EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
+                    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
+                        close(kq);
+                        THROW_EXCEPTION_WITH_INFO(strerror(errno));
                     }
                 }
             }
