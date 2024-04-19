@@ -161,7 +161,13 @@ void Server::select_strat()
     }
 }
 
-#ifdef __MAC__
+
+#if defined(__LINUX__)
+void Server::kqueue_strat()
+{
+    THROW_EXCEPTION_WITH_INFO("Kqueue does not work on Linux");
+}
+#elif defined(__MAC__)
 void Server::kqueue_strat()
 {
     const fd kq = kqueue();
