@@ -86,7 +86,7 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
         {
 			if(check_cgi_request(resource))
 			{
-                Cgi cgi(request);
+                Cgi cgi(request, config);
 				string strv;
 
 				strv = cgi.execute();
