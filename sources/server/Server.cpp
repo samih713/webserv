@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <sys/select.h>
 #include <utility>
+#if defined(__MAC__)
+#include <sys/event.h>
+#endif
 /* -------------------------------- INCLUDES -------------------------------- */
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
