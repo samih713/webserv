@@ -49,11 +49,11 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCLUDES) $(OBJS) -o $@
-	@echo "$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
+	@echo "$(BOLD)$(YELLOW)[ EXECUTABLE ]$(RESET) $(NAME) is ready."
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) $(DEPFLAGS) $(INCLUDES) -c $< -o $@
-	@echo "$(GREEN)[ COMPILE ]$(RESET) $<."
+	@echo "$(BOLD)$(GREEN)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
 	@mkdir -p $@ $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
@@ -64,22 +64,22 @@ run: re
 debug: export CXXFLAGS += $(DEBUGFLAGS)
 debug: fclean
 	@$(MAKE) -se all
-	@echo "$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
+	@echo "$(BOLD)$(MAGENTA)[ DEBUG ]$(RESET) $(NAME) is ready for debugging."
 
 clean:
 	@if [ -d $(OBJS_DIR) ]; then \
 		$(RM) $(OBJS_DIR); \
-		echo "$(RED)[ DELETE ]$(RESET) Removed object files."; \
+		echo "$(BOLD)$(RED)[ DELETE ]$(RESET) Removed object files."; \
 	fi
 	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SOCKET) ] || [ -f $(TEST_CGI) ]; then \
 		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SOCKET) $(TEST_CGI); \
-		echo "$(GREEN)[ DELETE ]$(RESET) Removed testers."; \
+		echo "$(BOLD)$(RED)[ DELETE ]$(RESET) Removed testers."; \
 	fi
 
 fclean: clean
 	@if [ -f $(NAME) ]; then \
 		$(RM) $(NAME); \
-		echo "$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
+		echo "$(BOLD)$(RED)[ DELETE ]$(RESET) Removed $(NAME)."; \
 	fi
 
 re: fclean
@@ -87,21 +87,21 @@ re: fclean
 
 test_parser:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(PARSER_SRCS) $(TEST_PARSER_SRC) -o $(TEST_PARSER)
-	@echo "$(BLUE)[ TEST ]$(RESET) Parser ready for testing."
+	@echo "$(BOLD)$(BLUE)[ TEST ]$(RESET) Parser ready for testing."
 
 test_http:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(CGI_SRCS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
-	@echo "$(BLUE)[ TEST ]$(RESET) HTTP ready for testing."
+	@echo "$(BOLD)$(BLUE)[ TEST ]$(RESET) HTTP ready for testing."
 
 #! SOCKET_main.cpp has a compile error so this test has been commented out
 # test_socket:
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client
 # 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
-# 	@echo "$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
+# 	@echo "$(BOLD)$(BLUE)[ TEST ]$(RESET) SOCKET ready for testing."
 
 test_cgi:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
-	@echo "$(BLUE)[ TEST ]$(RESET) CGI ready for testing."
+	@echo "$(BOLD)$(BLUE)[ TEST ]$(RESET) CGI ready for testing."
 
 -include $(OBJS:.o=.d)
 
