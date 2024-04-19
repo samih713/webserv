@@ -1,6 +1,5 @@
 #include "Response.hpp"
 #include "debug.hpp"
-#include "enum_utils.hpp"
 #include "Server.hpp"
 
 /**

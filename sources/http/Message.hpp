@@ -9,25 +9,6 @@ static const string NEWLINE  = "\n";
 static const string SP       = " ";
 static const string HTTP_VER = "HTTP/1.1";
 
-/* ------------------------------- METHOD ENUM ------------------------------ */
-#define METHOD_ENUMS                                                                     \
-    X(GET)                                                                               \
-    X(HEAD)                                                                              \
-    X(POST)                                                                              \
-    X(PUT)                                                                               \
-    X(DELETE)                                                                            \
-    X(CONNECT)                                                                           \
-    X(OPTIONS)                                                                           \
-    X(TRACE)                                                                             \
-    X(PATCH)
-
-// X macro to define the enum
-#define X(a) a,
-enum METHOD {
-    METHOD_ENUMS
-};
-#undef X
-
 /* ---------------------------- STATUS_CODE ENUM ---------------------------- */
 #define STATUS_CODE_LIST                                                                 \
     X(CONTINUE)                                                                          \

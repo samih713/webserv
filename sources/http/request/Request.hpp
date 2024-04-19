@@ -1,7 +1,7 @@
 #include "Message.hpp"
-#include "webserv.hpp"
 #include "ServerConfig.hpp"
 #include "TimeOut.hpp"
+#include "webserv.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
@@ -23,7 +23,7 @@ public:
 
     void recv(fd socket);
 
-    METHOD        get_method() const;
+    const string& get_method() const;
     const string& get_resource() const;
     const vsp&    get_headers() const;
 
@@ -49,7 +49,7 @@ private:
     bool completed;
     int  expectedBodySize;
 
-    METHOD method;
+    string method;
     string resource;
     string cgiResource;
     string http_version;

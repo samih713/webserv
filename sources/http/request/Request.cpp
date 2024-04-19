@@ -1,6 +1,5 @@
 #include "Request.hpp"
 #include "debug.hpp"
-#include "enum_utils.hpp"
 
 Request::Request()
     : message(""), headerReady(false), parsed(false), completed(false),
@@ -18,7 +17,7 @@ Request::Request(const Request& other)
 {}
 
 
-METHOD Request::get_method() const
+const string &Request::get_method() const
 {
     return method;
 }
@@ -45,7 +44,7 @@ bool Request::isCompleted()
 
 ostream& operator<<(ostream& os, const Request& r)
 {
-    os << "Method: " << enumToString(r.method) << std::endl;
+    os << "Method: " << r.method << std::endl;
     os << "Request-Target: " << r.resource << std::endl;
     os << "HTTP-Version: " << r.http_version << std::endl;
     os << "************ fields *************\n";

@@ -17,9 +17,9 @@ int main()
 #endif // parsing test
 
 #if 0  // basic test
-	METHOD m = GET;
-	std::string path;
-	std::string version;
+	string m = GET;
+	string path;
+	string version;
 
 	std::stringstream line(sample_message);
 	line.exceptions(std::ios::failbit | std::ios::badbit);
@@ -30,7 +30,7 @@ int main()
 	if (line.fail())
 		std::cout << "Failed to parse" << std::endl;
 	else {
-		std::cout << "METHOD is : " << enumToString(m) << std::endl;
+		std::cout << "METHOD is : " << m << std::endl;
 		std::cout << "PATH is : " << path << std::endl;
 		std::cout << "VERSION is : " << version << std::endl;
 	}

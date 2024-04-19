@@ -1,12 +1,5 @@
 #include "Message.hpp"
 #include "Request.hpp"
-#include "enum_utils.hpp"
-
-// defining the METHOD char * array
-#define X(a) ws_tostr(a), // stringify the enum
-template<>
-const char* enumStrings<METHOD>::data[] = { METHOD_ENUMS };
-#undef X
 
 // helper functions
 static void   check_line_terminator(istream& is, const string& check);
@@ -44,7 +37,7 @@ void Request::parse_header()
     string fieldValue;
 
     // Request Line
-    message >> enumFromString(method) >> resource >> http_version;
+    message >> method >> resource >> http_version;
     check_line_terminator(message, CRLF);
     // replace %20 with space
     replace_spaces(resource);
