@@ -204,7 +204,7 @@ size_t ConfigParser::_parse_client_max_body_size(void)
     if (suffix.size() > 1)
         THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_SIZE_SUFFIX);
 
-    size_t multiplier;
+    size_t multiplier = 0;
     if (suffix == "k" || suffix == "K")
         multiplier = 1000;
     else if (suffix == "m" || suffix == "M")
