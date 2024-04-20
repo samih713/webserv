@@ -240,24 +240,33 @@ ServerConfig ConfigParser::_parse_server_context(void)
         THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
+    set<string>  parsedServerDirectives;
     ServerConfig _serverConfig;
     while (*_itr != "}") {
-        if (*_itr == "listen")
+        if (*_itr == "listen") {
             _serverConfig.listenerPort = _parse_listen();
+            checkDuplicateDirective(parsedServerDirectives, "listen");
+        }
         else if (*_itr == "server_name")
             _parse_server_name(_serverConfig.serverName);
         else if (*_itr == "error_page")
             _parse_error_page(_serverConfig.errorPages, _serverConfig.serverRoot);
-        else if (*_itr == "root")
+        else if (*_itr == "root") {
             _serverConfig.serverRoot = _parse_root();
-        else if (*_itr == "client_max_body_size")
+            checkDuplicateDirective(parsedServerDirectives, "root");
+        }
+        else if (*_itr == "client_max_body_size") {
             _serverConfig.maxBodySize = _parse_client_max_body_size();
+            checkDuplicateDirective(parsedServerDirectives, "client_max_body_size");
+        }
         else if (*_itr == "index")
             _serverConfig.indexFiles = _parse_index(_serverConfig.serverRoot);
         else if (*_itr == "location")
             _serverConfig.locations.push_back(_parse_location_context());
-        else if (*_itr == "autoindex")
+        else if (*_itr == "autoindex") {
             _serverConfig.autoindex = _parse_autoindex();
+            checkDuplicateDirective(parsedServerDirectives, "autoindex");
+        }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_SERVER);
         if (*_itr == ";")

@@ -1,11 +1,13 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
+#include <set>
 #include <stack>
 #include <sys/stat.h>
 
 #ifndef CONFIG_PARSER_HPP
 #define CONFIG_PARSER_HPP
 
+using std::set;
 using std::stack;
 
 static const string ERR_INVALID_FILE("Parser: invalid file");
@@ -52,14 +54,10 @@ static const string ERR_UNEXPECTED_TOKENS_IN_LOCATION(
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] check for duplicate server names
-// [ ] check for duplicate listen ports
 // [ ] check for duplicate locations
 // [ ] check for duplicate indexes
 // [ ] check for duplicate error pages
-// [ ] check for duplicate autoindex (depends on context)
 // [ ] empty root can cause problems even if it's valid
-// [ ] check for duplicate client_max_body_size
 // [ ] handle cgi related directives
 // [ ] add directive to set http methods allowed
 
@@ -109,6 +107,13 @@ private:
         if (*(_itr + 1) != ";")
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
+    }
+    void checkDuplicateDirective(set<string>& parsedDirectives, const string& directive)
+    {
+        if (parsedDirectives.find(directive) != parsedDirectives.end())
+            THROW_EXCEPTION_WITH_INFO("Parser: duplicate " + directive + " found");
+
+        parsedDirectives.insert(directive);
     }
 };
 

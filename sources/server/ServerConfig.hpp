@@ -23,7 +23,7 @@ struct ServerConfig {
     map<STATUS_CODE, string> errorPages;
     bool                     autoindex;
 
-    ServerConfig() : listenerPort(8080), autoindex(false) {}
+    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false) {}
 
     void print(void) const
     {
