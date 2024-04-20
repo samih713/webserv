@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 02:23:34 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:50:25 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ char **headersToEnv(vsp &headers)
         envVector.push_back(envEntry);
     }
 
-	envVector.push_back("GATEWAY_INTERFACE=CGI/1.1");
+    // std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
+    // envVector.push_back(const_cast<char *>(gateway_interface.c_str()));
 
 
-	// "REQUEST_METHOD"
+    // "REQUEST_METHOD"
 	// "CONTENT_LENGTH"
 	// "CONTENT_TYPE"
 	// "PATH_INFO"
@@ -55,23 +56,6 @@ char **headersToEnv(vsp &headers)
 
     return envp;
 }
-
-// string *geturi(string res)
-// {
-//     char *result;
-// 	string *resn;
-// 	size_t qu;
-
-// 	result = NULL;
-// 	qu = res.find('?', 0); 
-// 	resn = new string(res.substr(0, qu));
-// 	//result = const_cast<char *>(res.substr(0,qu).c_str());
-// 	cout << *resn << endl;
-// 	cout<< "test" << qu <<endl;
-// 	result = const_cast<char *>(resn->c_str());
-// 	cout<< "result : " << result <<endl;
-//     return (resn);
-// }
 
 string geturi(string res)
 {
@@ -197,6 +181,7 @@ void Cgi::execute(const std::string& outputFile)
     close(fd[0]);
 }
 
+
 string Cgi::execute(void)
 {
     int         fd[2];
@@ -210,6 +195,7 @@ string Cgi::execute(void)
         return NULL;
     }
 	cout<< "FBB" << filePath << endl;
+
     // Fork the process
     id = fork();
     if (id == -1)
@@ -234,18 +220,34 @@ string Cgi::execute(void)
     // Parent process
     close(fd[1]); // Close the write end of the pipe
 
+    // Read the response from the pipe using a thread
+    std::thread readThread([&]() {
+        char    buffer[1024];
+        ssize_t bytesRead;
+        while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
+            res_body.append(buffer, bytesRead);
+        close(fd[0]);
+    });
+
     // Wait for the child process to finish
     int status;
     waitpid(id, &status, 0);
 
-    // Read the response from the pipe
-    char    buffer[1024];
-    ssize_t bytesRead;
-    while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
-    {
-        res_body.append(buffer, bytesRead);
-    }
+    // Join the read thread
+    readThread.join();
 
-    close(fd[0]);
+    // // Wait for the child process to finish
+    // int status;
+    // waitpid(id, &status, 0);
+
+    // // Read the response from the pipe
+    // char    buffer[1024];
+    // ssize_t bytesRead;
+    // while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
+    // {
+    //     res_body.append(buffer, bytesRead);
+    // }
+
+    //close(fd[0]);
 	return (res_body);
 }

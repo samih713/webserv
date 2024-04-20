@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:42:45 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 01:58:16 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:50:36 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define CGI_HPP
 
 #include <iostream>
+#include <thread>
 #include <cstring>
 #include <string>
 #include <unistd.h>
@@ -38,7 +39,6 @@ class Cgi {
 		string body;
         char **arguments;
         char **environment;
-	
 };
 
 #endif

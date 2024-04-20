@@ -26,15 +26,28 @@ inline const string find_resource_type(const string &resource)
     return (fileTypes.find(file_extension)->second);
 }
 
-bool check_cgi_request(const string &res)
-{
-	string filetype;
+// bool check_cgi_request(const string &res)
+// {
+// 	string filetype;
 
-	filetype = find_resource_type(res);
-	if(filetype == "bash" || filetype == "python")
-		return true;
-	else
-		return false;
+// 	filetype = find_resource_type(res);
+// 	if(filetype == "bash" || filetype == "python")
+// 		return true;
+// 	else
+// 		return false;
+// }
+
+bool check_cgi_request(string res)
+{
+    // Find the position of the word in the string
+    size_t pos = res.find("cgi-bin");
+
+    if (pos != std::string::npos)
+        return(true);
+    else
+        return(false);
+
+
 }
 
 
