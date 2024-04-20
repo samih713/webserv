@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 22:59:00 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 23:45:03 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,11 +91,12 @@ Cgi::Cgi(const Request &request, const ServerConfig &config): body(request.get_b
 {
 	string res;
 
+	(void)config;
 	res = const_cast<char *>(request.get_resource().c_str());
 	headers = request.get_headers();
 	environment = headersToEnv(headers);
 	//filePath = const_cast<char *>(geturi(request.get_resource())->c_str());
-	filePath = config.serverRoot + (geturi(res));
+	filePath = (geturi(res));
 	queryString = getStingQuery(res);
     //filePath = const_cast<char *> (request.get_resource().c_str());
     // // Check if the Python script exists
