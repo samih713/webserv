@@ -10,6 +10,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Check if the script is invoked with the argument "compile"
+if [ "$1" = "compile" ]; then
+    exit 0
+fi
+
 test_dir="./test_files"
 if [ ! -d "$test_dir" ]; then
     echo "Test directory '$test_dir' not found. Exiting."
@@ -25,6 +30,7 @@ sub_dirs=(
 
 # Prompt user to select a test directory
 echo "Select a test directory to run: "
+echo "0. all"
 for i in "${!sub_dirs[@]}"; do
     echo "$((i+1)). ${sub_dirs[i]}"
 done
