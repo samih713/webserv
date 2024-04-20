@@ -33,7 +33,11 @@ void Request::parse_content_length(const string& contentLength)
 
 void Request::parse_request_line()
 {
-    message >> method >> resource >> httpVersion;
+    char singleSpace[2] = {0};
+    std::noskipws(message);
+    message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> httpVersion;
+    if (strncmp(singleSpace, "  ", 2))
+        message.setstate(std::ios::failbit);
     check_line_terminator(message, CRLF);
     // replace %20 with space
     replace_spaces(resource);
@@ -75,7 +79,7 @@ void Request::apply_config(const ServerConfig& config)
 void Request::parse_body()
 {
     if (expectedBodySize != NOT_SET)
-        message.read(body.data(), (expectedBodySize <= maxBodySize? expectedBodySize:0));
+        body.append(message.str().substr(message.tellg()), (expectedBodySize <= maxBodySize? expectedBodySize:0));
     parsed = true;
 }
 
