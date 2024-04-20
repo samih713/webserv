@@ -33,8 +33,12 @@ static const string ERR_INVALID_ROOT("Parser: invalid root directive");
 static const string ERR_MISSING_ROOT("Parser: missing root directive");
 static const string ERR_INVALID_INDEX("Parser: invalid index directive");
 static const string ERR_INVALID_AUTOINDEX("Parser: invalid autoindex directive");
+
 static const string ERR_INVALID_BODY_SIZE(
     "Parser: invalid client_max_body_size directive");
+static const string ERR_MULTIPLE_SIZE_SUFFIX("Parser: multiple suffixes found");
+static const string ERR_MISSING_SIZE("Parser: missing size value");
+static const string ERR_MISSING_SUFFIX("Parser: missing size suffix");
 
 static const string ERR_ERROR_PATH("Parser: error page path missing");
 static const string ERR_ERROR_CODE("Parser: error page code missing");
@@ -84,7 +88,7 @@ private:
     fd     _parse_listen(void);
     void   _parse_server_name(string& serverName);
     string _parse_root(void);
-    string _parse_client_max_body_size(void);
+    size_t _parse_client_max_body_size(void);
     bool   _parse_autoindex(void);
 
     bool _is_string_number(const string& str)
