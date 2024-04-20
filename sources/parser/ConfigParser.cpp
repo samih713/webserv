@@ -191,7 +191,7 @@ string ConfigParser::_parse_root(void)
     return rootPath;
 }
 
-size_t suffix_to_multiplier(char suffix)
+static size_t _suffix_to_multiplier(char suffix)
 {
     switch (std::tolower(suffix)) {
         case 'k': return 1000;
@@ -201,14 +201,24 @@ size_t suffix_to_multiplier(char suffix)
     }
 }
 
+static size_t _convert_to_number(const string& maxBodySize)
+{
+    size_t n = 0;
+
+    string number = maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789"));
+    istringstream mbs(number);
+    mbs >> n;
+    string suffix = maxBodySize.substr(number.size());
+    if (suffix.size() != 1)
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_BODY_SIZE);
+    n *= _suffix_to_multiplier(suffix[0]);
+    return n;
+}
+
 size_t ConfigParser::_parse_client_max_body_size(void)
 {
     DEBUG_MSG("Parsing client_max_body_size directive", RE);
 
-    istringstream __mbs;
-    string        __number = "";
-    size_t        __n      = 0;
-    string        __suffix = "";
 
     ++_itr; // move to max body size
     if (*(_itr + 1) != ";")
@@ -222,12 +232,7 @@ size_t ConfigParser::_parse_client_max_body_size(void)
 
     _check_semicolon();
 
-    __number = maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789"));
-    __mbs.str(__number);
-    __mbs >> __n;
-    __suffix = maxBodySize.substr(__number.size());
-    __n *= suffix_to_multiplier(__suffix[0] ? __suffix[0] : 0);
-    return __n;
+    return _convert_to_number(maxBodySize);
 }
 
 bool ConfigParser::_parse_autoindex(void)
