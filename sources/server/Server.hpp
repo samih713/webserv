@@ -1,6 +1,6 @@
 #include "CachedPages.hpp"
-#include "ServerConfig.hpp"
 #include "ConnectionManager.hpp"
+#include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
 
 #ifndef SERVER_HPP
@@ -35,6 +35,7 @@ private:
     const ServerConfig& config;
     CachedPages*        cachedPages;
 
+    bool is_request_ready(Request& r, fd incoming);
     void handle_connection(fd incoming, fd_set& activeSockets);
     /* polling strats */
     void select_strat();

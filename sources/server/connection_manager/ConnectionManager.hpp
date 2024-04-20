@@ -1,6 +1,6 @@
+#include "Request.hpp"
 #include "TimeOut.hpp"
 #include "webserv.hpp"
-#include "Request.hpp"
 
 #ifndef CONNECTION_MANAGER_HPP
 #define CONNECTION_MANAGER_HPP
@@ -71,12 +71,10 @@ inline void ConnectionManager::remove_connection(fd currentSocket, fd_set& activ
 inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& activeSockets)
 {
     FD_SET(newConnection, &activeSockets);
-    Request& r =
-        connectionMap.insert(make_pair(newConnection, Request())).first->second;
-    if (r.isCompleted()) {
+    Request& r = connectionMap.insert(make_pair(newConnection, Request())).first->second;
+    if (r.is_completed()) {
         connectionMap.erase(newConnection);
-        return (
-            connectionMap.insert(make_pair(newConnection, Request())).first->second);
+        return (connectionMap.insert(make_pair(newConnection, Request())).first->second);
     }
     r.timer.update_time();
     return (r);
