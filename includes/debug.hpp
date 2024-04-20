@@ -35,9 +35,7 @@
 #ifdef __DEBUG__
 #define DEBUGASSERT(x) assert(x)
 #else
-#define DEBUGASSERT(x)                                                                   \
-    do {                                                                                 \
-    } while (0)
+#define DEBUGASSERT(x)
 #endif // __DEBUG__
 
 #endif // ERROR_HPP
