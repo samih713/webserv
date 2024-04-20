@@ -1,6 +1,5 @@
 #include "Message.hpp"
 #include "Request.hpp"
-#include "debug.hpp"
 
 // helper functions
 static void   check_line_terminator(istream& is, const string& check);
@@ -33,7 +32,7 @@ void Request::parse_content_length(const string& contentLength)
 
 void Request::parse_request_line()
 {
-    char singleSpace[2] = {0};
+    char singleSpace[2] = { 0 };
     std::noskipws(message);
     message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> httpVersion;
     if (strncmp(singleSpace, "  ", 2))
@@ -79,7 +78,8 @@ void Request::apply_config(const ServerConfig& config)
 void Request::parse_body()
 {
     if (expectedBodySize != NOT_SET)
-        body.append(message.str().substr(message.tellg()), (expectedBodySize <= maxBodySize? expectedBodySize:0));
+        body.append(message.str().substr(message.tellg()),
+            (expectedBodySize <= maxBodySize ? expectedBodySize : 0));
     parsed = true;
 }
 
