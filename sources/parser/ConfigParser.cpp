@@ -2,8 +2,6 @@
 
 ConfigParser::ConfigParser(const string& configFile)
 {
-    DEBUG_MSG("Parsing " << W << configFile, RE);
-
     // checking file extension
     if (configFile.find(".conf") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_FILE);
@@ -44,8 +42,6 @@ ConfigParser::ConfigParser(const string& configFile)
 void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
     const string&                                              root)
 {
-    DEBUG_MSG("Parsing error_page directive", RE);
-
     if (root.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
@@ -91,7 +87,6 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
 
 vector<string> ConfigParser::_parse_index(const string& root)
 {
-    DEBUG_MSG("Parsing index directive", RE);
     vector<string> indexFiles;
 
     if (root.empty())
@@ -110,8 +105,6 @@ vector<string> ConfigParser::_parse_index(const string& root)
 
 Location ConfigParser::_parse_location_context(void)
 {
-    DEBUG_MSG("Parsing location context", RE);
-
     ++_itr; // move to location modifier/path
     if (*_itr == "{")
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LOCATION);
@@ -148,8 +141,6 @@ Location ConfigParser::_parse_location_context(void)
 
 fd ConfigParser::_parse_listen(void)
 {
-    DEBUG_MSG("Parsing listen directive", RE);
-
     ++_itr; // move to port number
     if (*(_itr + 1) != ";")
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
@@ -168,8 +159,6 @@ fd ConfigParser::_parse_listen(void)
 
 void ConfigParser::_parse_server_name(string& serverName)
 {
-    DEBUG_MSG("Parsing server_name directive", RE);
-
     ++_itr; // move to server name
     if (_is_keyword(*_itr))
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
@@ -179,8 +168,6 @@ void ConfigParser::_parse_server_name(string& serverName)
 
 string ConfigParser::_parse_root(void)
 {
-    DEBUG_MSG("Parsing root directive", RE);
-
     ++_itr; // move to root path
     if (*(_itr + 1) != ";")
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
@@ -193,8 +180,6 @@ string ConfigParser::_parse_root(void)
 
 string ConfigParser::_parse_client_max_body_size(void)
 {
-    DEBUG_MSG("Parsing client_max_body_size directive", RE);
-
     ++_itr; // move to max body size
     if (*(_itr + 1) != ";")
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
@@ -212,8 +197,6 @@ string ConfigParser::_parse_client_max_body_size(void)
 
 bool ConfigParser::_parse_autoindex(void)
 {
-    DEBUG_MSG("Parsing autoindex directive", RE);
-
     ++_itr; // move to on/off
     string autoindex = *_itr;
     if (autoindex != "on" && autoindex != "off")
@@ -224,8 +207,6 @@ bool ConfigParser::_parse_autoindex(void)
 
 ServerConfig ConfigParser::_parse_server_context(void)
 {
-    DEBUG_MSG("Parsing server context", RE);
-
     ++_itr; // move to {
     if (*_itr != "{")
         THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
@@ -260,8 +241,6 @@ ServerConfig ConfigParser::_parse_server_context(void)
 
 vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
 {
-    DEBUG_MSG("Parsing HTTP context", RE);
-
     // setting values for Config object
     _itr = _tokens.begin();
     if (*_itr != "http") //! maybe there's stuff in the global context
