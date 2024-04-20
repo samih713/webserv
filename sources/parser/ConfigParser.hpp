@@ -1,5 +1,5 @@
-#include "webserv.hpp"
 #include "ServerConfig.hpp"
+#include "webserv.hpp"
 #include <stack>
 #include <sys/stat.h>
 
@@ -84,7 +84,7 @@ private:
     fd     _parse_listen(void);
     void   _parse_server_name(string& serverName);
     string _parse_root(void);
-    string _parse_client_max_body_size(void);
+    size_t _parse_client_max_body_size(void);
     bool   _parse_autoindex(void);
 
     bool _is_string_number(const string& str)

@@ -191,9 +191,24 @@ string ConfigParser::_parse_root(void)
     return rootPath;
 }
 
-string ConfigParser::_parse_client_max_body_size(void)
+size_t suffix_to_multiplier(char suffix)
+{
+    switch (std::tolower(suffix)) {
+        case 'k': return 1000;
+        case 'm': return 1000000;
+        case 'g': return 1000000000;
+        default:  return 1; // if there's no suffix
+    }
+}
+
+size_t ConfigParser::_parse_client_max_body_size(void)
 {
     DEBUG_MSG("Parsing client_max_body_size directive", RE);
+
+    istringstream __mbs;
+    string        __number = "";
+    size_t        __n      = 0;
+    string        __suffix = "";
 
     ++_itr; // move to max body size
     if (*(_itr + 1) != ";")
@@ -207,7 +222,12 @@ string ConfigParser::_parse_client_max_body_size(void)
 
     _check_semicolon();
 
-    return maxBodySize;
+    __number = maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789"));
+    __mbs.str(__number);
+    __mbs >> __n;
+    __suffix = maxBodySize.substr(__number.size());
+    __n *= suffix_to_multiplier(__suffix[0] ? __suffix[0] : 0);
+    return __n;
 }
 
 bool ConfigParser::_parse_autoindex(void)

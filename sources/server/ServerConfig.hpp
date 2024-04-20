@@ -15,7 +15,7 @@ struct Location {
 
 struct ServerConfig {
     fd                       listenerPort;
-    string                   maxBodySize;
+    size_t                   maxBodySize;
     string                   serverName;
     string                   serverRoot;
     vector<string>           indexFiles;
