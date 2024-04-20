@@ -186,7 +186,7 @@ size_t ConfigParser::_parse_client_max_body_size(void)
 
     string maxBodySize = *_itr;
     if (maxBodySize.find_first_not_of("0123456789kKmMgG.") != string::npos)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_BODY_SIZE);
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_CHAR);
     else if (maxBodySize.find_first_of("0123456789") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SIZE);
     else if (maxBodySize.find_first_of("kKmMgG") == string::npos) {
@@ -197,14 +197,14 @@ size_t ConfigParser::_parse_client_max_body_size(void)
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SUFFIX);
     }
     else if (maxBodySize.find_first_of(".") != maxBodySize.find_last_of("."))
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_BODY_SIZE);
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_CHAR);
 
     // get the suffix and its associated value
     string suffix = maxBodySize.substr(maxBodySize.find_first_not_of("0123456789."));
     if (suffix.size() > 1)
         THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_SIZE_SUFFIX);
 
-    size_t multiplier = 0;
+    size_t multiplier = 1;
     if (suffix == "k" || suffix == "K")
         multiplier = 1000;
     else if (suffix == "m" || suffix == "M")
@@ -212,9 +212,11 @@ size_t ConfigParser::_parse_client_max_body_size(void)
     else if (suffix == "g" || suffix == "G")
         multiplier = 1000000000;
 
-    double size = std::strtod(
-        maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789.")).c_str(),
-        NULL);
+    string value = maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789."));
+    if (value.size() > 13)
+        THROW_EXCEPTION_WITH_INFO(ERR_BODY_SIZE_OVERFLOW);
+
+    double size = std::strtod(value.c_str(), NULL);
 
     _check_semicolon();
 
