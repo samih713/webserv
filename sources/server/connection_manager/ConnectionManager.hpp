@@ -1,23 +1,30 @@
 #include "TimeOut.hpp"
 #include "webserv.hpp"
+#include "Request.hpp"
 
 #ifndef CONNECTION_MANAGER_HPP
 #define CONNECTION_MANAGER_HPP
 
-typedef std::map<fd, TimeOut> ConnectionMap;
+typedef map<fd, Request> ConnectionMap;
 
-class ConnectionManager
-{
-    public:
-        static void        remove_expired(fd_set &activeSockets);
-        static inline void update_connection(fd currentSocket);
-        static inline void remove_connection(fd currentSocket, fd_set &activeSockets);
-        static inline void add_connection(fd newConnection, fd_set &activeSockets);
+class ConnectionManager {
+public:
+    static void            remove_expired(fd_set& activeSockets);
+    static inline void     update_connection(fd currentSocket);
+    static inline Request& find_request(fd currentSocket);
+    static void            check_connection(fd currentSocket);
+    static inline void     remove_connection(fd currentSocket, fd_set& activeSockets);
+    static inline Request& add_connection(fd newConnection, fd_set& activeSockets);
 
-    private:
-        static ConnectionMap connectionMap;
-        ConnectionManager();
+private:
+    static ConnectionMap connectionMap;
+    ConnectionManager();
 };
+
+inline Request& ConnectionManager::find_request(fd currentSocket)
+{
+    return connectionMap.find(currentSocket)->second;
+}
 
 /**
  * Updates the connection time for a given socket in the ConnectionManager.
@@ -25,14 +32,12 @@ class ConnectionManager
  * @param currentSocket The file descriptor of the socket for which the connection time
  * needs to be updated.
  * @return void
- *
- * @throws Assertion error if the socket is not found in the ConnectionManager.
  */
 inline void ConnectionManager::update_connection(fd currentSocket)
 {
     ConnectionMap::iterator it = connectionMap.find(currentSocket);
     DEBUGASSERT(it != connectionMap.end() && "Connection not found");
-    it->second.update_time();
+    it->second.timer.update_time();
 }
 
 
@@ -44,7 +49,7 @@ inline void ConnectionManager::update_connection(fd currentSocket)
  *
  * @return void
  */
-inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &activeSockets)
+inline void ConnectionManager::remove_connection(fd currentSocket, fd_set& activeSockets)
 {
     FD_CLR(currentSocket, &activeSockets);
     close(currentSocket);
@@ -52,20 +57,29 @@ inline void ConnectionManager::remove_connection(fd currentSocket, fd_set &activ
     DEBUG_MSG("Connection closed", L);
 }
 
-
 /**
- * Adds a new connection to the active sockets set and connection map.
+ * @brief Adds a connection to the connection map by updating the
+ * activeSockets set and creating a new Request object or returns an existing one.
+ * If the Request object for the connection is already completed remove it
+ * and create a new one.
  *
  * @param newConnection The file descriptor of the new connection to be added
- * @param activeSockets Reference to the active sockets set
+ * @param activeSockets The set of active file descriptors for the connections
  *
- * @return void
+ * @return A reference to the Request object
  */
-inline void ConnectionManager::add_connection(fd newConnection, fd_set &activeSockets)
+inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& activeSockets)
 {
     FD_SET(newConnection, &activeSockets);
-    connectionMap.insert(std::make_pair(newConnection, TimeOut()));
+    Request& r =
+        connectionMap.insert(make_pair(newConnection, Request())).first->second;
+    if (r.isCompleted()) {
+        connectionMap.erase(newConnection);
+        return (
+            connectionMap.insert(make_pair(newConnection, Request())).first->second);
+    }
+    r.timer.update_time();
+    return (r);
 }
-
 
 #endif // CONNECTION_MANAGER_HPP

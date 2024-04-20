@@ -16,13 +16,12 @@
  *
  * @throws Socket::Exception if there is an error in creating or setting up the socket.
  */
-TCPSocket::TCPSocket(int port, int backLog)
-    : Socket(family, type, 0, SOCK_FLAG)
+TCPSocket::TCPSocket(int port, int backLog) : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
     // prep up the struct
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_family = family;
+    addr.sin_family      = family;
     std::memcpy(&address, &addr, sizeof(addr));
 
     // set-up port
@@ -30,7 +29,7 @@ TCPSocket::TCPSocket(int port, int backLog)
     bind();
     listen(backLog);
     DEBUG_MSG("TCPSocket created successfully, listening on port [" + ws_itoa(port) + "]",
-              L);
+        L);
 }
 
 

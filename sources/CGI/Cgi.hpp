@@ -6,19 +6,14 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:42:45 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 22:53:43 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 22:59:34 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CGI_HPP
 #define CGI_HPP
 
-#include <iostream>
-#include <cstring>
-#include <string>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include "Request.hpp"
 #include "webserv.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
@@ -41,4 +36,3 @@ class Cgi {
 };
 
 #endif
-

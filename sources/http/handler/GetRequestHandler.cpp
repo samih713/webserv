@@ -15,7 +15,7 @@ GetRequestHandler::~GetRequestHandler()
 };
 
 // parse accepted formats
-inline const string find_resource_type(const string &resource)
+inline const string find_resource_type(const string& resource)
 {
     size_t extension_index = resource.find_last_of('.');
     string file_extension;
@@ -56,43 +56,33 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
                                                    const ServerConfig &config)
 {
     vsp          requestHeaders = request.get_headers();
-    string       resource = request.get_resource();
+    string       resource       = request.get_resource();
+    string      defaultPage = config.serverRoot + "/";
     vector<char> body;
 
 
-    // TODO find a better way to include server name
-    add_header(std::make_pair<string, string>("Server", "The Wired"));
+    add_header(make_pair<string, string>("Server", config.serverName));
 
-    /* need to build resource location from the
-     * root directory in server configuration
-     * */
 
     ifstream resource_file;
     size_t   resource_size = 0;
-    status = OK;
-    if (resource == "/")
-    {
+    status                 = OK;
+    if (resource == defaultPage) {
         body = cachedPages->home.data;
-        add_header(std::make_pair<string, string>("Content-Type",
-                                                  cachedPages->home.contentType));
+        add_header(make_pair<string, string>("Content-Type",
+            cachedPages->home.contentType));
 
-        // remove
-        resource_size = cachedPages->home.contentLength;
-
-        add_header(std::make_pair<string, string>(
-            "Content-Length", ws_itoa(cachedPages->home.contentLength)));
+        add_header(make_pair<string, string>("Content-Length",
+            ws_itoa(cachedPages->home.contentLength)));
     }
-    else
-    {
-        resource = config.serverRoot + resource;
+    else {
         resource_file.open(resource.c_str(), std::ios_base::binary);
-        if (resource_file.fail())
-        {
+        if (resource_file.fail()) {
             status = NOT_FOUND;
-            add_header(std::make_pair<string, string>("Content-Type",
-                                                      cachedPages->notFound.contentType));
-            add_header(std::make_pair<string, string>(
-                "Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
+            add_header(make_pair<string, string>("Content-Type",
+                cachedPages->notFound.contentType));
+            add_header(make_pair<string, string>("Content-Length",
+                ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
         }
         else
@@ -122,7 +112,28 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 				  // content type
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
-                add_header(std::make_pair<string, string>("Content-Type", resource_type));
+                add_header(make_pair<string, string>("Content-Type", resource_type));
+
+            if (resource_type == "bash" || resource_type == "python") {
+                Cgi    cgi(request);
+                string result;
+
+                result = cgi.execute();
+                body   = vector<char>(result.begin(), result.end());
+                add_header(make_pair<string, string>("Content-Length",
+                    ws_itoa(body.size())));
+            }
+            else {
+                body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
+                    std::istreambuf_iterator<char>());
+                resource_file.seekg(0, std::ios_base::end);
+                resource_size = resource_file.tellg();
+                add_header(make_pair<string, string>("Content-Length",
+                    ws_itoa(resource_size)));
+                resource_file.seekg(0, std::ios_base::beg);
+            }
+            // content type
+
             // content length
             resource_file.seekg(0, std::ios_base::end);
             resource_size = resource_file.tellg();
@@ -134,7 +145,7 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
         }
     }
     /* authentication function goes here for the requested resource */
-    DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
+
     /* caching control */
 
     /* compression/encoding
@@ -146,13 +157,12 @@ const vector<char> GetRequestHandler::get_resource(const Request      &request,
 }
 
 
-Response GetRequestHandler::handle_request(const Request      &request,
-                                           const CachedPages  *cachedPages,
-                                           const ServerConfig &config)
+Response GetRequestHandler::handle_request(const Request& request,
+    const CachedPages* cachedPages, const ServerConfig& config)
 {
     DEBUG_MSG("Handling get request ... ", B);
 
     vsp request_headers = request.get_headers();
-    body = get_resource(request, cachedPages, config);
+    body                = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

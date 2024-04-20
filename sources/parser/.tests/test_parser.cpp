@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
             itr->print();
     }
     catch (std::exception &error) {
-        std::cerr << R << "[ ERROR ] " << RE << error.what() << std::endl;
+        std::cerr << error.what() << std::endl;
         return 1;
     }
     return 0;
