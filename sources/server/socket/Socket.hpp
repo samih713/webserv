@@ -22,44 +22,42 @@ static const int SOCK_FLAG = 0;
  *
  * This class provides functionality for creating and managing network sockets.
  */
-class Socket
-{
+class Socket {
+public:
+    virtual ~Socket() throw();
+    /* -------------------------------- Interface ------------------------------- */
+    void set_port(int port);
+    fd   get_fd() const throw();
+    void bind() const;
+    void listen(int backlog) const;
+    fd   accept();
+
+    /* ---------------------------- Socket Exception ---------------------------- */
+    class Exception: public std::exception {
     public:
-        virtual ~Socket() throw();
-        /* -------------------------------- Interface ------------------------------- */
-        void set_port(int port);
-        fd   get_fd() const throw();
-        void bind() const;
-        void listen(int backlog) const;
-        fd   accept();
-
-        /* ---------------------------- Socket Exception ---------------------------- */
-        class Exception : public std::exception
-        {
-            public:
-                explicit Exception(const std::string &error_message);
-                ~Exception() throw(){};
-                const char *what() const throw();
-
-            private:
-                std::string error_message;
-                std::string compose_msg(const std::string &message);
-        };
-
-    protected:
-        /* ------------------------------- Constructor ------------------------------ */
-        Socket(int family, int type, int protocol, int flags);
-        struct sockaddr address;
+        explicit Exception(const std::string& error_message);
+        ~Exception() throw() {};
+        const char* what() const throw();
 
     private:
-        static const fd invalidFD = -1;
-        fd              socketFD;
-        mutable bool    isBound;
-        mutable bool    isListening;
+        std::string error_message;
+        std::string compose_msg(const std::string& message);
+    };
 
-        // deleted
-        Socket(const Socket &);
-        Socket &operator=(const Socket &);
+protected:
+    /* ------------------------------- Constructor ------------------------------ */
+    Socket(int family, int type, int protocol, int flags);
+    struct sockaddr address;
+
+private:
+    static const fd invalidFD = -1;
+    fd              socketFD;
+    mutable bool    isBound;
+    mutable bool    isListening;
+
+    // deleted
+    Socket(const Socket&);
+    Socket& operator=(const Socket&);
 };
 
 #endif // SOCKET_HPP

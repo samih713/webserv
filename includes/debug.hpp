@@ -22,8 +22,7 @@
 #else
 #include <cassert>
 #define DEBUG_MSG(message, color)                                                        \
-    do                                                                                   \
-    {                                                                                    \
+    do {                                                                                 \
         std::cerr << (color);                                                            \
         std::cerr << message;                                                            \
         std::cerr << std::endl;                                                          \
@@ -37,8 +36,7 @@
 #define DEBUGASSERT(x) assert(x)
 #else
 #define DEBUGASSERT(x)                                                                   \
-    do                                                                                   \
-    {                                                                                    \
+    do {                                                                                 \
     } while (0)
 #endif // __DEBUG__
 
