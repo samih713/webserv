@@ -26,6 +26,7 @@ sub_dirs=(
     "client_body_size_check"
     "empty_check"
     "missing_check"
+    "duplicate_check"
 )
 
 # Prompt user to select a test directory
@@ -40,7 +41,7 @@ read -p "Enter the number corresponding to the test directory: " choice
 # Run all test directories if no input or 0 is entered
 if [ -z "$choice" ] || [ "$choice" -eq 0 ]; then
     echo "Running all test directories..."
-    selected_dirs=("./")
+    selected_dirs=("")
 else
     # Validate user input
     if ! [[ "$choice" =~ ^[1-${#sub_dirs[@]}]$ ]]; then
@@ -73,7 +74,7 @@ for dir in "${selected_dirs[@]}"; do
     if [ ! -d "test_files/$dir" ]; then
         echo "Test directory '$dir' not found. Skipping."
     else
-        find_tests "test_files/$dir"
+        find_tests "test_files$dir"
     fi
 done
 
