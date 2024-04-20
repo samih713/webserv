@@ -4,9 +4,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-const string      crlf("\r\n");
-const string      version("HTTP/1.1");
-const std::string request("GET /index.html " + version + crlf + crlf);
+const string crlf("\r\n");
+const string version("HTTP/1.1");
+// const std::string request("GET /index.html " + version + crlf + crlf);
 #define BUFFER_SIZE 4096
 
 int main()
@@ -32,24 +32,17 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    if (send(sockfd, request.c_str(), strlen(request.c_str()), 0) < 0) {
+    if (send(sockfd, sample_request.c_str(), strlen(sample_request.c_str()), 0) < 0) {
         std::cerr << "Failed to send the message. errno: " << errno << std::endl;
         exit(EXIT_FAILURE);
     }
     std::cout << "Message sent to server successfully." << std::endl;
 
     // Receive a response back from the server
-    char    buffer[BUFFER_SIZE] = { 0 };
-    ssize_t bytesReceived       = 0;
-    ssize_t result              = 0;
+    char    buffer[BUFFER_SIZE + 1] = { 0 };
+    ssize_t bytesReceived           = 0;
 
-    while (1) {
-        result = recv(sockfd, &buffer[bytesReceived], 200, 0);
-        sleep(1);
-        if (result == 0)
-            break;
-        bytesReceived += result;
-    }
+    bytesReceived = recv(sockfd, buffer, BUFFER_SIZE, 0);
 
     if (bytesReceived < 0) {
         std::cerr << "Failed to receive the message. errno: " << errno << std::endl;
