@@ -86,8 +86,7 @@ re: fclean
 	@$(MAKE) -s all
 
 test_parser:
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(PARSER_SRCS) $(TEST_PARSER_SRC) -o $(TEST_PARSER)
-	@echo "$(BLUE)[ TEST ]$(RESET) Parser ready for testing."
+	@cd ./$(PARSER_DIR)/$(TESTS_DIR) && ./run_tests.sh && cd -
 
 test_http:
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(CGI_SRCS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
@@ -116,4 +115,4 @@ format:
 
 -include $(OBJS:.o=.d)
 
-.PHONY: clean fclean all re debug run test_parser test_http test_socket test_cgi format
+.PHONY: clean fclean all re debug run test_http test_socket test_cgi format
