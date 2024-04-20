@@ -19,6 +19,7 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_EMPTY);
 
     string line;
+    string content;
     while (std::getline(file, line)) {
         // remove comments
         size_t pos = line.find('#');
@@ -33,10 +34,29 @@ ConfigParser::ConfigParser(const string& configFile)
         line.erase(0, line.find_first_not_of(" \t"));
         line.erase(line.find_last_not_of(" \t") + 1);
 
-        _content.append(line);
+        content.append(line);
     }
 
     file.close();
+
+    string currentToken;
+    for (string::const_iterator itr = content.begin(); itr != content.end(); ++itr) {
+        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+            _tokens.push_back(string(1, *itr));
+        }
+        else if (std::isspace(*itr)) { // whitespace
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+        }
+        else
+            currentToken.push_back(*itr); // add character to current token
+    }
 }
 
 void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
@@ -305,25 +325,6 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
 
 vector<ServerConfig> ConfigParser::parse(void)
 {
-    string currentToken;
-    for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
-        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-            _tokens.push_back(string(1, *itr));
-        }
-        else if (std::isspace(*itr)) { // whitespace
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-        }
-        else
-            currentToken.push_back(*itr); // add character to current token
-    }
-
     // check braces
     stack<string> braces;
     for (vector<string>::const_iterator itr = _tokens.begin(); itr != _tokens.end();

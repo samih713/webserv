@@ -74,7 +74,6 @@ public:
     vector<ServerConfig> parse(void);
 
 private:
-    string                         _content;
     vector<string>                 _tokens;
     vector<string>::const_iterator _itr;
 
