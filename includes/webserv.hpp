@@ -10,6 +10,7 @@
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
 
 // REQUEST
+// [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
 // [ ] headers to parse multiple line field-values, and multi-line
 // [ ] need to form proper error response in case of parsing failure
@@ -64,6 +65,7 @@ using std::fstream;
 using std::ifstream;
 using std::istream;
 using std::istringstream;
+using std::make_pair;
 using std::map;
 using std::ofstream;
 using std::ostream;
@@ -73,7 +75,6 @@ using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;
-using std::make_pair;
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;
