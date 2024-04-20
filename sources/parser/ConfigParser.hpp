@@ -108,7 +108,7 @@ private:
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
     }
-    void checkDuplicateDirective(set<string>& parsedDirectives, const string& directive)
+    void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
     {
         if (parsedDirectives.find(directive) != parsedDirectives.end())
             THROW_EXCEPTION_WITH_INFO("Parser: duplicate " + directive + " found");

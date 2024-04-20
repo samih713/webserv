@@ -245,7 +245,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
     while (*_itr != "}") {
         if (*_itr == "listen") {
             _serverConfig.listenerPort = _parse_listen();
-            checkDuplicateDirective(parsedServerDirectives, "listen");
+            check_duplicate_directive(parsedServerDirectives, "listen");
         }
         else if (*_itr == "server_name")
             _parse_server_name(_serverConfig.serverName);
@@ -253,11 +253,11 @@ ServerConfig ConfigParser::_parse_server_context(void)
             _parse_error_page(_serverConfig.errorPages, _serverConfig.serverRoot);
         else if (*_itr == "root") {
             _serverConfig.serverRoot = _parse_root();
-            checkDuplicateDirective(parsedServerDirectives, "root");
+            check_duplicate_directive(parsedServerDirectives, "root");
         }
         else if (*_itr == "client_max_body_size") {
             _serverConfig.maxBodySize = _parse_client_max_body_size();
-            checkDuplicateDirective(parsedServerDirectives, "client_max_body_size");
+            check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
         }
         else if (*_itr == "index")
             _serverConfig.indexFiles = _parse_index(_serverConfig.serverRoot);
@@ -265,7 +265,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
             _serverConfig.locations.push_back(_parse_location_context());
         else if (*_itr == "autoindex") {
             _serverConfig.autoindex = _parse_autoindex();
-            checkDuplicateDirective(parsedServerDirectives, "autoindex");
+            check_duplicate_directive(parsedServerDirectives, "autoindex");
         }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_SERVER);
