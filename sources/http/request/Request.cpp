@@ -3,7 +3,7 @@
 
 Request::Request()
     : message(""), headerReady(false), parsed(false), completed(false),
-      expectedBodySize(NOT_SET)
+      expectedBodySize(NOT_SET), maxBodySize(DEFAULT_MAX_BODY_SIZE)
 {}
 
 Request::~Request() {}
@@ -11,13 +11,14 @@ Request::~Request() {}
 Request::Request(const Request& other)
     : message(other.message.str()), headerReady(other.headerReady), parsed(other.parsed),
       completed(other.completed), expectedBodySize(other.expectedBodySize),
-      method(other.method), resource(other.resource), http_version(other.http_version),
-      header_fields(other.header_fields), trailer_fields(other.trailer_fields)
+      maxBodySize(other.maxBodySize), method(other.method), resource(other.resource),
+      httpVersion(other.httpVersion), header_fields(other.header_fields),
+      trailer_fields(other.trailer_fields)
 
 {}
 
 
-const string &Request::get_method() const
+const string& Request::get_method() const
 {
     return method;
 }
@@ -46,7 +47,7 @@ ostream& operator<<(ostream& os, const Request& r)
 {
     os << "Method: " << r.method << std::endl;
     os << "Request-Target: " << r.resource << std::endl;
-    os << "HTTP-Version: " << r.http_version << std::endl;
+    os << "HTTP-Version: " << r.httpVersion << std::endl;
     os << "************ fields *************\n";
     for (size_t i = 0; i < r.header_fields.size(); i++) {
         os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
