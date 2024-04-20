@@ -7,6 +7,7 @@
 #define REQUEST_HPP
 
 static const int BUFFER_SIZE(4096);
+static const int DEFAULT_MAX_BODY_SIZE(1048576);
 
 // should be mask bits
 static const int NOT_SET(-1);
@@ -38,6 +39,7 @@ public:
 
 private:
     void parse_body();
+    void parse_request_line();
     void parse_header();
     void apply_config(const ServerConfig& config);
     void parse_content_length(const string& contentLength);
@@ -48,11 +50,12 @@ private:
     bool parsed;
     bool completed;
     int  expectedBodySize;
+    int  maxBodySize;
 
     string method;
     string resource;
     string cgiResource;
-    string http_version;
+    string httpVersion;
 
     vsp         header_fields;
     vsp         trailer_fields;
