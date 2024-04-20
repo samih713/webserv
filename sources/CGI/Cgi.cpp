@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 21:50:25 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/20 22:53:33 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,34 +220,18 @@ string Cgi::execute(void)
     // Parent process
     close(fd[1]); // Close the write end of the pipe
 
-    // Read the response from the pipe using a thread
-    std::thread readThread([&]() {
-        char    buffer[1024];
-        ssize_t bytesRead;
-        while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
-            res_body.append(buffer, bytesRead);
-        close(fd[0]);
-    });
-
     // Wait for the child process to finish
     int status;
     waitpid(id, &status, 0);
 
-    // Join the read thread
-    readThread.join();
+    // Read the response from the pipe
+    char    buffer[1024];
+    ssize_t bytesRead;
+    while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
+    {
+        res_body.append(buffer, bytesRead);
+    }
 
-    // // Wait for the child process to finish
-    // int status;
-    // waitpid(id, &status, 0);
-
-    // // Read the response from the pipe
-    // char    buffer[1024];
-    // ssize_t bytesRead;
-    // while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0)
-    // {
-    //     res_body.append(buffer, bytesRead);
-    // }
-
-    //close(fd[0]);
+    close(fd[0]);
 	return (res_body);
 }
