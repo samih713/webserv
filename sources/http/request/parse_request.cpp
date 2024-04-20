@@ -1,5 +1,6 @@
 #include "Message.hpp"
 #include "Request.hpp"
+#include "debug.hpp"
 
 // helper functions
 static void   check_line_terminator(istream& is, const string& check);
@@ -30,22 +31,25 @@ void Request::parse_content_length(const string& contentLength)
         length.setstate(std::ios::failbit);
 }
 
+void Request::parse_request_line()
+{
+    message >> method >> resource >> httpVersion;
+    check_line_terminator(message, CRLF);
+    // replace %20 with space
+    replace_spaces(resource);
+}
+
 // TODO headers to parse multiple line field-values, and multi-line
 void Request::parse_header()
 {
     string fieldName;
     string fieldValue;
 
-    // Request Line
-    message >> method >> resource >> http_version;
-    check_line_terminator(message, CRLF);
-    // replace %20 with space
-    replace_spaces(resource);
+    parse_request_line();
     // Headers
-    while (true && !message.eof()) {
-        if (peek_line_terminator(message, CRLF))
-            break;
+    while (true && !message.eof() && !peek_line_terminator(message, CRLF)) {
         std::getline(message, fieldName, ':');
+
         if (fieldName.find(' ') != string::npos)
             message.setstate(std::ios::failbit);
         fieldValue = find_value(message);
@@ -64,15 +68,14 @@ void Request::apply_config(const ServerConfig& config)
 {
     resource    = config.serverRoot + resource;
     cgiResource = config.serverRoot + resource; // change to cgi root
+    maxBodySize = config.maxBodySize;
 }
 
 // TODO handle chunked encoding
 void Request::parse_body()
 {
-    if (!message.eof())
-        std::getline(message, body, '\0');
-    if (expectedBodySize != NOT_SET && expectedBodySize != NOT_SPECIFIED)
-        body = body.substr(0, expectedBodySize);
+    if (expectedBodySize != NOT_SET)
+        message.read(body.data(), (expectedBodySize <= maxBodySize? expectedBodySize:0));
     parsed = true;
 }
 
@@ -163,11 +166,7 @@ static string find_value(stringstream& message)
     return fieldValue;
 }
 
-/*
- * @brief Replaces all occurrences of "%20" in the resource string with a space character.
- *
- * @param resource The resource string to replace "%20" with a space character.
- */
+// TODO replace all other special characters
 static void replace_spaces(string& resource)
 {
     size_t pos;

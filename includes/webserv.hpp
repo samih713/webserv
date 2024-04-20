@@ -4,6 +4,7 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
+// [ ] handle chunked encoding for Requests/Responses
 // [ ] resource handling for get-requests, is broken
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
@@ -14,7 +15,6 @@
 // [ ] better error messages, stream throws no way to know where is error
 // [ ] headers to parse multiple line field-values, and multi-line
 // [ ] need to form proper error response in case of parsing failure
-// [ ] handle chunked encoding
 // [ ] parsing needs to be reviewed for white space parsing
 
 // CGI
