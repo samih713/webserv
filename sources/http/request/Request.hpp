@@ -25,24 +25,27 @@ public:
     void recv(fd socket);
 
     const string& get_method() const;
+    STATUS_CODE&  get_status() const;
     const string& get_resource() const;
     const vsp&    get_headers() const;
 
     bool parse_request(const ServerConfig& config);
 
-    bool isCompleted();
-    void setCompleted();
+    bool is_completed();
+    void set_completed();
+    void set_status(STATUS_CODE);
 
     TimeOut timer;
 
     friend ostream& operator<<(ostream& os, const Request& r);
 
 private:
-    void parse_body();
-    void parse_request_line();
-    void parse_header();
-    void apply_config(const ServerConfig& config);
-    void parse_content_length(const string& contentLength);
+    STATUS_CODE status;
+    void        parse_body();
+    void        parse_request_line();
+    void        parse_header();
+    void        apply_config(const ServerConfig& config);
+    void        parse_content_length(const string& contentLength);
 
     stringstream message;
 
@@ -57,9 +60,9 @@ private:
     string cgiResource;
     string httpVersion;
 
-    vsp         header_fields;
-    vsp         trailer_fields;
-    std::string body;
+    vsp    header_fields;
+    vsp    trailer_fields;
+    string body;
 
     // deleted copy assigment
     void operator=(const Request&);

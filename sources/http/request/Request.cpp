@@ -2,18 +2,18 @@
 #include "debug.hpp"
 
 Request::Request()
-    : message(""), headerReady(false), parsed(false), completed(false),
+    : status(OK), message(""), headerReady(false), parsed(false), completed(false),
       expectedBodySize(NOT_SET), maxBodySize(DEFAULT_MAX_BODY_SIZE)
 {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : message(other.message.str()), headerReady(other.headerReady), parsed(other.parsed),
-      completed(other.completed), expectedBodySize(other.expectedBodySize),
-      maxBodySize(other.maxBodySize), method(other.method), resource(other.resource),
-      httpVersion(other.httpVersion), header_fields(other.header_fields),
-      trailer_fields(other.trailer_fields)
+    : status(other.status), message(other.message.str()), headerReady(other.headerReady),
+      parsed(other.parsed), completed(other.completed),
+      expectedBodySize(other.expectedBodySize), maxBodySize(other.maxBodySize),
+      method(other.method), resource(other.resource), httpVersion(other.httpVersion),
+      header_fields(other.header_fields), trailer_fields(other.trailer_fields)
 
 {}
 
@@ -33,12 +33,18 @@ const string& Request::get_resource() const
     return resource;
 }
 
-void Request::setCompleted()
+void Request::set_status(STATUS_CODE s)
+{
+    status = s;
+}
+
+
+void Request::set_completed()
 {
     completed = true;
 }
 
-bool Request::isCompleted()
+bool Request::is_completed()
 {
     return completed;
 }
