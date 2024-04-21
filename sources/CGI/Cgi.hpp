@@ -24,11 +24,11 @@ public:
     string execute(void);
 
 private:
-    vsp    headers;
-    string queryString;
-    string filePath;
-    char** arguments;
-    char** environment;
+    map<string, string> headers;
+    string              queryString;
+    string              filePath;
+    char**              arguments;
+    char**              environment;
 };
 
 #endif

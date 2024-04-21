@@ -1,6 +1,6 @@
 #include "Cgi.hpp"
 
-static char** headers_to_env(const vsp& headers);
+static char** headers_to_env(const map<string, string>& headers);
 static string get_uri(string res);
 static string get_query_string(string res);
 
@@ -129,13 +129,13 @@ string Cgi::execute(void)
     return (res_body);
 }
 
-static char** headers_to_env(const vsp& headers)
+static char** headers_to_env(const map<string, string>& headers)
 {
     std::vector<char*> envVector;
 
     // Iterate through headers
-    vsp::const_iterator end = headers.end();
-    for (vsp::const_iterator it = headers.begin(); it != end; ++it) {
+    map<string, string>::const_iterator end = headers.end();
+    for (map<string, string>::const_iterator it = headers.begin(); it != end; ++it) {
         size_t len      = it->first.size() + it->second.size() + 2;
         char*  envEntry = new char[len];
         std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
