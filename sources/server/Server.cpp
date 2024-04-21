@@ -190,18 +190,21 @@ void Server::kqueue_strat()
                     THROW_EXCEPTION_WITH_INFO(strerror(errno));
                 }
             }
-            else
+            else if (eventList[i].flags & EV_EOF)
+            {
+                // remove connection from kqueue
+                EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
+                if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
+                    close(kq);
+                    THROW_EXCEPTION_WITH_INFO(strerror(errno));
+                }
+                close(eventList[i].ident);
+                // this should be done in handle_connection
+            }
+            else if (eventList[i].flags & EVFILT_READ)
             {
                 DEBUG_MSG("reading from connection", M);
-                if (handle_connection(eventList[i].ident) == CLOSE_CONNECTION)
-                {
-                    // remove connection from kqueue
-                    EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
-                    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
-                        close(kq);
-                        THROW_EXCEPTION_WITH_INFO(strerror(errno));
-                    }
-                }
+                //TODO HANDLE READ
             }
         }
     }
