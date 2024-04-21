@@ -14,9 +14,10 @@
  */
 void Request::recv(fd socket)
 {
-    char buffer[BUFFER_SIZE] = { 0 };
-    int  bytesReceived;
+    static char buffer[BUFFER_SIZE];
+    int  bytesReceived = 0;
 
+    std::memset(buffer, 0, BUFFER_SIZE);
     bytesReceived = ::recv(socket, &buffer[0], BUFFER_SIZE - 1, 0);
 
     if (bytesReceived == 0)
@@ -31,5 +32,5 @@ void Request::recv(fd socket)
         message.str(string(buffer).substr(0, bytesReceived));
 
     if (message.str().find(CRLF + CRLF) != string::npos)
-        headerReady = true;
+        headerState = READY_TO_PARSE;
 }
