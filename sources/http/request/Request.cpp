@@ -2,20 +2,22 @@
 #include "debug.hpp"
 
 Request::Request()
-    : status(OK), message(""), headerReady(false), parsed(false), completed(false),
+    : status(OK), message(""), headerState(NOT_READY), parsed(false), completed(false),
       expectedBodySize(NOT_SET), maxBodySize(DEFAULT_MAX_BODY_SIZE)
-{}
+{
+}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : status(other.status), message(other.message.str()), headerReady(other.headerReady),
+    : status(other.status), message(other.message.str()), headerState(other.headerState),
       parsed(other.parsed), completed(other.completed),
       expectedBodySize(other.expectedBodySize), maxBodySize(other.maxBodySize),
       method(other.method), resource(other.resource), httpVersion(other.httpVersion),
-      header_fields(other.header_fields), trailer_fields(other.trailer_fields)
+      headerFields(other.headerFields), trailer_fields(other.trailer_fields)
 
-{}
+{
+}
 
 
 const string& Request::get_method() const
@@ -23,9 +25,9 @@ const string& Request::get_method() const
     return method;
 }
 
-const vsp& Request::get_headers() const
+const HeaderMap& Request::get_headers() const
 {
-    return header_fields;
+    return headerFields;
 }
 
 const string& Request::get_resource() const
@@ -33,11 +35,15 @@ const string& Request::get_resource() const
     return resource;
 }
 
+STATUS_CODE Request::get_status() const
+{
+    return status;
+}
+
 void Request::set_status(STATUS_CODE s)
 {
     status = s;
 }
-
 
 void Request::set_completed()
 {
@@ -55,8 +61,8 @@ ostream& operator<<(ostream& os, const Request& r)
     os << "Request-Target: " << r.resource << std::endl;
     os << "HTTP-Version: " << r.httpVersion << std::endl;
     os << "************ fields *************\n";
-    for (size_t i = 0; i < r.header_fields.size(); i++) {
-        os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
+    for (HeaderMap::const_iterator it = r.headerFields.begin(); it != r.headerFields.end(); ++it) {
+        os << "[" << it->first << "]" << ": " << it->second
            << std::endl;
     }
     os << "************ body *************\n";
