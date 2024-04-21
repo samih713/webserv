@@ -12,6 +12,14 @@ static const int DEFAULT_MAX_BODY_SIZE(1048576);
 // should be mask bits
 static const int NOT_SET(-1);
 static const int NOT_SPECIFIED(0);
+// header states
+
+enum HEADER_STATE {
+    NOT_READY,
+    READY_TO_PARSE,
+    NOT_PARSED,
+    PARSED,
+};
 
 static const string ERR_PARSE("Request_parser: failed to parse request");
 
@@ -24,10 +32,10 @@ public:
 
     void recv(fd socket);
 
-    const string& get_method() const;
-    STATUS_CODE&  get_status() const;
-    const string& get_resource() const;
-    const vsp&    get_headers() const;
+    STATUS_CODE      get_status() const;
+    const string&    get_method() const;
+    const string&    get_resource() const;
+    const HeaderMap& get_headers() const;
 
     bool parse_request(const ServerConfig& config);
 
@@ -44,12 +52,13 @@ private:
     void        parse_body();
     void        parse_request_line();
     void        parse_header();
+    void        parse_header_fields_content();
+    void        parse_content_length(HeaderMap::const_iterator it);
     void        apply_config(const ServerConfig& config);
-    void        parse_content_length(const string& contentLength);
 
-    stringstream message;
+    istringstream message;
 
-    bool headerReady;
+    int  headerState;
     bool parsed;
     bool completed;
     int  expectedBodySize;
@@ -60,9 +69,9 @@ private:
     string cgiResource;
     string httpVersion;
 
-    vsp    header_fields;
-    vsp    trailer_fields;
-    string body;
+    HeaderMap headerFields;
+    vsp       trailer_fields;
+    string    body;
 
     // deleted copy assigment
     void operator=(const Request&);
