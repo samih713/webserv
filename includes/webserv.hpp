@@ -13,9 +13,10 @@
 // REQUEST
 // [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
-// [ ] headers to parse multiple line field-values, and multi-line
-// [ ] need to form proper error response in case of parsing failure
+// [ ] sets status for 400, 501 ... etc
 // [ ] parsing needs to be reviewed for white space parsing
+// [ ] optimizing in case of similar request, no need to parse again
+// [x] headers to parse multiple line field-values, and multi-line
 
 // CGI
 // [ ] fix forking here for sleep
@@ -78,6 +79,7 @@ using std::vector;
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;
+typedef map<string, string> HeaderMap;
 // clang-format on
 // socket_descriptor type
 typedef int fd;
