@@ -1,9 +1,9 @@
-#include "webserv.hpp"
 #include "GetRequestHandler.hpp"
-#include "debug.hpp"
-#include "FileType.hpp"
 #include "CachedPages.hpp"
 #include "Cgi.hpp"
+#include "FileType.hpp"
+#include "debug.hpp"
+#include "webserv.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -29,25 +29,31 @@ inline const string find_resource_type(const string& resource)
 
 
 // TODO resource handling for get-requests, is broken
-const vector<char> GetRequestHandler::get_resource(const Request& request,
+const vector<char> GetRequestHandler::get_resource(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    vsp          requestHeaders = request.get_headers();
-    string       resource       = request.get_resource();
-    string      defaultPage = config.serverRoot + "/";
-    vector<char> body;
+    HeaderMap    requestHeaders = r.get_headers();
+    string       resource       = r.get_resource();
+    string       defaultPage    = config.serverRoot + "/";
+    vector<char> body(0);
 
 
+    // add_general_headers()
     add_header(make_pair<string, string>("Server", config.serverName));
 
 
     ifstream resource_file;
     size_t   resource_size = 0;
-    status                 = OK;
+    status                 = r.get_status();
+
+    // if (status != OK) handle other bad cases
+    //     return body;
+    // a non implemented method is 501
+    //  a URI thats too long is 414
     if (resource == defaultPage) {
         body = cachedPages->home.data;
-        add_header(make_pair<string, string>("Content-Type",
-            cachedPages->home.contentType));
+        add_header(
+            make_pair<string, string>("Content-Type", cachedPages->home.contentType));
 
         add_header(make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
@@ -68,21 +74,21 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
                 add_header(make_pair<string, string>("Content-Type", resource_type));
 
             if (resource_type == "bash" || resource_type == "python") {
-                Cgi    cgi(request);
+                Cgi    cgi(r);
                 string result;
 
                 result = cgi.execute();
                 body   = vector<char>(result.begin(), result.end());
-                add_header(make_pair<string, string>("Content-Length",
-                    ws_itoa(body.size())));
+                add_header(
+                    make_pair<string, string>("Content-Length", ws_itoa(body.size())));
             }
             else {
                 body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                     std::istreambuf_iterator<char>());
                 resource_file.seekg(0, std::ios_base::end);
                 resource_size = resource_file.tellg();
-                add_header(make_pair<string, string>("Content-Length",
-                    ws_itoa(resource_size)));
+                add_header(
+                    make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
                 resource_file.seekg(0, std::ios_base::beg);
             }
             // content type
@@ -103,12 +109,12 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 }
 
 
-Response GetRequestHandler::handle_request(const Request& request,
+Response GetRequestHandler::handle_request(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
     DEBUG_MSG("Handling get request ... ", B);
 
-    vsp request_headers = request.get_headers();
-    body                = get_resource(request, cachedPages, config);
+    HeaderMap requestHeaders = r.get_headers();
+    body                     = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);
 }
