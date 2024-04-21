@@ -35,7 +35,7 @@ private:
     const ServerConfig& config;
     CachedPages*        cachedPages;
 
-    bool is_request_ready(Request& r, fd incoming);
+    bool validate_request(Request& r);
     void handle_connection(fd incoming, fd_set& activeSockets);
     /* polling strats */
     void select_strat();

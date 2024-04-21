@@ -56,10 +56,9 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-bool Server::is_request_ready(Request& r, fd incoming)
+bool Server::validate_request(Request& r)
 {
     try {
-        r.recv(incoming);
         if (!r.parse_request(config))
             return false;
         return true;
@@ -75,7 +74,8 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
     ConnectionManager::check_connection(incoming);
     Request& r = ConnectionManager::add_connection(incoming, activeSockets);
     try {
-        if (!is_request_ready(r, incoming))
+        r.recv(incoming);
+        if (!validate_request(r))
             return;
 
         IRequestHandler* handler =
