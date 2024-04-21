@@ -5,29 +5,24 @@
 static void   check_line_terminator(istream& is, const string& check);
 static void   replace_spaces(string& resource);
 static bool   peek_line_terminator(istream& is, const string& check);
-static string find_value(stringstream& message);
+static string find_value(istringstream& message);
+static void   add_header(istringstream& message, HeaderMap& headerFields);
+static void   to_lower(string& str);
 
 // throws ios failure
 bool Request::parse_request(const ServerConfig& config)
 {
     message.exceptions(std::ios::failbit | std::ios::badbit);
-    if (headerReady && expectedBodySize == NOT_SET) {
+    if (headerState == READY_TO_PARSE)
         parse_header();
-        apply_config(config);
-        if (expectedBodySize != NOT_SPECIFIED)
+    if (headerState == PARSED) {
+        if (expectedBodySize == NOT_SPECIFIED)
+            parsed = true;
+        else
             parse_body();
     }
+    apply_config(config);
     return parsed;
-}
-
-
-void Request::parse_content_length(const string& contentLength)
-{
-    stringstream length(contentLength);
-    length.exceptions(std::ios::failbit | std::ios::badbit);
-    length >> expectedBodySize;
-    if (!length.eof())
-        length.setstate(std::ios::failbit);
 }
 
 void Request::parse_request_line()
@@ -38,32 +33,47 @@ void Request::parse_request_line()
     if (strncmp(singleSpace, "  ", 2))
         message.setstate(std::ios::failbit);
     check_line_terminator(message, CRLF);
-    // replace %20 with space
     replace_spaces(resource);
 }
 
-// TODO headers to parse multiple line field-values, and multi-line
+void Request::parse_header_fields_content()
+{
+    parse_content_length(headerFields.find("content-length"));
+}
+
 void Request::parse_header()
 {
-    string fieldName;
-    string fieldValue;
-
     parse_request_line();
-    // Headers
-    while (true && !message.eof() && !peek_line_terminator(message, CRLF)) {
-        std::getline(message, fieldName, ':');
 
-        if (fieldName.find(' ') != string::npos)
-            message.setstate(std::ios::failbit);
-        fieldValue = find_value(message);
-        header_fields.push_back(make_pair(fieldName, fieldValue));
-        if (fieldName == "Content-length")
-            parse_content_length(fieldValue);
-        else
-            expectedBodySize = NOT_SPECIFIED;
-    }
-    if (expectedBodySize == NOT_SPECIFIED)
-        parsed = true;
+    // Headers Fields
+    while (true && !message.eof() && !peek_line_terminator(message, CRLF))
+        add_header(message, headerFields);
+
+    // end of header fields
+    check_line_terminator(message, CRLF);
+
+    // set state to parsed
+    headerState = PARSED;
+}
+
+void static add_header(istringstream& message, HeaderMap& headerFields)
+{
+    static string fieldName;
+    static string fieldValue;
+
+    fieldName.clear();
+    fieldValue.clear();
+
+    std::getline(message, fieldName, ':');
+    if (fieldName.find(' ') != string::npos)
+        message.setstate(std::ios::failbit);
+    to_lower(fieldName);
+    fieldValue = find_value(message);
+    // set-cookie is a special case
+    if (headerFields.find(fieldName) != headerFields.end())
+        headerFields[fieldName].append(" , " + fieldValue);
+    else
+        headerFields.insert(std::make_pair(fieldName, fieldValue));
 }
 
 // applies the configuration parameters to the request
@@ -83,22 +93,6 @@ void Request::parse_body()
     parsed = true;
 }
 
-/**
- * @brief Checks if the input stream has the specified line terminator.
- *
- * This function reads characters from the input stream until it reaches the end of the
- * specified line terminator string or the end of the stream. If the characters read do
- * not match the line terminator string, the function sets the failbit of the input
- * stream.
- *
- * @param is The input stream to check for the line terminator.
- * @param check The line terminator string to compare against the characters read from the
- * input stream.
- *
- * @return void
- *
- * @throws None
- */
 static void check_line_terminator(istream& is, const string& check)
 {
     string line_terminator;
@@ -114,22 +108,6 @@ static void check_line_terminator(istream& is, const string& check)
     std::skipws(is);
 }
 
-/**
- * Check if the next characters in the input stream match a given string.
- *
- * This function reads characters from the input stream `is` and compares them to the
- * characters in the `check` string. If the characters in the input stream match the
- * characters in the `check` string, the function returns true. If the characters do
- * not match, the function returns false.
- *
- * @param is The input stream to read characters from.
- * @param check The string to compare the characters read from the input stream to.
- *
- * @return true if the characters in the input stream match the characters in the
- * `check` string, false otherwise.
- *
- * @throws None
- */
 static bool peek_line_terminator(istream& is, const string& check)
 {
     string         line_terminator;
@@ -150,14 +128,7 @@ static bool peek_line_terminator(istream& is, const string& check)
     return true;
 }
 
-/**
- * @brief Extracts a value from a message, leading and trailing whitespace characters are
- * removed before returning it.
- *
- * @param message The stringstream from which to extract the value.
- * @return The extracted value as a string.
- */
-static string find_value(stringstream& message)
+static string find_value(istringstream& message)
 {
     string fieldValue;
     std::getline(message, fieldValue);
@@ -170,10 +141,33 @@ static string find_value(stringstream& message)
     return fieldValue;
 }
 
+void Request::parse_content_length(const HeaderMap::const_iterator it)
+{
+    if (it == headerFields.end()) {
+        expectedBodySize = NOT_SPECIFIED;
+        return;
+    }
+
+    istringstream length;
+
+    length.exceptions(std::ios::failbit | std::ios::badbit);
+    length >> expectedBodySize;
+
+    if (!length.eof())
+        length.setstate(std::ios::failbit);
+}
+
+// replace %20 with space
 // TODO replace all other special characters
 static void replace_spaces(string& resource)
 {
     size_t pos;
     while ((pos = resource.find("%20")) != std::string::npos)
         resource.replace(pos, 3, " ");
+}
+
+static void to_lower(string& str)
+{
+    for (size_t i = 0; i < str.length(); i++)
+        str[i] = std::tolower(str[i]);
 }
