@@ -6,7 +6,7 @@
 // typedef char supported file extensions
 typedef map<string, string> types_map_t;
 
-static const std::pair<std::string, std::string> init_filetypes[] = {
+static const pair<string, string> init_filetypes[] = {
     make_pair("html", "text/html"),
     make_pair("css", "text/css"),
     make_pair("js", "application/javascript"),

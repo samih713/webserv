@@ -27,14 +27,14 @@ int main()
     while (true)
     {
 
-        std::cout << "---------- Server is up and waiting!!! ----------------"
-                  << std::endl;
+        cout << "---------- Server is up and waiting!!! ----------------"
+                  << endl;
         FD_ZERO(&read_fds);
         FD_SET(a.get_fd(), &read_fds);
 
         if (select(fdmax + 1, &read_fds, NULL, NULL, NULL) == -1)
         {
-            std::cerr << "Error with select" << std::endl;
+            cerr << "Error with select" << endl;
             continue;
         }
 
@@ -42,27 +42,27 @@ int main()
         {
             // accept if a connection happens
             file_descriptor peer = a.accept();
-            std::cout << "peer is connected on port " << peer << "\n";
+            cout << "peer is connected on port " << peer << "\n";
 
             // receive data from the connected peer
             char    buffer[1024];
             ssize_t bytesRead = recv(peer, buffer, sizeof(buffer), 0);
             if (bytesRead == -1)
             {
-                std::cerr << "Error receiving data from peer" << std::endl;
+                cerr << "Error receiving data from peer" << endl;
                 continue;
             }
 
             // process the received data
-            std::string receivedData(buffer, bytesRead);
-            std::cout << "Received data from peer: " << receivedData << std::endl;
+            string receivedData(buffer, bytesRead);
+            cout << "Received data from peer: " << receivedData << endl;
 
             // send a response back to the peer
-            std::string response = "Hello from the server!";
+            string response = "Hello from the server!";
             ssize_t     bytesSent = send(peer, response.c_str(), response.length(), 0);
             if (bytesSent == -1)
             {
-                std::cerr << "Error sending";
+                cerr << "Error sending";
             }
         }
     }
@@ -89,14 +89,14 @@ int main()
 #define X(test_case)                                                                     \
     do                                                                                   \
     {                                                                                    \
-        std::cout << "---- Case[" << test_case << "] -----\n";                           \
+        cout << "---- Case[" << test_case << "] -----\n";                           \
         TCPSocket socket;                                                                \
 		try { \
 			socket.set_port(test_case);                                                      \
 			socket.bind();                                                                   \
 		} \
 		catch (Socket::Exception &se) { \
-			std::cerr << "Error in port number\n"; \
+			cerr << "Error in port number\n"; \
 		} \
     } while (false);
     TEST_CASES

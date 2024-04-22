@@ -43,18 +43,18 @@ bool Request::isCompleted()
     return completed;
 }
 
-std::ostream& operator<<(ostream& os, const Request& r)
+ostream& operator<<(ostream& os, const Request& r)
 {
-    os << "Method: " << enumToString(r.method) << std::endl;
-    os << "Request-Target: " << r.resource << std::endl;
-    os << "HTTP-Version: " << r.http_version << std::endl;
+    os << "Method: " << enumToString(r.method) << endl;
+    os << "Request-Target: " << r.resource << endl;
+    os << "HTTP-Version: " << r.http_version << endl;
     os << "************ fields *************\n";
     for (size_t i = 0; i < r.header_fields.size(); i++) {
         os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
-           << std::endl;
+           << endl;
     }
     os << "************ body *************\n";
-    os << r.body << std::endl;
+    os << r.body << endl;
     return os;
 }
 

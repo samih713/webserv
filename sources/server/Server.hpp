@@ -14,7 +14,7 @@ enum polling_strat {
 };
 
 // wait message
-static const std::string WAIT_MESSAGE("*** Server is now waiting for connections ***");
+static const string WAIT_MESSAGE("*** Server is now waiting for connections ***");
 // default backLog
 static const int DEFAULT_BACKLOG(16);
 // default select wait

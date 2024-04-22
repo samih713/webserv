@@ -56,7 +56,7 @@ private:
 
     vsp         header_fields;
     vsp         trailer_fields;
-    std::string body;
+    string body;
 
     // deleted copy assigment
     void operator=(const Request&);

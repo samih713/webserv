@@ -20,7 +20,7 @@ class Cgi {
 public:
     Cgi(const Request& request);
     ~Cgi();
-    void   execute(const std::string& outputFile);
+    void   execute(const string& outputFile);
     string execute(void);
 
 private:

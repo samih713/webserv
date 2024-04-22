@@ -47,11 +47,11 @@ int main(int argc, char** argv, char** envp)
 
 	// for (int i = 0; envp[i] != NULL; ++i)
     // {
-    //     std::cout << envp[i] << std::endl;
+    //     cout << envp[i] << endl;
     // }
 	// cout<< endl<<endl;
 
-	//const std::string outputFile;
+	//const string outputFile;
 
 	string res;
 
@@ -76,9 +76,9 @@ int main(int argc, char** argv, char** envp)
 
        //cgi.execute("stds");
     }
-    catch (std::runtime_error &e)
+    catch (runtime_error &e)
     {
-        cerr << e.what() << std::endl;
+        cerr << e.what() << endl;
     }
 
     // const char *pythonScriptPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
@@ -87,7 +87,7 @@ int main(int argc, char** argv, char** envp)
     // // Check if the Python script exists
     // if (access(pythonScriptPath, X_OK) == -1)
     // {
-    //     std::cerr << "Error: Python script not found or does not have execution permission." << std::endl;
+    //     cerr << "Error: Python script not found or does not have execution permission." << endl;
     //     return 1;
     // }
 

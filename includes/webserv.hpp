@@ -23,17 +23,6 @@
 // [ ] different strategies
 // [ ] testing (with a testing framework)
 
-/* -------------------------------- WARNINGS -------------------------------- */
-
-// PARSER
-// [ ] maybe there's stuff in the global context that need to be parsed
-
-/* --------------------------------- MACROS --------------------------------- */
-#define ws_tostr(name) #name
-#define ws_itoa(number)                                                                  \
-    static_cast<const std::ostringstream&>((std::ostringstream() << std::dec << number)) \
-        .str()
-
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "./debug.hpp"
 #include <cerrno>
@@ -80,22 +69,27 @@ typedef vector<pair<string, string> > vsp;
 // clang-format on
 // socket_descriptor type
 typedef int fd;
+/* --------------------------------- MACROS --------------------------------- */
+#define ws_tostr(name) #name
+#define ws_itoa(number)                                                                  \
+    static_cast<const ostringstream&>((ostringstream() << std::dec << number)) \
+        .str()
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 #define THROW_EXCEPTION_WITH_INFO(msg)                                                   \
     do {                                                                                 \
-        std::ostringstream oss;                                                          \
+        ostringstream oss;                                                          \
         oss << __FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE << (msg);     \
-        throw std::runtime_error(oss.str());                                             \
+        throw runtime_error(oss.str());                                             \
     } while (0)
 
-static std::string ERR_NULL("Socket: null ptr error");
-static std::string ERR_CREAT("Socket: creation failed");
-static std::string ERR_BIND("Socket: binding failed");
-static std::string ERR_NBIND("Socket: not bound to a port");
-static std::string ERR_LIST("Socket: listen failed");
-static std::string ERR_NLIST("Socket: not listening");
-static std::string ERR_ACCP("Socket: accept failed");
+static string ERR_NULL("Socket: null ptr error");
+static string ERR_CREAT("Socket: creation failed");
+static string ERR_BIND("Socket: binding failed");
+static string ERR_NBIND("Socket: not bound to a port");
+static string ERR_LIST("Socket: listen failed");
+static string ERR_NLIST("Socket: not listening");
+static string ERR_ACCP("Socket: accept failed");
 
-static std::string ERR_MEMORY_ALLOC("Memory: allocation failed");
+static string ERR_MEMORY_ALLOC("Memory: allocation failed");
 
 #endif // WEBSERV_HPP

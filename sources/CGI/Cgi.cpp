@@ -25,22 +25,22 @@ Cgi::~Cgi()
     delete[] arguments;
 }
 
-void Cgi::execute(const std::string& outputFile)
+void Cgi::execute(const string& outputFile)
 {
     int         fd[2];
     int         id;
-    std::string res_body;
+    string res_body;
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {
-        std::cerr << "Error creating pipe: " << strerror(errno) << std::endl;
+        cerr << "Error creating pipe: " << strerror(errno) << endl;
         return;
     }
 
     // Fork the process
     id = fork();
     if (id == -1) {
-        std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+        cerr << "Error forking process: " << strerror(errno) << endl;
         return;
     }
     else if (id == 0) {
@@ -50,7 +50,7 @@ void Cgi::execute(const std::string& outputFile)
         close(fd[1]);
 
         if (execve(const_cast<char*>(filePath.c_str()), arguments, environment) == -1) {
-            std::cerr << "Error executing execve: " << strerror(errno) << std::endl;
+            cerr << "Error executing execve: " << strerror(errno) << endl;
             _exit(EXIT_FAILURE);
         }
     }
@@ -68,14 +68,14 @@ void Cgi::execute(const std::string& outputFile)
     while ((bytesRead = read(fd[0], buffer, 90)) > 0)
         res_body.append(buffer, bytesRead);
     // Save the response to a file
-    std::ofstream outFile(outputFile.c_str());
+    ofstream outFile(outputFile.c_str());
     if (outFile.is_open()) {
         outFile << res_body;
         outFile.close();
-        std::cout << "Response saved to: " << outputFile << std::endl;
+        cout << "Response saved to: " << outputFile << endl;
     }
     else {
-        std::cerr << "Error opening output file: " << strerror(errno) << std::endl;
+        cerr << "Error opening output file: " << strerror(errno) << endl;
     }
 
     close(fd[0]);
@@ -85,11 +85,11 @@ string Cgi::execute(void)
 {
     int         fd[2];
     int         id;
-    std::string res_body;
+    string res_body;
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {
-        std::cerr << "Error creating pipe: " << strerror(errno) << std::endl;
+        cerr << "Error creating pipe: " << strerror(errno) << endl;
         return NULL;
     }
 
@@ -97,7 +97,7 @@ string Cgi::execute(void)
     // TODO fix forking here for sleep
     id = fork();
     if (id == -1) {
-        std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+        cerr << "Error forking process: " << strerror(errno) << endl;
         return NULL;
     }
     else if (id == 0) {
@@ -107,7 +107,7 @@ string Cgi::execute(void)
         close(fd[1]);
 
         if (execve(const_cast<char*>(filePath.c_str()), arguments, environment) == -1) {
-            std::cerr << "Error executing execve: " << strerror(errno) << std::endl;
+            cerr << "Error executing execve: " << strerror(errno) << endl;
             _exit(EXIT_FAILURE);
         }
     }
@@ -131,7 +131,7 @@ string Cgi::execute(void)
 
 static char** headers_to_env(const vsp& headers)
 {
-    std::vector<char*> envVector;
+    vector<char*> envVector;
 
     // Iterate through headers
     vsp::const_iterator end = headers.end();
