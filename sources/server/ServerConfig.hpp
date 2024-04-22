@@ -25,7 +25,8 @@ struct ServerConfig {
     bool                     autoindex;
     in_addr_t                serverAddr;
 
-    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false) {
+    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false)
+    {
         serverAddr = inet_addr("127.0.0.1");
     }
 
@@ -33,7 +34,7 @@ struct ServerConfig {
     {
         cout << "ServerConfig {" << endl;
         cout << "  listenerPort: " << listenerPort << endl;
-        cout << "  host: " << inet_ntoa(*(struct in_addr*)&serverAddr) << endl;
+        cout << "  host: " << inet_ntoa(*(struct in_addr*) &serverAddr) << endl;
         cout << "  maxBodySize: " << maxBodySize << endl;
         cout << "  indexFiles: [";
         for (vector<string>::const_iterator itr = indexFiles.begin();

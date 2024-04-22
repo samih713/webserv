@@ -87,7 +87,7 @@ private:
     Location             _parse_location_context(void);
     vector<string>       _parse_index(const string& root);
     void   _parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
-    fd   _parse_listen(in_addr_t& serverAddr);
+    fd     _parse_listen(in_addr_t& serverAddr);
     void   _parse_server_name(string& serverName);
     string _parse_root(void);
     size_t _parse_client_max_body_size(void);

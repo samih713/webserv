@@ -15,8 +15,8 @@ class Logger {
 public:
     static void log_message(const string& message, LogLevel level, bool toFile = false)
     {
-        string logMessage =
-            "[" + _get_current_time() + "]\t[" + _level_to_string(level) + "]\t" + message;
+        string logMessage = "[" + _get_current_time() + "]\t[" + _level_to_string(level) +
+                            "]\t" + message;
         if (toFile) {
             ofstream _logFile;
             _logFile.open(LOG_FILE, std::ios_base::app);
@@ -51,7 +51,7 @@ private:
             case INFO:  return "INFO";
             case DEBUG: return "DEBUG";
             case ERROR: return "ERROR";
-            default: return "NULL";
+            default:    return "NULL";
         }
     }
 
