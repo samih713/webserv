@@ -29,7 +29,12 @@ static const string ERR_UNEXPECTED_TOKENS_OUT(
 static const string ERR_MISSING_SERVER("Parser: missing server context");
 static const string ERR_UNEXPECTED_TOKENS_IN_SERVER(
     "Parser: Unexpected tokens found inside the server context");
+
 static const string ERR_INVALID_LISTEN("Parser: invalid listen directive");
+static const string ERR_MULTIPLE_COLON("Parser: multiple colons used");
+static const string ERR_INVALID_HOST("Parser: invalid host value");
+static const string ERR_INVALID_PORT("Parser: invalid port value");
+
 static const string ERR_INVALID_SERVER_NAME("Parser: invalid server_name directive");
 static const string ERR_INVALID_ROOT("Parser: invalid root directive");
 static const string ERR_MISSING_ROOT("Parser: missing root directive");
@@ -69,7 +74,7 @@ const string keywords[NUM_KEYWORDS] = { "http", "server", "listen", "server_name
 class ConfigParser {
 public:
     ConfigParser(const string& filepath);
-    ~ConfigParser() {};
+    ~ConfigParser() {}
 
     vector<ServerConfig> parse(void);
 
@@ -82,13 +87,13 @@ private:
     Location             _parse_location_context(void);
     vector<string>       _parse_index(const string& root);
     void   _parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
-    fd     _parse_listen(void);
+    fd   _parse_listen(in_addr_t& serverAddr);
     void   _parse_server_name(string& serverName);
     string _parse_root(void);
     size_t _parse_client_max_body_size(void);
     bool   _parse_autoindex(void);
 
-    bool _is_string_number(const string& str)
+    bool _is_number(const string& str)
     {
         if (str.find_first_not_of("0123456789") != string::npos)
             return false;

@@ -70,7 +70,7 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_CODE);
 
     vector<STATUS_CODE> codes;
-    while (_is_string_number(*_itr)) {
+    while (_is_number(*_itr)) {
         codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
         ++_itr; // move to next error code
     }
@@ -166,21 +166,51 @@ Location ConfigParser::_parse_location_context(void)
     return location;
 }
 
-fd ConfigParser::_parse_listen(void)
+fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
 {
-    ++_itr; // move to port number
-    if (*(_itr + 1) != ";")
-        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
+    ++_itr; // move to host:port
 
-    if (!_is_string_number(*_itr))
+    string portStr;
+    string hostStr;
+    size_t colonPos = _itr->find(":");
+    if (colonPos != string::npos) { // host:port
+        if (colonPos == 0)
+            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_HOST);
+        hostStr = _itr->substr(0, colonPos);
+        portStr = _itr->substr(colonPos + 1);
+    }
+    else if (_itr->find(".") != string::npos)
+        hostStr = *_itr;
+    else if (_is_number(*_itr))
+        portStr = *_itr;
+    else if (_itr->find_first_of(":") != _itr->find_last_of(":"))
+        THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_COLON);
+    else
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LISTEN);
 
-    fd listenerPort =
-        std::atoi(_itr->c_str()); //! listen can also handle IP address like 0.0.0.0:80
-    if (listenerPort > MAX_PORT || listenerPort < 0)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LISTEN);
+    // parse host
+    if (!hostStr.empty()) {
+        if (hostStr != "localhost" && hostStr != "127.0.0.1") {
+            struct sockaddr_in sockaddr;
+            if (inet_pton(AF_INET, hostStr.c_str(), &sockaddr.sin_addr))
+                serverAddr = inet_addr(hostStr.c_str());
+            else
+                THROW_EXCEPTION_WITH_INFO(ERR_INVALID_HOST);
+        }
+    }
+    else
+        serverAddr = htonl(INADDR_ANY);
+
+    // parse port
+    fd listenerPort = 8080;
+    if (!portStr.empty()) {
+        listenerPort = (int) std::strtod(portStr.c_str(), NULL);
+        if (listenerPort > MAX_PORT || listenerPort < 0)
+            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_PORT);
+    }
 
     _check_semicolon();
+
     return listenerPort;
 }
 
@@ -271,7 +301,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
     ServerConfig _serverConfig;
     while (*_itr != "}") {
         if (*_itr == "listen") {
-            _serverConfig.listenerPort = _parse_listen();
+            _serverConfig.listenerPort = _parse_listen(_serverConfig.serverAddr);
             check_duplicate_directive(parsedServerDirectives, "listen");
         }
         else if (*_itr == "server_name")
@@ -315,7 +345,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
-    set<string> parsedHTTPDirectives;
+    set<string>          parsedHTTPDirectives;
     vector<ServerConfig> serverConfigs;
     while (*_itr != "}") {
         if (*_itr == "server")
@@ -341,7 +371,8 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         ++_itr;
     }
 
-    if ((_itr + 1) != _tokens.end()) // after http context no more tokens should be present
+    // after http context no more tokens should be present
+    if ((_itr + 1) != _tokens.end())
         THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_OUT);
 
     return serverConfigs;
