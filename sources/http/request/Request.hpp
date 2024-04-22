@@ -1,7 +1,7 @@
 #include "Message.hpp"
-#include "webserv.hpp"
 #include "ServerConfig.hpp"
 #include "TimeOut.hpp"
+#include "webserv.hpp"
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
@@ -54,8 +54,8 @@ private:
     string cgiResource;
     string http_version;
 
-    vsp         header_fields;
-    vsp         trailer_fields;
+    vsp    header_fields;
+    vsp    trailer_fields;
     string body;
 
     // deleted copy assigment

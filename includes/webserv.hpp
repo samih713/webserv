@@ -53,6 +53,7 @@ using std::fstream;
 using std::ifstream;
 using std::istream;
 using std::istringstream;
+using std::make_pair;
 using std::map;
 using std::ofstream;
 using std::ostream;
@@ -62,7 +63,6 @@ using std::runtime_error;
 using std::string;
 using std::stringstream;
 using std::vector;
-using std::make_pair;
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;
@@ -72,14 +72,13 @@ typedef int fd;
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
-    static_cast<const ostringstream&>((ostringstream() << std::dec << number)) \
-        .str()
+    static_cast<const ostringstream&>((ostringstream() << std::dec << number)).str()
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 #define THROW_EXCEPTION_WITH_INFO(msg)                                                   \
     do {                                                                                 \
-        ostringstream oss;                                                          \
+        ostringstream oss;                                                               \
         oss << __FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE << (msg);     \
-        throw runtime_error(oss.str());                                             \
+        throw runtime_error(oss.str());                                                  \
     } while (0)
 
 static string ERR_NULL("Socket: null ptr error");

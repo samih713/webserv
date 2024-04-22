@@ -1,6 +1,6 @@
 #include "CachedPages.hpp"
-#include "ServerConfig.hpp"
 #include "ConnectionManager.hpp"
+#include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
 
 #ifndef SERVER_HPP
