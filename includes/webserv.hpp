@@ -25,7 +25,6 @@
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
-#include "Logger.hpp"
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
