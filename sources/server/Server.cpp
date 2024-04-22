@@ -4,7 +4,7 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "RequestHandlerFactory.hpp"
-#include "debug.hpp"
+#include "webserv.hpp"
 #include <algorithm>
 #include <sys/select.h>
 #include <utility>
@@ -27,6 +27,10 @@
 Server& Server::get_instance(const ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
+    string        serverAddr = inet_ntoa(*(struct in_addr*) &config.serverAddr);
+    Logger::log_message("Server created successfully on port [" + serverAddr + ":" +
+                            ws_itoa(config.listenerPort) + "]",
+        INFO);
     return instance;
 }
 
