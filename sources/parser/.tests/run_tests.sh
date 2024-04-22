@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # Compiling test_parser
 c++ -Wall -Werror -Wextra -std=c++98 -ggdb3 -D__DEBUG__ -I../ -I../../../includes/ -I../../server/ -I../../http/ ../ConfigParser.cpp ./test_parser.cpp -o test_parser
