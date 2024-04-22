@@ -17,7 +17,11 @@ int main(int argc, char **argv) {
         vector<ServerConfig> configs = parser.parse();
         // configs[0].print();
         Server &webserv = Server::get_instance(configs[0], 10);
+        #if defined(__LINUX__)
         webserv.start(SELECT);
+        #elif defined(__MAC__)
+        webserv.start(KQUEUE);
+        #endif
     }
     catch (std::exception &error)
     {
