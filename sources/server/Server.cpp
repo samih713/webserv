@@ -204,7 +204,29 @@ void Server::kqueue_strat()
             else if (eventList[i].flags & EVFILT_READ)
             {
                 DEBUG_MSG("reading from connection", M);
-                //TODO HANDLE READ
+                //! this is not a good fix at all and is very hard-cody
+                try {
+                    Request req;
+                    req.recv(eventList[i].ident);
+                    if (!req.parse_request(config))
+                        continue;
+                    
+                    IRequestHandler* handler = RequestHandlerFactory::MakeRequestHandler(req.get_method());
+                    Response response = handler->handle_request(req, cachedPages, config);
+                    response.send_response(eventList[i].ident);
+                    delete handler;
+                }
+                catch (std::ios_base::failure& f) {
+                    DEBUG_MSG(ERR_PARSE, R);
+                }
+                catch (std::exception& e) {
+                    EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
+                    if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
+                        close(kq);
+                        THROW_EXCEPTION_WITH_INFO(strerror(errno));
+                    }
+                    DEBUG_MSG(e.what(), R);
+                }
             }
         }
     }
