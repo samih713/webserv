@@ -19,6 +19,9 @@ static const string WAIT_MESSAGE("*** Server is now waiting for connections ***"
 static const int DEFAULT_BACKLOG(16);
 // default select wait
 static const int SELECTWAITTIME(5);
+// default kqueue wait
+static const int KQUEUEWAITTIME(5);
+static const int MAX_EVENTS(16);
 
 class Server {
 public:
@@ -38,7 +41,7 @@ private:
     void handle_connection(fd incoming, fd_set& activeSockets);
     /* polling strats */
     void select_strat();
-    // void kqueue_strat();
+    void kqueue_strat();
     // void poll_strat();
     // void epoll_strat();
 

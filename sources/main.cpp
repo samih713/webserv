@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
         vector<ServerConfig> configs = parser.parse();
         // configs[0].print();
         Server &webserv = Server::get_instance(configs[0], 10);
-        webserv.start(SELECT);
+        webserv.start(KQUEUE);
     }
     catch (std::exception &error)
     {

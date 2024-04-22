@@ -12,3 +12,5 @@ CYAN=`tput setaf 6` # Cyan
 WHITE=`tput setaf 7` # White
 
 BOLD=`tput bold`
+
+BOLD:=`tput bold`
