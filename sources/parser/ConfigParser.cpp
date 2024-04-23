@@ -190,7 +190,9 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
 
     // parse host
     if (!hostStr.empty()) {
-        if (hostStr != "localhost" && hostStr != "127.0.0.1") {
+        if (hostStr == "localhost" || hostStr == "127.0.0.1")
+            serverAddr = inet_addr("127.0.0.1");
+        else {
             struct sockaddr_in sockaddr;
             if (inet_pton(AF_INET, hostStr.c_str(), &sockaddr.sin_addr))
                 serverAddr = inet_addr(hostStr.c_str());
@@ -198,8 +200,6 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
                 THROW_EXCEPTION_WITH_INFO(ERR_INVALID_HOST);
         }
     }
-    else
-        serverAddr = htonl(INADDR_ANY);
 
     // parse port
     fd listenerPort = 8080;

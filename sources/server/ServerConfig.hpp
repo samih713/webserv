@@ -27,7 +27,7 @@ struct ServerConfig {
 
     ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false)
     {
-        serverAddr = inet_addr("127.0.0.1");
+        serverAddr = inet_addr(INADDR_ANY);
     }
 
     void print(void) const
