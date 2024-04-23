@@ -48,10 +48,10 @@ private:
     static string _level_to_string(LogLevel level)
     {
         switch (level) {
-            case INFO:  return "INFO";
-            case DEBUG: return "DEBUG";
-            case ERROR: return "ERROR";
-            default:    return "NULL";
+            case INFO:  return string(B "INFO" RE);
+            case DEBUG: return string(M "DEBUG" RE);
+            case ERROR: return string(R "ERROR" RE);
+            default:    return string(W "NULL" RE);
         }
     }
 
