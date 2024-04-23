@@ -1,30 +1,29 @@
-#include "Server.hpp"
 #include "ConfigParser.hpp"
+#include "Logger.hpp"
+#include "Server.hpp"
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
 
-int main(int argc, char **argv) {
-    if (argc > 2)
-    {
+int main(int argc, char** argv)
+{
+    if (argc > 2) {
         cerr << "Usage: " << argv[0] << " [<config_file>]" << endl;
         exit(1);
     }
 
-    try
-    {
-        string config_file = (argc == 2) ? argv[1] : "./configs/default.conf";
-        ConfigParser parser(config_file);
+    try {
+        string       configFile = (argc == 2) ? argv[1] : "./configs/default.conf";
+        ConfigParser parser(configFile);
+        Logger::log_message("Parsing " + configFile, INFO);
         vector<ServerConfig> configs = parser.parse();
         // configs[0].print();
-        Server &webserv = Server::get_instance(configs[0], 10);
-        #if defined(__LINUX__)
+        Server& webserv = Server::get_instance(configs[0], 10);
+#if defined(__LINUX__)
         webserv.start(SELECT);
-        #elif defined(__MAC__)
+#elif defined(__MAC__)
         webserv.start(KQUEUE);
-        #endif
-    }
-    catch (std::exception &error)
-    {
+#endif
+    } catch (std::exception& error) {
         cerr << error.what() << endl;
     }
 }
