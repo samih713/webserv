@@ -59,7 +59,7 @@ Server::~Server()
 bool Server::validate_request(Request& r)
 {
     try {
-        if (!r.parse_request(config))
+        if (!r.process(config))
             return false;
         return true;
     } catch (std::ios_base::failure& f) {
@@ -78,10 +78,19 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         if (!validate_request(r))
             return;
 
+        // delete
+        // printing request for debugging
+        DEBUG_MSG(r, Y);
+        // delete
+
+        // handle response like this
+        //      if (r.get_status() == BAD_REQUEST) {
+        // return Response(r.get_status());
+        //      }
+
         IRequestHandler* handler =
             RequestHandlerFactory::MakeRequestHandler(r.get_method());
         Response response = handler->handle_request(r, cachedPages, config);
-
         response.send_response(incoming);
         r.set_completed();
         delete handler;
