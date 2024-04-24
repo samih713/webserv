@@ -1,6 +1,7 @@
 #include "Request.hpp"
 #include "Server.hpp"
 
+static bool find_header_end(const stringstream& message);
 
 // TODO use expectedBodySize in recv instead of during parsing
 /**
@@ -29,7 +30,11 @@ void Request::recv(fd socket)
 
     message << string(buffer, bytesReceived);
 
-    // if header end is found, indicate header is ready to be parsed
-    if (header(NOT_READY) && message.str().find(CRLF + CRLF))
+    if (header(NOT_READY) && find_header_end(message))
         header.state = READY_TO_PARSE;
+}
+
+static bool find_header_end(const stringstream& message)
+{
+    return message.str().find(CRLF + CRLF) != string::npos;
 }
