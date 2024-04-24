@@ -24,6 +24,6 @@ int main(int argc, char** argv)
         webserv.start(KQUEUE);
 #endif
     } catch (std::exception& error) {
-        cerr << error.what() << endl;
+        Logger::log_message(error.what(), ERROR);
     }
 }
