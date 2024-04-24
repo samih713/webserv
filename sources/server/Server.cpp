@@ -82,9 +82,9 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         delete handler;
     } catch (std::ios_base::failure& f) {
         DEBUG_MSG(ERR_PARSE, R);
-    } catch (std::exception& e) {
+    } catch (std::exception& error) {
         ConnectionManager::remove_connection(incoming, activeSockets);
-        DEBUG_MSG(e.what(), R);
+        DEBUG_MSG(error.what(), R);
     }
 }
 
@@ -219,14 +219,14 @@ void Server::kqueue_strat()
                     delete handler;
                 } catch (std::ios_base::failure& f) {
                     DEBUG_MSG(ERR_PARSE, R);
-                } catch (std::exception& e) {
+                } catch (std::exception& error) {
                     EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0,
                         0);
                     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
                         close(kq);
                         THROW_EXCEPTION_WITH_INFO(strerror(errno));
                     }
-                    DEBUG_MSG(e.what(), R);
+                    DEBUG_MSG(error.what(), R);
                 }
             }
         }

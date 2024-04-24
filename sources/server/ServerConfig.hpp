@@ -25,10 +25,10 @@ struct ServerConfig {
     bool                     autoindex;
     in_addr_t                serverAddr;
 
-    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false)
-    {
-        serverAddr = htonl(INADDR_ANY);
-    }
+    ServerConfig()
+        : listenerPort(8080), maxBodySize(1000000), autoindex(false),
+          serverAddr(htonl(INADDR_ANY))
+    {}
 
     void print(void) const
     {
