@@ -92,7 +92,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             RequestHandlerFactory::MakeRequestHandler(r.get_method());
         Response response = handler->handle_request(r, cachedPages, config);
         response.send_response(incoming);
-        r.set_completed();
+        ConnectionManager::remove_connection(incoming, activeSockets); // after completing remove
         delete handler;
     } catch (std::exception& e) {
         ConnectionManager::remove_connection(incoming, activeSockets);

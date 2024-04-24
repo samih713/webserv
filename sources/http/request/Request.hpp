@@ -23,8 +23,6 @@ public:
     const string&    get_resource() const;
     const HeaderMap& get_headers() const;
 
-    bool is_completed();
-    void set_completed();
     void set_status(STATUS_CODE);
 
     TimeOut timer;
@@ -38,7 +36,6 @@ private:
     STATUS_CODE status;
     Header      header;
 
-    bool completed;
     stringstream message;
 
     int recievedBodyLength;

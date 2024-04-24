@@ -1,13 +1,13 @@
 #include "Request.hpp"
 #include "debug.hpp"
 
-Request::Request() : status(OK), completed(false), recievedBodyLength(0) {}
+Request::Request() : status(OK), recievedBodyLength(0) {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
     : status(other.status), header(other.header), message(other.message.str()),
-      completed(false), recievedBodyLength(other.recievedBodyLength), body(other.body)
+      recievedBodyLength(other.recievedBodyLength), body(other.body)
 {}
 
 
@@ -34,16 +34,6 @@ STATUS_CODE Request::get_status() const
 void Request::set_status(STATUS_CODE s)
 {
     status = s;
-}
-
-void Request::set_completed()
-{
-    completed = true;
-}
-
-bool Request::is_completed()
-{
-    return completed;
 }
 
 ostream& operator<<(ostream& os, const Request& r)
