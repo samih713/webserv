@@ -10,51 +10,59 @@
 using std::set;
 using std::stack;
 
-static const string ERR_INVALID_FILE("Parser: invalid file");
-static const string ERR_STAT("Parser: not a regular file");
-static const string ERR_OPEN("Parser: cannot open file");
-static const string ERR_EMPTY("Parser: file is empty");
+// file related error messages
+static const string ERR_FILE("Config: invalid file");
+static const string ERR_STAT("Config: not a regular file");
+static const string ERR_OPEN("Config: cannot open file");
+static const string ERR_EMPTY("Config: file is empty");
 
-static const string ERR_CLOSING_BRACE("Parser: } missing");
-static const string ERR_OPENINING_BRACE("Parser: { missing");
-static const string ERR_MISSING_SEMICOLON("Parser: missing semicolon");
-static const string ERR_MISSING_CONTEXT("Parser: missing context");
+// brace related error messages
+static const string ERR_CLOSING_BRACE("Config: } missing");
+static const string ERR_OPENING_BRACE("Config: { missing");
+static const string ERR_MISSING_SEMICOLON("Config: missing semicolon");
+static const string ERR_MISSING_CONTEXT("Config: missing context");
 
-static const string ERR_MISSING_HTTP("Parser: missing HTTP context");
-static const string ERR_UNEXPECTED_TOKENS_IN(
-    "Parser: Unexpected tokens found inside the HTTP context");
-static const string ERR_UNEXPECTED_TOKENS_OUT(
-    "Parser: Unexpected tokens found outside the HTTP context");
+// global context error messages
+static const string ERR_TOKENS("Config: Unexpected tokens found in the global context");
 
-static const string ERR_MISSING_SERVER("Parser: missing server context");
-static const string ERR_UNEXPECTED_TOKENS_IN_SERVER(
-    "Parser: Unexpected tokens found inside the server context");
+// http context error messages
+static const string ERR_MISSING_HTTP("Config: missing HTTP context");
+static const string ERR_HTTP_TOKENS("Config: Unexpected tokens in the HTTP context");
 
-static const string ERR_INVALID_LISTEN("Parser: invalid listen directive");
-static const string ERR_MULTIPLE_COLON("Parser: multiple colons used");
-static const string ERR_INVALID_HOST("Parser: invalid host value");
-static const string ERR_INVALID_PORT("Parser: invalid port value");
+// server context error messages
+static const string ERR_MISSING_SERVER("Config: missing server context");
+static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server context");
 
-static const string ERR_INVALID_SERVER_NAME("Parser: invalid server_name directive");
-static const string ERR_INVALID_ROOT("Parser: invalid root directive");
-static const string ERR_MISSING_ROOT("Parser: missing root directive");
-static const string ERR_INVALID_INDEX("Parser: invalid index directive");
-static const string ERR_INVALID_AUTOINDEX("Parser: invalid autoindex directive");
+// location context error messages
+static const string ERR_LOCATION("Config: invalid location context");
+static const string ERR_LOCATION_PATH("Config: location path missing");
+static const string ERR_LOCATION_TOKENS("Config: Unexpected tokens in location context");
 
-static const string ERR_INVALID_CHAR("Parser: invalid character in client_max_body_size");
-static const string ERR_MULTIPLE_SIZE_SUFFIX("Parser: multiple suffixes found");
-static const string ERR_MISSING_SIZE("Parser: missing size value");
-static const string ERR_MISSING_SUFFIX("Parser: missing size suffix");
-static const string ERR_BODY_SIZE_OVERFLOW("Parser: body size is out of bounds");
+// listen directive error messages
+static const string ERR_LISTEN("Config: invalid listen directive");
+static const string ERR_MULTIPLE_COLON("Config: multiple colons used");
+static const string ERR_HOST("Config: invalid host value");
+static const string ERR_PORT("Config: invalid port value");
 
-static const string ERR_ERROR_PATH("Parser: error page path missing");
-static const string ERR_ERROR_CODE("Parser: error page code missing");
-static const string ERR_INVALID_ERROR_PATH("Parser: invalid error page path");
+// generic directive error messages
+static const string ERR_SERVER_NAME("Config: invalid server_name directive");
+static const string ERR_ROOT("Config: invalid root directive");
+static const string ERR_MISSING_ROOT("Config: missing root directive");
+static const string ERR_INDEX("Config: invalid index directive");
+static const string ERR_AUTOINDEX("Config: invalid autoindex directive");
 
-static const string ERR_INVALID_LOCATION("Parser: invalid location context");
-static const string ERR_LOCATION_PATH("Parser: location path missing");
-static const string ERR_UNEXPECTED_TOKENS_IN_LOCATION(
-    "Parser: Unexpected tokens found inside the location context");
+// client_max_body_size directive error messages
+static const string ERR_INVALID_CHAR("Config: invalid character in client_max_body_size");
+static const string ERR_MULTIPLE_SUFFIX("Config: multiple suffixes found");
+static const string ERR_MISSING_SIZE("Config: missing size value");
+static const string ERR_MISSING_SUFFIX("Config: missing size suffix");
+static const string ERR_BODY_SIZE_OVERFLOW("Config: body size is out of bounds");
+
+// error_page directive error messages
+static const string ERR_MISSING_ERROR_PATH("Config: error page path missing");
+static const string ERR_MISSING_ERROR_CODE("Config: error code missing");
+static const string ERR_ERROR_PATH("Config: invalid error page path");
+
 
 #define MAX_PORT 65535
 
@@ -82,10 +90,13 @@ private:
     vector<string>                 _tokens;
     vector<string>::const_iterator _itr;
 
+    // parsing config contexts
     vector<ServerConfig> _parse_HTTP_context(void);
     ServerConfig         _parse_server_context(void);
     Location             _parse_location_context(void);
-    vector<string>       _parse_index(const string& root);
+
+    // parsing config directives
+    vector<string> _parse_index(const string& root);
     void   _parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
     fd     _parse_listen(in_addr_t& serverAddr);
     void   _parse_server_name(string& serverName);
@@ -115,7 +126,7 @@ private:
     void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
     {
         if (parsedDirectives.find(directive) != parsedDirectives.end())
-            THROW_EXCEPTION_WITH_INFO("Parser: duplicate " + directive + " found");
+            THROW_EXCEPTION_WITH_INFO("Config: duplicate " + directive + " found");
 
         parsedDirectives.insert(directive);
     }

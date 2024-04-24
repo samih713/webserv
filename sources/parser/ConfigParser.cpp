@@ -4,7 +4,7 @@ ConfigParser::ConfigParser(const string& configFile)
 {
     // checking file extension
     if (configFile.find(".conf") == string::npos)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_FILE);
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE);
 
     // check if file exists and is a regular file
     struct stat fileStat;
@@ -67,7 +67,7 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
 
     ++_itr; // move to error code
     if (*_itr == ";")
-        THROW_EXCEPTION_WITH_INFO(ERR_ERROR_CODE);
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ERROR_CODE);
 
     vector<STATUS_CODE> codes;
     while (_is_number(*_itr)) {
@@ -80,14 +80,14 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
     string errorPath = *_itr;
     if (errorPath.find(".html") == string::npos &&
         errorPath.find(".htm") == string::npos && errorPath.find(".txt") == string::npos)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
+        THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     if (errorPath.find("/") == string::npos)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
+        THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     else if (errorPath.find_first_of("/") != errorPath.find_last_of("/"))
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
+        THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     if (errorPath.find("x") == string::npos) {
         if (errorPath.find_first_of("x") != errorPath.find_last_of("x"))
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_ERROR_PATH);
+            THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     }
 
     for (vector<STATUS_CODE>::const_iterator itr = codes.begin(); itr != codes.end();
@@ -115,7 +115,7 @@ vector<string> ConfigParser::_parse_index(const string& root)
     ++_itr; // move to index file
     while (*_itr != ";") {
         if (_is_keyword(*_itr))
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_INDEX);
+            THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
         indexFiles.push_back(root + "/" + *_itr);
         ++_itr;
     }
@@ -126,8 +126,6 @@ vector<string> ConfigParser::_parse_index(const string& root)
 Location ConfigParser::_parse_location_context(void)
 {
     ++_itr; // move to location modifier/path
-    if (*_itr == "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LOCATION);
 
     Location location;
     if (*_itr == "=" || *_itr == "~") {
@@ -138,7 +136,7 @@ Location ConfigParser::_parse_location_context(void)
 
     ++_itr; // move to {
     if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LOCATION);
+        THROW_EXCEPTION_WITH_INFO(ERR_LOCATION);
     ++_itr; // move to location content
 
     set<string> parsedLocationDirectives;
@@ -158,7 +156,7 @@ Location ConfigParser::_parse_location_context(void)
             check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
         }
         else
-            THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_LOCATION);
+            THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
         ++_itr;
     }
     ++_itr; // move to next directive
@@ -175,7 +173,7 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
     size_t colonPos = _itr->find(":");
     if (colonPos != string::npos) { // host:port
         if (colonPos == 0)
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_HOST);
+            THROW_EXCEPTION_WITH_INFO(ERR_HOST);
         hostStr = _itr->substr(0, colonPos);
         portStr = _itr->substr(colonPos + 1);
     }
@@ -186,7 +184,7 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
     else if (_itr->find_first_of(":") != _itr->find_last_of(":"))
         THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_COLON);
     else
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LISTEN);
+        THROW_EXCEPTION_WITH_INFO(ERR_LISTEN);
 
     // parse host
     if (!hostStr.empty()) {
@@ -197,7 +195,7 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
             if (inet_pton(AF_INET, hostStr.c_str(), &sockaddr.sin_addr))
                 serverAddr = inet_addr(hostStr.c_str());
             else
-                THROW_EXCEPTION_WITH_INFO(ERR_INVALID_HOST);
+                THROW_EXCEPTION_WITH_INFO(ERR_HOST);
         }
     }
 
@@ -206,7 +204,7 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
     if (!portStr.empty()) {
         listenerPort = (int) std::strtod(portStr.c_str(), NULL);
         if (listenerPort > MAX_PORT || listenerPort < 0)
-            THROW_EXCEPTION_WITH_INFO(ERR_INVALID_PORT);
+            THROW_EXCEPTION_WITH_INFO(ERR_PORT);
     }
 
     _check_semicolon();
@@ -218,7 +216,7 @@ void ConfigParser::_parse_server_name(string& serverName)
 {
     ++_itr; // move to server name
     if (_is_keyword(*_itr))
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_SERVER_NAME);
+        THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
     serverName = *_itr;
     ++_itr;
 }
@@ -259,7 +257,7 @@ size_t ConfigParser::_parse_client_max_body_size(void)
     // get the suffix and its associated value
     string suffix = maxBodySize.substr(maxBodySize.find_first_not_of("0123456789."));
     if (suffix.size() > 1)
-        THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_SIZE_SUFFIX);
+        THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_SUFFIX);
 
     size_t multiplier = 1;
     if (suffix == "k" || suffix == "K")
@@ -285,7 +283,7 @@ bool ConfigParser::_parse_autoindex(void)
     ++_itr; // move to on/off
     string autoindex = *_itr;
     if (autoindex != "on" && autoindex != "off")
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_AUTOINDEX);
+        THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX);
     _check_semicolon();
     return autoindex == "on";
 }
@@ -294,7 +292,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
 {
     ++_itr; // move to {
     if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
+        THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
     ++_itr; // move to first directive
 
     set<string>  parsedServerDirectives;
@@ -325,7 +323,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
             check_duplicate_directive(parsedServerDirectives, "autoindex");
         }
         else
-            THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_SERVER);
+            THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
         if (*_itr == ";")
             ++_itr;
     }
@@ -342,7 +340,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
 
     ++_itr; // move to {
     if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
+        THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
     ++_itr; // move to first directive
 
     set<string>          parsedHTTPDirectives;
@@ -367,13 +365,13 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
             check_duplicate_directive(parsedHTTPDirectives, "autoindex");
         }
         else
-            THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN);
+            THROW_EXCEPTION_WITH_INFO(ERR_HTTP_TOKENS);
         ++_itr;
     }
 
     // after http context no more tokens should be present
     if ((_itr + 1) != _tokens.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_OUT);
+        THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
 
     return serverConfigs;
 }
@@ -393,7 +391,7 @@ vector<ServerConfig> ConfigParser::parse(void)
         }
         else if (*itr == "}") {
             if (braces.empty()) // missing opening brace
-                THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
+                THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
             braces.pop();
         }
     }
