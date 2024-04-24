@@ -140,7 +140,7 @@ enum STATUS_CODE {
 static const std::string sample_response =
     "HTTP/1.1 200 OK\r\n"                        // status line
     "Content-Type: text/html; charset=UTF-8\r\n" // headers
-    "Content-Length: 123\r\n"
+    "Content-Length: 23\r\n"
     "\r\n"
     "<html>\r\n"
     "<head><title>Sample Page</title></head>\r\n"
@@ -151,6 +151,7 @@ static const std::string sample_request =
     "Host: Linode.com\r\n"               // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
     "Gecko/20091102 Firefox/3.5.5 \r\n"
+    "Content-Length: 23\r\n"
     "Accept-Encoding: gzip,deflate\r\n"
     "Accept-Charset: ISO-8859-1,utf-8\r\n"
     "Cache-Control: no-cache\r\n"
