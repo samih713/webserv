@@ -1,38 +1,29 @@
 #include "Request.hpp"
 #include "debug.hpp"
 
-Request::Request()
-    : status(OK), message(""), headerState(NOT_READY), parsed(false), completed(false),
-      expectedBodySize(NOT_SET), maxBodySize(DEFAULT_MAX_BODY_SIZE)
-{
-}
+Request::Request() : status(OK), completed(false), recievedBodyLength(0) {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : status(other.status), message(other.message.str()), headerState(other.headerState),
-      parsed(other.parsed), completed(other.completed),
-      expectedBodySize(other.expectedBodySize), maxBodySize(other.maxBodySize),
-      method(other.method), resource(other.resource), httpVersion(other.httpVersion),
-      headerFields(other.headerFields), trailer_fields(other.trailer_fields)
-
-{
-}
+    : status(other.status), header(other.header), message(other.message.str()),
+      completed(false), recievedBodyLength(other.recievedBodyLength), body(other.body)
+{}
 
 
 const string& Request::get_method() const
 {
-    return method;
+    return header.method;
 }
 
 const HeaderMap& Request::get_headers() const
 {
-    return headerFields;
+    return header.fields;
 }
 
 const string& Request::get_resource() const
 {
-    return resource;
+    return header.resource;
 }
 
 STATUS_CODE Request::get_status() const
@@ -57,14 +48,13 @@ bool Request::is_completed()
 
 ostream& operator<<(ostream& os, const Request& r)
 {
-    os << "Method: " << r.method << std::endl;
-    os << "Request-Target: " << r.resource << std::endl;
-    os << "HTTP-Version: " << r.httpVersion << std::endl;
+    os << "Method: " << r.header.method << std::endl;
+    os << "Request-Target: " << r.header.resource << std::endl;
+    os << "HTTP-Version: " << r.header.version << std::endl;
     os << "************ fields *************\n";
-    for (HeaderMap::const_iterator it = r.headerFields.begin(); it != r.headerFields.end(); ++it) {
-        os << "[" << it->first << "]" << ": " << it->second
-           << std::endl;
-    }
+    for (HeaderMap::const_iterator it = r.header.fields.begin();
+         it != r.header.fields.end(); ++it)
+        os << "[" << it->first << "]" << ": " << it->second << std::endl;
     os << "************ body *************\n";
     os << r.body << std::endl;
     return os;

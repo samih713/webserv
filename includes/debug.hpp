@@ -20,7 +20,6 @@
 #ifndef __DEBUG__
 #define DEBUG_MSG(message, color)
 #else
-#include <cassert>
 #define DEBUG_MSG(message, color)                                                        \
     do {                                                                                 \
         std::cerr << (color);                                                            \
@@ -33,6 +32,7 @@
 
 /* ------------------------------- DEBUG BUILD ------------------------------ */
 #ifdef __DEBUG__
+#include <cassert>
 #define DEBUGASSERT(x) assert(x)
 #else
 #define DEBUGASSERT(x)

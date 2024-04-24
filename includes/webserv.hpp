@@ -11,6 +11,8 @@
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
 
 // REQUEST
+// https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
+// [ ] handle transfer size
 // [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
 // [ ] sets status for 400, 501 ... etc
