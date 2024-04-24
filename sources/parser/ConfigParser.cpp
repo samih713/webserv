@@ -123,46 +123,6 @@ vector<string> ConfigParser::_parse_index(const string& root)
     return indexFiles;
 }
 
-Location ConfigParser::_parse_location_context(void)
-{
-    ++_itr; // move to location modifier/path
-
-    Location location;
-    if (*_itr == "=" || *_itr == "~") {
-        location.modifier = *_itr;
-        ++_itr; // move to path
-    }
-    location.path = *_itr;
-
-    ++_itr; // move to {
-    if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_LOCATION);
-    ++_itr; // move to location content
-
-    set<string> parsedLocationDirectives;
-    while (*_itr != "}") {
-        if (*_itr == "root") {
-            location.root = _parse_root();
-            _check_duplicate_directive(parsedLocationDirectives, "root");
-        }
-        else if (*_itr == "autoindex") {
-            location.autoindex = _parse_autoindex();
-            _check_duplicate_directive(parsedLocationDirectives, "autoindex");
-        }
-        else if (*_itr == "index")
-            location.indexFiles = _parse_index(location.root);
-        else if (*_itr == "client_max_body_size") {
-            location.maxBodySize = _parse_client_max_body_size();
-            _check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
-        }
-        else
-            THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
-        ++_itr;
-    }
-    ++_itr; // move to next directive
-
-    return location;
-}
 
 fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
 {
@@ -283,6 +243,47 @@ bool ConfigParser::_parse_autoindex(void)
         THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX);
     _check_semicolon();
     return autoindex == "on";
+}
+
+Location ConfigParser::_parse_location_context(void)
+{
+    ++_itr; // move to location modifier/path
+
+    Location location;
+    if (*_itr == "=" || *_itr == "~") {
+        location.modifier = *_itr;
+        ++_itr; // move to path
+    }
+    location.path = *_itr;
+
+    ++_itr; // move to {
+    if (*_itr != "{")
+        THROW_EXCEPTION_WITH_INFO(ERR_LOCATION);
+    ++_itr; // move to location content
+
+    set<string> parsedLocationDirectives;
+    while (*_itr != "}") {
+        if (*_itr == "root") {
+            location.root = _parse_root();
+            _check_duplicate_directive(parsedLocationDirectives, "root");
+        }
+        else if (*_itr == "autoindex") {
+            location.autoindex = _parse_autoindex();
+            _check_duplicate_directive(parsedLocationDirectives, "autoindex");
+        }
+        else if (*_itr == "index")
+            location.indexFiles = _parse_index(location.root);
+        else if (*_itr == "client_max_body_size") {
+            location.maxBodySize = _parse_client_max_body_size();
+            _check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
+        }
+        else
+            THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
+        ++_itr;
+    }
+    ++_itr; // move to next directive
+
+    return location;
 }
 
 ServerConfig ConfigParser::_parse_server_context(void)
