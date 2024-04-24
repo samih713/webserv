@@ -38,9 +38,8 @@ private:
     STATUS_CODE status;
     Header      header;
 
-    istringstream message;
-
     bool completed;
+    stringstream message;
 
     int recievedBodyLength;
 

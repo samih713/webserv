@@ -22,7 +22,7 @@ struct Header {
     bool    operator()(HEADER_STATE s);
 
     // API
-    void parse_header(istringstream& message);
+    void parse_header(stringstream& message);
     // members
     string    method;
     string    resource;
@@ -36,8 +36,8 @@ struct Header {
     bool         chunked;
 
 private:
-    void parse_request_line(istringstream& message);
-    void add_header(istringstream& message);
+    void parse_request_line(stringstream& message);
+    void add_header(stringstream& message);
     void process_content();
     void is_chunked(const HeaderMap::const_iterator it);
     void find_content_length(HeaderMap::const_iterator it);

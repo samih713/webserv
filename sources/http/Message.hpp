@@ -151,7 +151,7 @@ static const std::string sample_request =
     "Host: Linode.com\r\n"               // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
     "Gecko/20091102 Firefox/3.5.5 \r\n"
-    "Content-Length: 23\r\n"
+    "Content-Length: 69\r\n"
     "Accept-Encoding: gzip,deflate\r\n"
     "Accept-Charset: ISO-8859-1,utf-8\r\n"
     "Cache-Control: no-cache\r\n"

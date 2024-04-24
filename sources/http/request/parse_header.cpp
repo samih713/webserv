@@ -4,14 +4,14 @@
 #include "webserv.hpp"
 
 // helper utils
-static void   check_line_terminator(istream& message, const string& check);
-static bool   peek_line_terminator(istream& message, const string& check);
+static void   check_line_terminator(stringstream& message, const string& check);
+static bool   peek_line_terminator(stringstream& message, const string& check);
 static void   replace_spaces(string& resource);
 static void   to_lower(string& str);
-static string get_field_value(istringstream& message);
+static string get_field_value(stringstream& message);
 
 
-void Header::parse_header(istringstream& message)
+void Header::parse_header(stringstream& message)
 {
     // Request line
     parse_request_line(message);
@@ -24,7 +24,7 @@ void Header::parse_header(istringstream& message)
     process_content();
 }
 
-void Header::parse_request_line(istringstream& message)
+void Header::parse_request_line(stringstream& message)
 {
     // accepted version
     static const string acceptedVersion("HTTP/1.1");
@@ -42,7 +42,7 @@ void Header::parse_request_line(istringstream& message)
     replace_spaces(resource);
 }
 
-void Header::add_header(istringstream& message)
+void Header::add_header(stringstream& message)
 {
     static string fieldName;
     static string fieldValue;
@@ -104,7 +104,7 @@ void Header::find_content_length(const HeaderMap::const_iterator it)
 }
 
 // helper utils
-static string get_field_value(istringstream& message)
+static string get_field_value(stringstream& message)
 {
     string fieldValue;
 
@@ -127,7 +127,7 @@ static void to_lower(string& str)
         str[i] = std::tolower(str[i]);
 }
 
-static void check_line_terminator(istream& message, const string& check)
+static void check_line_terminator(stringstream& message, const string& check)
 {
     string line_terminator;
     std::noskipws(message);
@@ -143,7 +143,7 @@ static void check_line_terminator(istream& message, const string& check)
     std::skipws(message);
 }
 
-static bool peek_line_terminator(istream& message, const string& check)
+static bool peek_line_terminator(stringstream& message, const string& check)
 {
     string         line_terminator;
     std::streampos initialPos = message.tellg();

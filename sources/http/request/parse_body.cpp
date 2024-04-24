@@ -13,7 +13,7 @@ static bool parse_chunked_body()
     // when done set parsed to true
 }
 
-// content-length or maxBodySize
+
 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
 // TODO handle transfer size
 bool Request::parse_body()
