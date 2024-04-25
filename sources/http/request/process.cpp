@@ -1,34 +1,41 @@
 #include "Message.hpp"
 #include "Request.hpp"
 
-// processing the request is basically 2 parts
-//	[1] - header
-//	[2] - body
 
-// throws ios failure
+/**
+ * @brief Process the HTTP request by parsing the request
+ * header and body. It applies the provided server configuration to the request header and
+ * checks if the request body can be parsed successfully.
+ *
+ * @param config The server configuration to apply to the request header.
+ * @return True if the request was processed successfully, false otherwise.
+ */
 bool Request::process(const ServerConfig& config)
 {
-    // expectedBodySize = std::min(expectedBodySize, maxBodySize);
-
-    // setup stream to throw on parsing errors
-    message.exceptions(std::ios::failbit | std::ios::badbit);
-
-    if (header(READY_TO_PARSE))
-        header.parse_header(message);
-    else
-        return false;
-
-    if (parse_body())
-        apply_config(config);
-    else
-        return false;
-
-    return true;
-    // if (expectedBodySize == NOT_SPECIFIED)
-    //     return true;
+    try {
+        if (header(READY_TO_PARSE)) {
+            // setup stream to throw on parsing errors
+            message.exceptions(std::ios::failbit | std::ios::badbit);
+            header.parse_header(message);
+            header.state = PARSED;
+            apply_config(config);
+        }
+        if (header(PARSED) && parse_body())
+            return true;
+    } catch (std::ios_base::failure& f) {
+        set_status(BAD_REQUEST);
+        DEBUG_MSG(ERR_PARSE + string(f.what()), R);
+        return true;
+    }
+    return false;
 }
 
-// applies the configuration parameters to the request
+/**
+ * @brief Modifies the request header by updating the resource paths and body size based
+ * on the server configuration.
+ *
+ * @param config The server configuration to apply.
+ */
 void Request::apply_config(const ServerConfig& config)
 {
     header.resource    = config.serverRoot + header.resource;
