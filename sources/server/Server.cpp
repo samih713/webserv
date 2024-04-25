@@ -56,43 +56,28 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-bool Server::validate_request(Request& r)
-{
-    try {
-        if (!r.process(config))
-            return false;
-        return true;
-    } catch (std::ios_base::failure& f) {
-        r.set_status(BAD_REQUEST);
-        DEBUG_MSG(ERR_PARSE, R);
-        return true;
-    }
-}
-
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
     ConnectionManager::check_connection(incoming);
     Request& r = ConnectionManager::add_connection(incoming, activeSockets);
     try {
         r.recv(incoming);
-        if (!validate_request(r))
-            return;
+        if(!r.process(config))
+            return ;
 
         // delete
         // printing request for debugging
         DEBUG_MSG(r, Y);
         // delete
 
-        // handle response like this
-        //      if (r.get_status() == BAD_REQUEST) {
-        // return Response(r.get_status());
-        //      }
+        // handle requests based on status here
 
         IRequestHandler* handler =
             RequestHandlerFactory::MakeRequestHandler(r.get_method());
         Response response = handler->handle_request(r, cachedPages, config);
         response.send_response(incoming);
-        ConnectionManager::remove_connection(incoming, activeSockets); // after completing remove
+        ConnectionManager::remove_connection(incoming,
+            activeSockets); // after completing remove
         delete handler;
     } catch (std::exception& e) {
         ConnectionManager::remove_connection(incoming, activeSockets);
