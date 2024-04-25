@@ -6,7 +6,7 @@
 /*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/23 12:42:45 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/20 22:59:34 by hmohamed         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:04:14 by hmohamed         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@
 #include "Request.hpp"
 #include "webserv.hpp"
 #include "Request.hpp"
+#include "TimeOut.hpp"
 #include "Server.hpp"
+#include "signal.h"
 
 class Cgi {
 	public:
@@ -25,6 +27,8 @@ class Cgi {
         ~Cgi();
         void execute(const std::string &outputFile);
         string execute(void);
+		char **headersToEnv(const Request &request, const string res, const ServerConfig &config);
+		TimeOut timer;
 
     private:
         vsp    headers;

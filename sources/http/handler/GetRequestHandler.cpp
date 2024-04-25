@@ -50,6 +50,20 @@ bool check_cgi_request(string res)
 
 }
 
+//fuction to get url without the query string
+string geturis(string res)
+{
+	string resn;
+	size_t qu;
+
+	qu = res.find('?', 0); 
+	resn = res.substr(0, qu);
+	//result = const_cast<char *>(res.substr(0,qu).c_str());
+	cout << resn << endl;
+	cout<< "test" << qu <<endl;
+    return (resn);
+}
+
 
 // TODO resource handling for get-requests, is broken
 const vector<char> GetRequestHandler::get_resource(const Request& request,
@@ -59,15 +73,15 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     string       resource       = request.get_resource();
     string       defaultPage    = config.serverRoot + "/";
     vector<char> body;
+	string		plain_res		= geturis(resource);
 
 
     add_header(make_pair<string, string>("Server", config.serverName));
 
-
     ifstream resource_file;
     size_t   resource_size = 0;
     status                 = OK;
-    if (resource == defaultPage) {
+    if (plain_res == defaultPage) {
         body = cachedPages->home.data;
         add_header(
             make_pair<string, string>("Content-Type", cachedPages->home.contentType));
@@ -76,7 +90,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
             ws_itoa(cachedPages->home.contentLength)));
     }
     else {
-        resource_file.open(resource.c_str(), std::ios_base::binary);
+        resource_file.open(plain_res.c_str(), std::ios_base::binary);
         if (resource_file.fail()) {
             status = NOT_FOUND;
             add_header(make_pair<string, string>("Content-Type",
@@ -86,11 +100,10 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
             body = cachedPages->notFound.data;
         }
         else {
-            string resource_type = find_resource_type(resource);
+            string resource_type = find_resource_type(plain_res);
             if (resource_type.length() != 0)
                 add_header(make_pair<string, string>("Content-Type", resource_type));
-
-            if (check_cgi_request(resource)) {
+            if (check_cgi_request(plain_res)) {
                 Cgi    cgi(request, config);
                 string result;
 
