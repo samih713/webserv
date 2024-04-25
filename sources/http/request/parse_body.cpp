@@ -18,25 +18,17 @@ static bool parse_chunked_body()
 // TODO handle transfer size
 bool Request::parse_body()
 {
-    int available(0);
-    int toAppendSize(0);
-
-    // error checking
-    DEBUGASSERT(header.bodySize >= recievedBodyLength &&
-                "negative remaining size check logic:" __FILE__);
-
-    int remaining(header.bodySize - recievedBodyLength);
-    // chunked encoding
-    if (header.chunked) {
-        return (parse_chunked_body());
-    }
-    // content-length parsing
-    else if (IS_SET(header.bodySize)) {
-        available    = message.str().length() - message.tellg();
-        toAppendSize = std::min(available, remaining);
-        body.append(message.str().substr(message.tellg()), toAppendSize);
-    }
-    else
+    size_t available(message.str().length() - message.tellg());
+    DEBUGASSERT(!message.eof() && "available is negative");
+    // ! what happens if it never finished? it closes automatically?
+    if (available < header.bodySize)
         return false;
+
+    // chunked encoding
+    if (header.chunked)
+        return (parse_chunked_body());
+    // content-length parsing
+    else if (IS_SET(header.bodySize))
+        body = message.str().substr(message.tellg(), header.bodySize);
     return true;
 }
