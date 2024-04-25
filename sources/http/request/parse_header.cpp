@@ -94,7 +94,7 @@ void Header::find_content_length(const HeaderMap::const_iterator it)
     if (it == fields.end())
         bodySize = NOT_SPECIFIED;
 
-    istringstream length;
+    istringstream length(it->second);
 
     length.exceptions(std::ios::failbit | std::ios::badbit);
     length >> bodySize;
