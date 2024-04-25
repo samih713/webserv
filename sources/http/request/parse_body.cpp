@@ -3,7 +3,7 @@
 #include "debug.hpp"
 #include "webserv.hpp"
 
-#define IS_SET(x) ((x) != NOT_SET)
+#define IS_SET(x) ((x) != NOT_SPECIFIED)
 
 // TODO handle chunked encoding
 static bool parse_chunked_body()

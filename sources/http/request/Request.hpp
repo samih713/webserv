@@ -38,8 +38,6 @@ private:
 
     stringstream message;
 
-    int recievedBodyLength;
-
     string body;
 
     // deleted copy assigment

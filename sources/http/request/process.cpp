@@ -33,5 +33,5 @@ void Request::apply_config(const ServerConfig& config)
 {
     header.resource    = config.serverRoot + header.resource;
     header.cgiResource = config.serverRoot + header.resource; // change to cgi root
-    header.bodySize    = config.maxBodySize;
+    header.bodySize    = std::min(header.bodySize, config.maxBodySize);
 }

@@ -1,13 +1,13 @@
 #include "Request.hpp"
 #include "debug.hpp"
 
-Request::Request() : status(OK), recievedBodyLength(0) {}
+Request::Request() : status(OK) {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
     : status(other.status), header(other.header), message(other.message.str()),
-      recievedBodyLength(other.recievedBodyLength), body(other.body)
+      body(other.body)
 {}
 
 
@@ -44,7 +44,8 @@ ostream& operator<<(ostream& os, const Request& r)
     os << "************ fields *************\n";
     for (HeaderMap::const_iterator it = r.header.fields.begin();
          it != r.header.fields.end(); ++it)
-        os << "[" << it->first << "]" << ": " << it->second << std::endl;
+        os << "[" << it->first << "]"
+           << ": " << it->second << std::endl;
     os << "************ body *************\n";
     os << r.body << std::endl;
     return os;

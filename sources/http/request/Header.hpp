@@ -6,7 +6,6 @@
 static const int DEFAULT_MAX_BODY_SIZE(1048576);
 
 // expected content length
-static const int NOT_SET(-1);
 static const int NOT_SPECIFIED(0);
 
 enum HEADER_STATE {
@@ -28,7 +27,7 @@ struct Header {
     string    resource;
     string    version;
     string    cgiResource;
-    int       bodySize;
+    size_t    bodySize;
     HeaderMap fields;
 
     // states

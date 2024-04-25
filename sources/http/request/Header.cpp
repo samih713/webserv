@@ -1,6 +1,6 @@
 #include "Header.hpp"
 
-Header::Header() : bodySize(NOT_SET),state(NOT_READY), chunked(false) {}
+Header::Header() : bodySize(NOT_SPECIFIED), state(NOT_READY), chunked(false) {}
 
 Header::Header(const Header& other)
     : method(other.method), resource(other.resource), version(other.version),
