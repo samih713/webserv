@@ -22,6 +22,8 @@ void Header::parse_header(stringstream& message)
     check_line_terminator(message, CRLF);
     // after all headers are completed
     process_content();
+    if (state == BAD)
+        message.setstate(std::ios::failbit);
 }
 
 void Header::parse_request_line(stringstream& message)

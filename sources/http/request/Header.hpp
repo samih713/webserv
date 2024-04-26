@@ -11,7 +11,8 @@ static const int NOT_SPECIFIED(0);
 enum HEADER_STATE {
     NOT_READY,
     READY_TO_PARSE,
-    PARSED
+    PARSED,
+    BAD
 };
 
 struct Header {
