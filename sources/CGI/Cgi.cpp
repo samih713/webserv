@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Cgi.cpp                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hmohamed <hmohamed@student.42abudhabi.ae>  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/23 12:44:51 by hmohamed          #+#    #+#             */
-/*   Updated: 2024/04/25 14:04:56 by hmohamed         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include  "Cgi.hpp"
 
 string getStingQuery(string res)
@@ -23,7 +11,6 @@ string getStingQuery(string res)
 	cout<< "the ?  :" << qu <<endl;
     cout << "lingth:" << length << endl;
     resn = res.substr(qu + 1, length);
-	//result = const_cast<char *>(res.substr(0,qu).c_str());
 	cout << resn << endl;
     return (resn);
 }
@@ -36,7 +23,6 @@ string geturi(string res)
 
 	qu = res.find('?', 0); 
 	resn = res.substr(0, qu);
-	//result = const_cast<char *>(res.substr(0,qu).c_str());
 	cout << resn << endl;
 	cout<< "test" << qu <<endl;
     return (resn);
@@ -52,8 +38,6 @@ Cgi::Cgi(const Request &request, const ServerConfig &config): body(request.get_b
 	headers = request.get_headers();
 	environment = headersToEnv(request, res, config);
 	timer = request.timer;
-	//filePath = const_cast<char *>(geturi(request.get_resource())->c_str());
-	//queryString = getStingQuery(res);
     //filePath = const_cast<char *> (request.get_resource().c_str());
     // // Check if the Python script exists
     // if (access(filePath, X_OK) == -1)
@@ -126,7 +110,6 @@ char ** Cgi::headersToEnv(const Request &request, const string res, const Server
 	
 	char* token = strtok(const_cast<char *>(queryString.c_str()), "&");
     
-	//cout << token +3 <<endl;
     // Iterate through the tokens and push integers onto the stack
     while (token != NULL) {
 		envVector.push_back(strdup(token));
@@ -278,50 +261,3 @@ string Cgi::execute(void)
     close(fd[0]);
     return (res_body);
 }
-
-// static char** headers_to_env(const vsp& headers)
-// {
-//     vector<char*> envVector;
-
-//     // Iterate through headers
-//     vsp::const_iterator end = headers.end();
-//     for (vsp::const_iterator it = headers.begin(); it != end; ++it) {
-//         size_t len      = it->first.size() + it->second.size() + 2;
-//         char*  envEntry = new char[len];
-//         std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
-//         envVector.push_back(envEntry);
-//     }
-
-//     // Allocate memory for char* array
-//     char** envp = new char*[envVector.size() + 1];
-
-//     // Copy pointers from vector to char* array
-//     for (size_t i = 0; i < envVector.size(); ++i)
-//         envp[i] = envVector[i];
-//     envp[envVector.size()] = NULL;
-
-//     return envp;
-// }
-
-// static string get_uri(string res)
-// {
-//     string resn;
-//     size_t qu;
-
-//     qu   = res.find('?', 0);
-//     resn = res.substr(0, qu);
-//     // result = const_cast<char *>(res.substr(0,qu).c_str());
-//     return (resn);
-// }
-
-// static string get_query_string(string res)
-// {
-//     string resn;
-//     size_t qu;
-//     size_t length;
-
-//     qu     = res.find('?', 0);
-//     length = res.length();
-//     resn   = res.substr(qu + 1, length);
-//     return (resn);
-// }
