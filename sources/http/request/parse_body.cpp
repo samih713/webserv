@@ -1,16 +1,30 @@
 #include "Message.hpp"
 #include "Request.hpp"
 #include "debug.hpp"
+#include "request_utils.hpp"
 #include "webserv.hpp"
+#include <string>
 
 #define IS_SET(x) ((x) != NOT_SPECIFIED)
 
 // TODO handle chunked encoding
-static bool parse_chunked_body()
+bool Request::parse_chunked_body()
 {
-    DEBUGASSERT(false && "not yet implemented");
+    static size_t chunked_body_size(0);
+    string        line;
+
+    // parse chunk size
+    // if line is not ending in CRLF fail
+    if (!peek_line_terminator(message, CRLF))
+        message.setstate(std::ios::failbit);
+    message >> std::hex >> chunked_body_size; // take in size
+    message.ignore(2);                        // ignore CRLF
+
+    // parse chunk
+    // while (!peek_line_terminator(stringstream & message, const string& check))
+
+        DEBUGASSERT(false && "not yet implemented");
     return false;
-    // when done set parsed to true
 }
 
 

@@ -30,9 +30,9 @@ public:
     friend ostream& operator<<(ostream& os, const Request& r);
 
 private:
-    bool parse_body();
-    void apply_config(const ServerConfig& config);
-
+    bool        parse_body();
+    bool        parse_chunked_body();
+    void        apply_config(const ServerConfig& config);
     STATUS_CODE status;
     Header      header;
 
