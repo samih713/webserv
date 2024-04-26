@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <config_file>" << std::endl;
+        cerr << "Usage: " << argv[0] << " <config_file>" << endl;
         exit(1);
     }
 
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
             itr->print();
     }
     catch (std::exception &error) {
-        std::cerr << error.what() << std::endl;
+        cerr << error.what() << endl;
         return 1;
     }
     return 0;

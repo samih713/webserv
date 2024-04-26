@@ -163,7 +163,7 @@ fd Socket::accept()
  *
  * @throws None
  */
-Socket::Exception::Exception(const std::string& error_message)
+Socket::Exception::Exception(const string& error_message)
 {
     this->error_message = compose_msg(error_message);
 };
@@ -186,9 +186,9 @@ const char* Socket::Exception::what() const throw()
  * @param message The message to be included in the error message.
  * @return A string containing the composed error message.
  */
-std::string Socket::Exception::compose_msg(const std::string& message)
+string Socket::Exception::compose_msg(const string& message)
 {
-    std::stringstream _msg;
+    stringstream _msg;
     _msg << message << (errno ? ": " + string(strerror(errno)) : "");
     return _msg.str();
 }

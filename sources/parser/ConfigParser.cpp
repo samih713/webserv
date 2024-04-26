@@ -19,6 +19,7 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_EMPTY);
 
     string line;
+    string content;
     while (std::getline(file, line)) {
         // remove comments
         size_t pos = line.find('#');
@@ -33,10 +34,29 @@ ConfigParser::ConfigParser(const string& configFile)
         line.erase(0, line.find_first_not_of(" \t"));
         line.erase(line.find_last_not_of(" \t") + 1);
 
-        _content.append(line);
+        content.append(line);
     }
 
     file.close();
+
+    string currentToken;
+    for (string::const_iterator itr = content.begin(); itr != content.end(); ++itr) {
+        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+            _tokens.push_back(string(1, *itr));
+        }
+        else if (std::isspace(*itr)) { // whitespace
+            if (!currentToken.empty()) {
+                _tokens.push_back(currentToken);
+                currentToken.clear();
+            }
+        }
+        else
+            currentToken.push_back(*itr); // add character to current token
+    }
 }
 
 void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
@@ -121,17 +141,24 @@ Location ConfigParser::_parse_location_context(void)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_LOCATION);
     ++_itr; // move to location content
 
+    set<string> parsedLocationDirectives;
     while (*_itr != "}") {
-        if (*_itr == "root")
+        if (*_itr == "root") {
             location.root = _parse_root();
-        else if (*_itr == "autoindex")
+            check_duplicate_directive(parsedLocationDirectives, "root");
+        }
+        else if (*_itr == "autoindex") {
             location.autoindex = _parse_autoindex();
+            check_duplicate_directive(parsedLocationDirectives, "autoindex");
+        }
         else if (*_itr == "index")
             location.indexFiles = _parse_index(location.root);
-        else {
-            cout << *_itr << endl;
-            THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_LOCATION);
+        else if (*_itr == "client_max_body_size") {
+            location.maxBodySize = _parse_client_max_body_size();
+            check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
         }
+        else
+            THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN_LOCATION);
         ++_itr;
     }
     ++_itr; // move to next directive
@@ -288,16 +315,33 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
+    set<string> parsedHTTPDirectives;
     vector<ServerConfig> serverConfigs;
     while (*_itr != "}") {
         if (*_itr == "server")
             serverConfigs.push_back(_parse_server_context());
+        else if (*_itr == "root") {
+            // _serverConfig.serverRoot = _parse_root();
+            check_duplicate_directive(parsedHTTPDirectives, "root");
+        }
+        else if (*_itr == "index")
+            ; // index here will be default index for all servers
+        else if (*_itr == "error_page")
+            ; // error_page here will be default error_page for all servers
+        else if (*_itr == "client_max_body_size") {
+            // _serverConfig.maxBodySize = _parse_client_max_body_size();
+            check_duplicate_directive(parsedHTTPDirectives, "client_max_body_size");
+        }
+        else if (*_itr == "autoindex") {
+            // _serverConfig.autoindex = _parse_autoindex();
+            check_duplicate_directive(parsedHTTPDirectives, "autoindex");
+        }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_IN);
         ++_itr;
     }
 
-    if ((_itr + 1) != _tokens.end())
+    if ((_itr + 1) != _tokens.end()) // after http context no more tokens should be present
         THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_OUT);
 
     return serverConfigs;
@@ -305,25 +349,6 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
 
 vector<ServerConfig> ConfigParser::parse(void)
 {
-    string currentToken;
-    for (string::const_iterator itr = _content.begin(); itr != _content.end(); ++itr) {
-        if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-            _tokens.push_back(string(1, *itr));
-        }
-        else if (std::isspace(*itr)) { // whitespace
-            if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
-                currentToken.clear();
-            }
-        }
-        else
-            currentToken.push_back(*itr); // add character to current token
-    }
-
     // check braces
     stack<string> braces;
     for (vector<string>::const_iterator itr = _tokens.begin(); itr != _tokens.end();

@@ -1,6 +1,6 @@
 #include "CachedPages.hpp"
-#include "ServerConfig.hpp"
 #include "ConnectionManager.hpp"
+#include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
 
 #ifndef SERVER_HPP
@@ -14,11 +14,14 @@ enum polling_strat {
 };
 
 // wait message
-static const std::string WAIT_MESSAGE("*** Server is now waiting for connections ***");
+static const string WAIT_MESSAGE("*** Server is now waiting for connections ***");
 // default backLog
 static const int DEFAULT_BACKLOG(16);
 // default select wait
 static const int SELECTWAITTIME(5);
+// default kqueue wait
+static const int KQUEUEWAITTIME(5);
+static const int MAX_EVENTS(16);
 
 class Server {
 public:
@@ -39,7 +42,7 @@ private:
     void handle_connection(fd incoming, fd_set& activeSockets);
     /* polling strats */
     void select_strat();
-    // void kqueue_strat();
+    void kqueue_strat();
     // void poll_strat();
     // void epoll_strat();
 

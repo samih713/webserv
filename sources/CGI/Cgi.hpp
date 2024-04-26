@@ -21,14 +21,14 @@
 #include "signal.h"
 
 class Cgi {
-	public:
-   // Cgi(char* filePath, char** arguments, char** environment);
-        Cgi(const Request &request, const ServerConfig &config);
-        ~Cgi();
-        void execute(const std::string &outputFile);
-        string execute(void);
-		char **headersToEnv(const Request &request, const string res, const ServerConfig &config);
-		TimeOut timer;
+		
+public:
+    Cgi(const Request &request, const ServerConfig &config);
+    ~Cgi();
+    void   execute(const string& outputFile);
+    char **headersToEnv(const Request &request, const string res, const ServerConfig &config);
+		TimeOut timer;  
+    string execute(void);
 
     private:
         vsp    headers;
