@@ -63,6 +63,9 @@ static const string ERR_MISSING_ERROR_PATH("Config: error page path missing");
 static const string ERR_MISSING_ERROR_CODE("Config: error code missing");
 static const string ERR_ERROR_PATH("Config: invalid error page path");
 
+// allow_methods directive error messages
+static const string ERR_METHOD("Config: invalid method");
+static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 
 #define MAX_PORT 65535
 
@@ -74,10 +77,11 @@ static const string ERR_ERROR_PATH("Config: invalid error page path");
 // [ ] handle cgi related directives
 // [ ] add directive to set http methods allowed
 
-#define NUM_KEYWORDS 10
+#define NUM_KEYWORDS 15
 
 const string keywords[NUM_KEYWORDS] = { "http", "server", "listen", "server_name",
-    "location", "root", "index", "error_page", "client_max_body_size", "autoindex" };
+    "location", "root", "index", "error_page", "client_max_body_size", "autoindex",
+    "allow_methods" };
 
 class ConfigParser {
 public:
@@ -103,6 +107,7 @@ private:
     string _parse_root(void);
     size_t _parse_client_max_body_size(void);
     bool   _parse_autoindex(void);
+    void  _parse_allow_methods(vector<string>& methods);
 
     bool _is_number(const string& str)
     {

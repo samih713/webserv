@@ -245,6 +245,25 @@ bool ConfigParser::_parse_autoindex(void)
     return autoindex == "on";
 }
 
+void ConfigParser::_parse_allow_methods(vector<string>& methods)
+{
+    ++_itr; // move to methods
+
+    while (*_itr != ";") {
+        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE" || *_itr == "PUT") // add more methods here
+            methods.push_back(*_itr);
+        else
+            THROW_EXCEPTION_WITH_INFO(ERR_METHOD);
+        ++_itr;
+    }
+
+    if (methods.empty())
+        THROW_EXCEPTION_WITH_INFO(ERR_EMPTY_METHODS);
+
+    --_itr; // move back to last method
+    _check_semicolon();
+}
+
 Location ConfigParser::_parse_location_context(void)
 {
     ++_itr; // move to location modifier/path
@@ -276,6 +295,10 @@ Location ConfigParser::_parse_location_context(void)
         else if (*_itr == "client_max_body_size") {
             location.maxBodySize = _parse_client_max_body_size();
             _check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
+        }
+        else if (*_itr == "allow_methods") {
+            _parse_allow_methods(location.methods);
+            _check_duplicate_directive(parsedLocationDirectives, "allow_methods");
         }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);

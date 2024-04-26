@@ -22,6 +22,7 @@ if [ ! -d "$test_dir" ]; then
 fi
 
 sub_dirs=(
+    "allow_methods_check"
     "brace_check"
     "client_body_size_check"
     "duplicate_check"
