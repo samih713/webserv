@@ -250,7 +250,8 @@ void ConfigParser::_parse_allow_methods(vector<string>& methods)
     ++_itr; // move to methods
 
     while (*_itr != ";") {
-        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE" || *_itr == "PUT") // add more methods here
+        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE" ||
+            *_itr == "PUT") // add more methods here
             methods.push_back(*_itr);
         else
             THROW_EXCEPTION_WITH_INFO(ERR_METHOD);
@@ -356,7 +357,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
 {
     // setting values for Config object
     _itr = _tokens.begin();
-    if (*_itr != "http") //! maybe there's stuff in the global context
+    if (*_itr != "http")
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_HTTP);
 
     ++_itr; // move to {
@@ -393,6 +394,8 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
     // after http context no more tokens should be present
     if ((_itr + 1) != _tokens.end())
         THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
+    else if (serverConfigs.empty())
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SERVER);
 
     return serverConfigs;
 }
@@ -405,9 +408,13 @@ vector<ServerConfig> ConfigParser::parse(void)
          ++itr)
     {
         if (*itr == "{") {
-            if (*(itr - 1) != "server" && *(itr - 1) != "http" &&
-                *(itr - 2) != "location" && *(itr - 3) != "location")
+            if (itr - 1 >= _tokens.begin() && *(itr - 1) != "server" &&
+                *(itr - 1) != "http" &&
+                (itr - 2 >= _tokens.begin() && *(itr - 2) != "location") &&
+                (itr - 3 >= _tokens.begin() && *(itr - 3) != "location"))
+            {
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
+            }
             braces.push("{");
         }
         else if (*itr == "}") {
