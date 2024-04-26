@@ -25,6 +25,7 @@ public:
 
     METHOD        get_method() const;
     const string& get_resource() const;
+		const string   &get_body() const;
     const vsp&    get_headers() const;
 
     bool parse_request(const ServerConfig& config);

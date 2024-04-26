@@ -30,6 +30,17 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
     return instance;
 }
 
+bool Server::check_cgi_request(string res)
+{
+    // Find the position of the word in the string
+    size_t pos = res.find("cgi-bin");
+
+    if (pos != std::string::npos)
+        return (true);
+    else
+        return (false);
+}
+
 /**
  * @brief Constructor for the Server class.
  *
@@ -62,6 +73,8 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
+	int id;
+
     try {
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
@@ -69,13 +82,35 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         if (!r.parse_request(config))
             return;
 
-        IRequestHandler* handler =
-            RequestHandlerFactory::MakeRequestHandler(r.get_method());
-        Response response = handler->handle_request(r, cachedPages, config);
+		if(check_cgi_request(r.get_resource()))
+		{
+            id = fork();
+            if (id == -1) {
+                std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+            }
+            else if (id == 0) {
+                // Child process
+                IRequestHandler* handler =
+                    RequestHandlerFactory::MakeRequestHandler(r.get_method());
+                Response response = handler->handle_request(r, cachedPages, config);
 
-        response.send_response(incoming);
+                response.send_response(incoming);
+                r.setCompleted();
+                delete handler;
+				exit(0);
+            }
+        }else{
+            IRequestHandler* handler =
+                RequestHandlerFactory::MakeRequestHandler(r.get_method());
+            Response response = handler->handle_request(r, cachedPages, config);
+
+            response.send_response(incoming);
+           // r.setCompleted();
+            delete handler;
+        }
         r.setCompleted();
-        delete handler;
+
+
     } catch (std::ios_base::failure& f) {
         DEBUG_MSG(ERR_PARSE, R);
     } catch (std::exception& e) {

@@ -29,6 +29,7 @@ public:
         int                                         backLog = DEFAULT_BACKLOG);
     ~Server();
     void start(enum polling_strat);
+    bool check_cgi_request(string res);
 
 protected:
     Server(const ServerConfig& config, int backLog);
