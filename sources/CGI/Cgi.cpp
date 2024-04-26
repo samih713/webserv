@@ -279,49 +279,49 @@ string Cgi::execute(void)
     return (res_body);
 }
 
-static char** headers_to_env(const vsp& headers)
-{
-    vector<char*> envVector;
+// static char** headers_to_env(const vsp& headers)
+// {
+//     vector<char*> envVector;
 
-    // Iterate through headers
-    vsp::const_iterator end = headers.end();
-    for (vsp::const_iterator it = headers.begin(); it != end; ++it) {
-        size_t len      = it->first.size() + it->second.size() + 2;
-        char*  envEntry = new char[len];
-        std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
-        envVector.push_back(envEntry);
-    }
+//     // Iterate through headers
+//     vsp::const_iterator end = headers.end();
+//     for (vsp::const_iterator it = headers.begin(); it != end; ++it) {
+//         size_t len      = it->first.size() + it->second.size() + 2;
+//         char*  envEntry = new char[len];
+//         std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
+//         envVector.push_back(envEntry);
+//     }
 
-    // Allocate memory for char* array
-    char** envp = new char*[envVector.size() + 1];
+//     // Allocate memory for char* array
+//     char** envp = new char*[envVector.size() + 1];
 
-    // Copy pointers from vector to char* array
-    for (size_t i = 0; i < envVector.size(); ++i)
-        envp[i] = envVector[i];
-    envp[envVector.size()] = NULL;
+//     // Copy pointers from vector to char* array
+//     for (size_t i = 0; i < envVector.size(); ++i)
+//         envp[i] = envVector[i];
+//     envp[envVector.size()] = NULL;
 
-    return envp;
-}
+//     return envp;
+// }
 
-static string get_uri(string res)
-{
-    string resn;
-    size_t qu;
+// static string get_uri(string res)
+// {
+//     string resn;
+//     size_t qu;
 
-    qu   = res.find('?', 0);
-    resn = res.substr(0, qu);
-    // result = const_cast<char *>(res.substr(0,qu).c_str());
-    return (resn);
-}
+//     qu   = res.find('?', 0);
+//     resn = res.substr(0, qu);
+//     // result = const_cast<char *>(res.substr(0,qu).c_str());
+//     return (resn);
+// }
 
-static string get_query_string(string res)
-{
-    string resn;
-    size_t qu;
-    size_t length;
+// static string get_query_string(string res)
+// {
+//     string resn;
+//     size_t qu;
+//     size_t length;
 
-    qu     = res.find('?', 0);
-    length = res.length();
-    resn   = res.substr(qu + 1, length);
-    return (resn);
-}
+//     qu     = res.find('?', 0);
+//     length = res.length();
+//     resn   = res.substr(qu + 1, length);
+//     return (resn);
+// }
