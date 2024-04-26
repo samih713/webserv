@@ -1,13 +1,11 @@
 #include "Header.hpp"
 #include "Message.hpp"
 #include "debug.hpp"
+#include "request_utils.hpp"
 #include "webserv.hpp"
 
-// helper utils
-static void   check_line_terminator(stringstream& message, const string& check);
-static bool   peek_line_terminator(stringstream& message, const string& check);
+// helpers
 static void   replace_spaces(string& resource);
-static void   to_lower(string& str);
 static string get_field_value(stringstream& message);
 
 
@@ -53,6 +51,7 @@ void Header::add_header(stringstream& message)
     fieldValue.clear();
 
     std::getline(message, fieldName, ':');
+
     if (fieldName.find(' ') != string::npos)
         message.setstate(std::ios::failbit);
     to_lower(fieldName);
@@ -78,16 +77,35 @@ void Header::process_content()
         find_content_length(contentLength);
 }
 
-void Header::is_chunked(const __attribute__((unused)) HeaderMap::const_iterator it)
+void Header::is_chunked(const HeaderMap::const_iterator it)
 {
-    // const string& encoding(it->second);
+    const string& transfer_encoding(it->second);
+    string        last;
+    stack<string> values;
+    string        word;
+    bool          exists(false);
 
-    // split up int a encodings
-    // string::const_iterator begin = encoding.begin();
-    // string::const_iterator end   = encoding.end();
-
+    size_t delLoc(0);
+    size_t i(0);
+    while (delLoc != string::npos) { // not at end
+        delLoc = transfer_encoding.find(", ", i);
+        word   = transfer_encoding.substr(i, delLoc - i);
+        to_lower(word); // transfer encodings are case insensitive
+        values.push(word);
+        i = delLoc + 2;
+        if (word == "chunked")
+            exists = true;
+    }
     // if chunked is the last encoding, set process chunked
+    last = values.top();
+    to_lower(last); // transfer encoding is case insensitive
+    if (last == "chunked")
+        chunked = true;
+    if (exists && !chunked)
+        state = BAD;
+
     // if not set status to 400
+
     DEBUGASSERT(false && "not yet implemented");
 }
 
@@ -123,48 +141,6 @@ static string get_field_value(stringstream& message)
     return fieldValue;
 }
 
-static void to_lower(string& str)
-{
-    for (size_t i = 0; i < str.length(); i++)
-        str[i] = std::tolower(str[i]);
-}
-
-static void check_line_terminator(stringstream& message, const string& check)
-{
-    string line_terminator;
-    std::noskipws(message);
-
-    string::const_iterator check_end = check.end();
-    for (string::const_iterator it = check.begin(); it != check_end && message.good();
-         it++)
-        line_terminator += message.get();
-
-    if (line_terminator != check)
-        message.setstate(std::ios::failbit);
-
-    std::skipws(message);
-}
-
-static bool peek_line_terminator(stringstream& message, const string& check)
-{
-    string         line_terminator;
-    std::streampos initialPos = message.tellg();
-    std::noskipws(message);
-
-    string::const_iterator check_end = check.end();
-    for (string::const_iterator it = check.begin(); it != check_end && message.good();
-         it++)
-        line_terminator += message.get();
-
-    message.clear();
-    message.seekg(initialPos, std::ios::beg);
-
-    if (line_terminator != check)
-        return false;
-
-    std::skipws(message);
-    return true;
-}
 
 // replace %20 with space
 // TODO replace all other special characters
