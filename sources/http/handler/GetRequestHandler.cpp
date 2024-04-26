@@ -76,7 +76,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 	string		plain_res		= geturis(resource);
 
 
-    add_header(make_pair<string, string>("Server", config.serverName));
+    add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
     ifstream resource_file;
     size_t   resource_size = 0;
@@ -84,7 +84,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     if (plain_res == defaultPage) {
         body = cachedPages->home.data;
         add_header(
-            make_pair<string, string>("Content-Type", cachedPages->home.contentType));
+            make_pair<string, string>("Content-Type", cachedPages->home.contentType.c_str()));
 
         add_header(make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
@@ -94,7 +94,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
         if (resource_file.fail()) {
             status = NOT_FOUND;
             add_header(make_pair<string, string>("Content-Type",
-                cachedPages->notFound.contentType));
+                cachedPages->notFound.contentType.c_str()));
             add_header(make_pair<string, string>("Content-Length",
                 ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
@@ -102,7 +102,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
         else {
             string resource_type = find_resource_type(plain_res);
             if (resource_type.length() != 0)
-                add_header(make_pair<string, string>("Content-Type", resource_type));
+                add_header(make_pair<string, string>("Content-Type", resource_type.c_str()));
             if (check_cgi_request(plain_res)) {
                 Cgi    cgi(request, config);
                 string result;
