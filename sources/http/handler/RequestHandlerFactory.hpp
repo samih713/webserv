@@ -1,7 +1,6 @@
-#include <algorithm>
-#include "FindHeaderKey.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
+#include <algorithm>
 
 #ifndef REQUESTHANDLERFACTORY_HPP
 #define REQUESTHANDLERFACTORY_HPP
@@ -43,11 +42,10 @@ private:
         vector<string>::iterator it = std::find(methods.begin(), methods.end(), method);
         return static_cast<METHOD>(std::distance(methods.begin(), it));
     }
-    static void init_methods(vector<string> &methods);
-    
+    static void init_methods(vector<string>& methods);
 };
 
-void RequestHandlerFactory::init_methods(vector<string> &methods)
+void RequestHandlerFactory::init_methods(vector<string>& methods)
 {
     methods.push_back("GET");
     methods.push_back("POST");

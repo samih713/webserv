@@ -9,6 +9,7 @@
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
+// [ ] client sends an infinite loop test this case
 
 // REQUEST
 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
@@ -52,6 +53,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
 #include <sstream>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <sys/select.h>
@@ -75,6 +77,7 @@ using std::ostream;
 using std::ostringstream;
 using std::pair;
 using std::runtime_error;
+using std::stack;
 using std::string;
 using std::stringstream;
 using std::vector;
