@@ -34,7 +34,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 {
     vsp          requestHeaders = request.get_headers();
     string       resource       = request.get_resource();
-    string       defaultPage    = config.serverRoot + "/";
+    string       defaultPage    = config.root + "/";
     vector<char> body;
 
 

@@ -16,26 +16,25 @@ struct Location {
 };
 
 struct ServerConfig {
-    fd                       listenerPort;
-    size_t                   maxBodySize;
+    fd                       port;
+    in_addr_t                host;
     string                   serverName;
-    string                   serverRoot;
+    size_t                   maxBodySize;
+    string                   root;
     vector<string>           indexFiles;
-    vector<Location>         locations;
-    map<STATUS_CODE, string> errorPages;
     bool                     autoindex;
-    in_addr_t                serverAddr;
+    map<STATUS_CODE, string> errorPages;
+    vector<Location>         locations;
 
     ServerConfig()
-        : listenerPort(8080), maxBodySize(1000000), autoindex(false),
-          serverAddr(htonl(INADDR_ANY))
+        : port(8080), host(htonl(INADDR_ANY)), maxBodySize(1000000), autoindex(false)
     {}
 
     void print(void) const
     {
         cout << "ServerConfig {" << endl;
-        cout << "  listenerPort: " << listenerPort << endl;
-        cout << "  host: " << inet_ntoa(*(struct in_addr*) &serverAddr) << endl;
+        cout << "  port: " << port << endl;
+        cout << "  host: " << inet_ntoa(*(struct in_addr*) &host) << endl;
         cout << "  maxBodySize: " << maxBodySize << endl;
         cout << "  indexFiles: [";
         for (vector<string>::const_iterator itr = indexFiles.begin();
@@ -48,7 +47,7 @@ struct ServerConfig {
         cout << "]" << endl;
         cout << "  autoindex: " << autoindex << endl;
         cout << "  serverName: [" << serverName << "]" << endl;
-        cout << "  serverRoot: " << serverRoot << endl;
+        cout << "  root: " << root << endl;
         cout << "  locations: [" << endl;
         for (vector<Location>::const_iterator itr = locations.begin();
              itr != locations.end(); ++itr)

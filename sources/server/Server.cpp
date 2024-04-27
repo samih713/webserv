@@ -27,9 +27,9 @@
 Server& Server::get_instance(const ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
-    string        serverAddr = inet_ntoa(*(struct in_addr*) &config.serverAddr);
-    Logger::log_message("Server created successfully on port [" + serverAddr + ":" +
-                            ws_itoa(config.listenerPort) + "]",
+    string        host = inet_ntoa(*(struct in_addr*) &config.host);
+    Logger::log_message("Server created successfully on port [" + host + ":" +
+                            ws_itoa(config.port) + "]",
         INFO);
     return instance;
 }
@@ -46,7 +46,7 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
 Server::Server(const ServerConfig& config, int backLog)
-    : _listener(config.listenerPort, backLog, config.serverAddr), _config(config),
+    : _listener(config.port, backLog, config.host), _config(config),
       _cachedPages(new CachedPages(config))
 {
     DEBUG_MSG("Server was created successfully", B);

@@ -124,7 +124,7 @@ vector<string> ConfigParser::_parse_index(const string& root)
 }
 
 
-fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
+fd ConfigParser::_parse_listen(in_addr_t& host)
 {
     ++_itr; // move to host:port
 
@@ -149,27 +149,27 @@ fd ConfigParser::_parse_listen(in_addr_t& serverAddr)
     // parse host
     if (!hostStr.empty()) {
         if (hostStr == "localhost" || hostStr == "127.0.0.1")
-            serverAddr = inet_addr("127.0.0.1");
+            host = inet_addr("127.0.0.1");
         else {
             struct sockaddr_in sockaddr;
             if (inet_pton(AF_INET, hostStr.c_str(), &sockaddr.sin_addr))
-                serverAddr = inet_addr(hostStr.c_str());
+                host = inet_addr(hostStr.c_str());
             else
                 THROW_EXCEPTION_WITH_INFO(ERR_HOST);
         }
     }
 
     // parse port
-    fd listenerPort = 8080;
+    fd port = 8080;
     if (!portStr.empty()) {
-        listenerPort = (int) std::strtod(portStr.c_str(), NULL);
-        if (listenerPort > MAX_PORT || listenerPort < 0)
+        port = (int) std::strtod(portStr.c_str(), NULL);
+        if (port > MAX_PORT || port < 0)
             THROW_EXCEPTION_WITH_INFO(ERR_PORT);
     }
 
     _check_semicolon();
 
-    return listenerPort;
+    return port;
 }
 
 void ConfigParser::_parse_server_name(string& serverName)
@@ -321,15 +321,15 @@ ServerConfig ConfigParser::_parse_server_context(void)
     ServerConfig _serverConfig;
     while (*_itr != "}") {
         if (*_itr == "listen") {
-            _serverConfig.listenerPort = _parse_listen(_serverConfig.serverAddr);
+            _serverConfig.port = _parse_listen(_serverConfig.host);
             _check_duplicate_directive(parsedServerDirectives, "listen");
         }
         else if (*_itr == "server_name")
             _parse_server_name(_serverConfig.serverName);
         else if (*_itr == "error_page")
-            _parse_error_page(_serverConfig.errorPages, _serverConfig.serverRoot);
+            _parse_error_page(_serverConfig.errorPages, _serverConfig.root);
         else if (*_itr == "root") {
-            _serverConfig.serverRoot = _parse_root();
+            _serverConfig.root = _parse_root();
             _check_duplicate_directive(parsedServerDirectives, "root");
         }
         else if (*_itr == "client_max_body_size") {
@@ -337,7 +337,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
             _check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
         }
         else if (*_itr == "index")
-            _serverConfig.indexFiles = _parse_index(_serverConfig.serverRoot);
+            _serverConfig.indexFiles = _parse_index(_serverConfig.root);
         else if (*_itr == "location")
             _serverConfig.locations.push_back(_parse_location_context());
         else if (*_itr == "autoindex") {
@@ -371,7 +371,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         if (*_itr == "server")
             serverConfigs.push_back(_parse_server_context());
         else if (*_itr == "root") {
-            // _serverConfig.serverRoot = _parse_root();
+            // _serverConfig.root = _parse_root();
             _check_duplicate_directive(parsedHTTPDirectives, "root");
         }
         else if (*_itr == "index")

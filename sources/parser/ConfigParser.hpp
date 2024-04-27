@@ -75,7 +75,6 @@ static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 // [ ] check for duplicate error pages
 // [ ] empty root can cause problems even if it's valid
 // [ ] handle cgi related directives
-// [ ] add directive to set http methods allowed
 
 #define NUM_KEYWORDS 15
 
@@ -102,12 +101,12 @@ private:
     // parsing config directives
     vector<string> _parse_index(const string& root);
     void   _parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
-    fd     _parse_listen(in_addr_t& serverAddr);
+    fd     _parse_listen(in_addr_t& host);
     void   _parse_server_name(string& serverName);
     string _parse_root(void);
     size_t _parse_client_max_body_size(void);
     bool   _parse_autoindex(void);
-    void  _parse_allow_methods(vector<string>& methods);
+    void   _parse_allow_methods(vector<string>& methods);
 
     bool _is_number(const string& str)
     {
@@ -128,7 +127,8 @@ private:
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
     }
-    void _check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
+    void _check_duplicate_directive(set<string>& parsedDirectives,
+        const string&                            directive)
     {
         if (parsedDirectives.find(directive) != parsedDirectives.end())
             THROW_EXCEPTION_WITH_INFO("Config: duplicate " + directive + " found");
