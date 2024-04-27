@@ -79,7 +79,7 @@ void Header::process_content()
 
 void Header::is_chunked(const HeaderMap::const_iterator it)
 {
-    const string& transfer_encoding(it->second);
+    const string& tEncoding(it->second);
     string        last;
     stack<string> values;
     string        word;
@@ -88,8 +88,8 @@ void Header::is_chunked(const HeaderMap::const_iterator it)
     size_t delLoc(0);
     size_t i(0);
     while (delLoc != string::npos) { // not at end
-        delLoc = transfer_encoding.find(", ", i);
-        word   = transfer_encoding.substr(i, delLoc - i);
+        delLoc = tEncoding.find(", ", i);
+        word   = tEncoding.substr(i, delLoc - i);
         to_lower(word); // transfer encodings are case insensitive
         values.push(word);
         i = delLoc + 2;
