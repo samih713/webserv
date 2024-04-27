@@ -1,11 +1,13 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
+#include <set>
 #include <stack>
 #include <sys/stat.h>
 
 #ifndef CONFIG_PARSER_HPP
 #define CONFIG_PARSER_HPP
 
+using std::set;
 using std::stack;
 
 static const string ERR_INVALID_FILE("Parser: invalid file");
@@ -33,8 +35,12 @@ static const string ERR_INVALID_ROOT("Parser: invalid root directive");
 static const string ERR_MISSING_ROOT("Parser: missing root directive");
 static const string ERR_INVALID_INDEX("Parser: invalid index directive");
 static const string ERR_INVALID_AUTOINDEX("Parser: invalid autoindex directive");
-static const string ERR_INVALID_BODY_SIZE(
-    "Parser: invalid client_max_body_size directive");
+
+static const string ERR_INVALID_CHAR("Parser: invalid character in client_max_body_size");
+static const string ERR_MULTIPLE_SIZE_SUFFIX("Parser: multiple suffixes found");
+static const string ERR_MISSING_SIZE("Parser: missing size value");
+static const string ERR_MISSING_SUFFIX("Parser: missing size suffix");
+static const string ERR_BODY_SIZE_OVERFLOW("Parser: body size is out of bounds");
 
 static const string ERR_ERROR_PATH("Parser: error page path missing");
 static const string ERR_ERROR_CODE("Parser: error page code missing");
@@ -48,14 +54,10 @@ static const string ERR_UNEXPECTED_TOKENS_IN_LOCATION(
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] check for duplicate server names
-// [ ] check for duplicate listen ports
 // [ ] check for duplicate locations
 // [ ] check for duplicate indexes
 // [ ] check for duplicate error pages
-// [ ] check for duplicate autoindex (depends on context)
 // [ ] empty root can cause problems even if it's valid
-// [ ] check for duplicate client_max_body_size
 // [ ] handle cgi related directives
 // [ ] add directive to set http methods allowed
 
@@ -72,7 +74,6 @@ public:
     vector<ServerConfig> parse(void);
 
 private:
-    string                         _content;
     vector<string>                 _tokens;
     vector<string>::const_iterator _itr;
 
@@ -105,6 +106,13 @@ private:
         if (*(_itr + 1) != ";")
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
+    }
+    void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
+    {
+        if (parsedDirectives.find(directive) != parsedDirectives.end())
+            THROW_EXCEPTION_WITH_INFO("Parser: duplicate " + directive + " found");
+
+        parsedDirectives.insert(directive);
     }
 };
 

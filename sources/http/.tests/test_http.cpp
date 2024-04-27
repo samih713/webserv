@@ -8,11 +8,11 @@ int main()
     try
     {
         Request request(sample_request);
-        std::cout << request;
+        cout << request;
     }
     catch (runtime_error &e)
     {
-        std::cerr << e.what() << std::endl;
+        cerr << e.what() << endl;
     }
 #endif // parsing test
 
@@ -21,18 +21,18 @@ int main()
 	string path;
 	string version;
 
-	std::stringstream line(sample_message);
+	stringstream line(sample_message);
 	line.exceptions(std::ios::failbit | std::ios::badbit);
 
-	std::cout << "GET: " << enumToString(m) << std::endl;
+	cout << "GET: " << enumToString(m) << endl;
 
 	line >> enumFromString(m) >> path >> version;
 	if (line.fail())
-		std::cout << "Failed to parse" << std::endl;
+		cout << "Failed to parse" << endl;
 	else {
-		std::cout << "METHOD is : " << m << std::endl;
-		std::cout << "PATH is : " << path << std::endl;
-		std::cout << "VERSION is : " << version << std::endl;
+		cout << "METHOD is : " << m << endl;
+		cout << "PATH is : " << path << endl;
+		cout << "VERSION is : " << version << endl;
 	}
 #endif // basic test
     return 0;

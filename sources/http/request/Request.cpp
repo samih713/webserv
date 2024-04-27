@@ -21,6 +21,11 @@ const HeaderMap& Request::get_headers() const
     return header.fields;
 }
 
+const string& Request::get_body() const
+{
+    return body;
+}
+
 const string& Request::get_resource() const
 {
     return header.resource;
@@ -47,7 +52,7 @@ ostream& operator<<(ostream& os, const Request& r)
         os << "[" << it->first << "]"
            << ": " << it->second << std::endl;
     os << "************ body *************\n";
-    os << r.body << std::endl;
+    os << r.body << endl;
     return os;
 }
 

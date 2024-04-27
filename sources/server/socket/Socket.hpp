@@ -35,13 +35,13 @@ public:
     /* ---------------------------- Socket Exception ---------------------------- */
     class Exception: public std::exception {
     public:
-        explicit Exception(const std::string& error_message);
+        explicit Exception(const string& error_message);
         ~Exception() throw() {};
         const char* what() const throw();
 
     private:
-        std::string error_message;
-        std::string compose_msg(const std::string& message);
+        string error_message;
+        string compose_msg(const string& message);
     };
 
 protected:

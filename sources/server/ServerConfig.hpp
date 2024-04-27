@@ -1,5 +1,5 @@
-#include "webserv.hpp"
 #include "Message.hpp"
+#include "webserv.hpp"
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
@@ -10,7 +10,8 @@ struct Location {
     string         root;
     vector<string> indexFiles;
     bool           autoindex;
-    Location() : autoindex(false) {}
+    size_t         maxBodySize;
+    Location() : autoindex(false), maxBodySize(1000000) {}
 };
 
 struct ServerConfig {
@@ -22,8 +23,9 @@ struct ServerConfig {
     vector<Location>         locations;
     map<STATUS_CODE, string> errorPages;
     bool                     autoindex;
+    in_addr_t                serverAddr;
 
-    ServerConfig() : listenerPort(8080), autoindex(false) {}
+    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false) {}
 
     void print(void) const
     {

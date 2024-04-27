@@ -21,6 +21,7 @@ public:
     STATUS_CODE      get_status() const;
     const string&    get_method() const;
     const string&    get_resource() const;
+    const string&    get_body() const;
     const HeaderMap& get_headers() const;
 
     void set_status(STATUS_CODE);

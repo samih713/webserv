@@ -1,20 +1,49 @@
 #include "Cgi.hpp"
 
-static char** headers_to_env(const map<string, string>& headers);
-static string get_uri(string res);
-static string get_query_string(string res);
-
-Cgi::Cgi(const Request& request)
+string getStingQuery(string res)
 {
-    string resource = request.get_resource();
-    headers         = request.get_headers();
-    environment     = headers_to_env(headers);
-    filePath        = get_uri(resource);
-    queryString     = get_query_string(resource);
+    string resn;
+    size_t qu;
+    size_t length;
 
+    qu     = res.find('?', 0);
+    length = res.length();
+    resn = res.substr(qu + 1, length);
+    return (resn);
+}
+
+string geturi(string res)
+{
+    string resn;
+    size_t qu;
+
+    qu   = res.find('?', 0);
+    resn = res.substr(0, qu);
+    return (resn);
+}
+
+Cgi::Cgi(const Request& request, const ServerConfig& config) : body(request.get_body())
+{
+    string res;
+
+    (void) config;
+    res         = const_cast<char*>(request.get_resource().c_str());
+    filePath    = (geturi(res));
+    headers     = request.get_headers();
+    environment = headersToEnv(request, res, config);
+    timer       = request.timer;
+    // filePath = const_cast<char *> (request.get_resource().c_str());
+    //  // Check if the Python script exists
+    //  if (access(filePath, X_OK) == -1)
+    //  {
+    //      std::cerr << "Error: Python script not found or does not have execution
+    //      permission." << std::endl;
+    //  	return ;
+    //  }
     arguments    = new char*[2];
     arguments[0] = const_cast<char*>(filePath.c_str());
     arguments[1] = NULL;
+
 }
 
 Cgi::~Cgi()
@@ -25,22 +54,80 @@ Cgi::~Cgi()
     delete[] arguments;
 }
 
-void Cgi::execute(const std::string& outputFile)
+char** Cgi::headersToEnv(const Request& request, const string res,
+    const ServerConfig& config)
 {
-    int         fd[2];
-    int         id;
-    std::string res_body;
+    std::vector<char*> envVector;
+    string queryString = getStingQuery(res);
+    // Iterate through headers
+    for (HeaderMap::iterator it = headers.begin(); it != headers.end(); ++it) {
+        size_t len      = it->first.size() + it->second.size() + 2;
+        char*  envEntry = new char[len];
+        std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
+        envVector.push_back(envEntry);
+    }
+
+    // std::string gateway_interface = "GATEWAY_INTERFACE=CGI/1.1";
+    // envVector.push_back(const_cast<char *>(gateway_interface.c_str()));
+
+    envVector.push_back(strdup("GATEWAY_INTERFACE=CGI/1.1"));
+    envVector.push_back(strdup("SERVER_PROTOCOL=HTTP/1.1"));
+    string val;
+    val = "SERVER_NAME=" + config.serverName;
+    envVector.push_back(strdup(val.c_str()));
+    val = "SERVER_SOFTWARE=" + config.serverName + "/1.0";
+    envVector.push_back(strdup(val.c_str()));
+    val = "SERVER_PORT=" + ws_itoa(config.listenerPort);
+    envVector.push_back(strdup(val.c_str()));
+    val = "REQUEST_URI=" + request.get_resource();
+    envVector.push_back(strdup(val.c_str()));
+    queryString = getStingQuery(res);
+    // val = "QUERY_STRING=" + queryString;
+    // envVector.push_back(strdup(val.c_str()));
+    // "REQUEST_METHOD"
+    // "PATH_INFO"
+    // "PATH_TRANSLATED"
+    // "QUERY_STRING"
+    // "REMOTEaddr"
+    // "REMOTE_IDENT"
+    // "REMOTE_USER"
+
+
+    char* token = strtok(const_cast<char*>(queryString.c_str()), "&");
+
+    // Iterate through the tokens and push integers onto the stack
+    while (token != NULL) {
+        envVector.push_back(strdup(token));
+        token = strtok(NULL, "&");
+    }
+
+    // Allocate memory for char* array
+    char** envp = new char*[envVector.size() + 1];
+
+    // Copy pointers from vector to char* array
+    for (size_t i = 0; i < envVector.size(); ++i)
+        envp[i] = envVector[i];
+    envp[envVector.size()] = NULL;
+
+    return envp;
+}
+
+void Cgi::execute(const string& outputFile)
+{
+    int    fd[2];
+    int    id;
+    string res_body;
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {
-        std::cerr << "Error creating pipe: " << strerror(errno) << std::endl;
+        cerr << "Error creating pipe: " << strerror(errno) << endl;
         return;
     }
 
     // Fork the process
     id = fork();
     if (id == -1) {
-        std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+        cerr << "Error forking process: " << strerror(errno) << endl;
         return;
     }
     else if (id == 0) {
@@ -50,7 +137,7 @@ void Cgi::execute(const std::string& outputFile)
         close(fd[1]);
 
         if (execve(const_cast<char*>(filePath.c_str()), arguments, environment) == -1) {
-            std::cerr << "Error executing execve: " << strerror(errno) << std::endl;
+            cerr << "Error executing execve: " << strerror(errno) << endl;
             _exit(EXIT_FAILURE);
         }
     }
@@ -68,28 +155,29 @@ void Cgi::execute(const std::string& outputFile)
     while ((bytesRead = read(fd[0], buffer, 90)) > 0)
         res_body.append(buffer, bytesRead);
     // Save the response to a file
-    std::ofstream outFile(outputFile.c_str());
+    ofstream outFile(outputFile.c_str());
     if (outFile.is_open()) {
         outFile << res_body;
         outFile.close();
-        std::cout << "Response saved to: " << outputFile << std::endl;
+        DEBUG_MSG("Response saved to: " outputFile, Y);
     }
     else {
-        std::cerr << "Error opening output file: " << strerror(errno) << std::endl;
+        DEBUG_MSG("Error opening output file: " + strerror(errno), Y);
     }
 
     close(fd[0]);
 }
 
+
 string Cgi::execute(void)
 {
-    int         fd[2];
-    int         id;
-    std::string res_body;
+    int    fd[2];
+    int    id;
+    string res_body;
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {
-        std::cerr << "Error creating pipe: " << strerror(errno) << std::endl;
+        cerr << "Error creating pipe: " << strerror(errno) << endl;
         return NULL;
     }
 
@@ -97,7 +185,7 @@ string Cgi::execute(void)
     // TODO fix forking here for sleep
     id = fork();
     if (id == -1) {
-        std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+        cerr << "Error forking process: " << strerror(errno) << endl;
         return NULL;
     }
     else if (id == 0) {
@@ -107,71 +195,55 @@ string Cgi::execute(void)
         close(fd[1]);
 
         if (execve(const_cast<char*>(filePath.c_str()), arguments, environment) == -1) {
-            std::cerr << "Error executing execve: " << strerror(errno) << std::endl;
+            cerr << "Error executing execve: " << strerror(errno) << endl;
             _exit(EXIT_FAILURE);
         }
     }
 
     // Parent process
     close(fd[1]); // Close the write end of the pipe
-
-    // Wait for the child process to finish
     int status;
-    waitpid(id, &status, 0);
+    // Wait for the child process to finish or until timeout
+    while (true) {
+        // Check if the timeout duration has been reached
+        if (timer.is_timeout()) {
+            std::cerr << "Timeout reached. Exiting." << std::endl;
+            // Terminate the child process
+            kill(id, SIGTERM);
+            break;
+        }
 
-    // Read the response from the pipe
-    char    buffer[91];
-    ssize_t bytesRead;
-    while ((bytesRead = read(fd[0], buffer, 90)) > 0)
-        res_body.append(buffer, bytesRead);
+        // Check if the child process has finished
+        if (waitpid(id, &status, WNOHANG) == id) {
+            // Child process has finished
+            // Read from the pipe
+            char    buffer[1024];
+            ssize_t bytesRead = read(fd[0], buffer, sizeof(buffer));
+            if (bytesRead > 0) {
+                res_body.append(buffer, bytesRead);
+            }
+            else if (bytesRead == 0) {
+                break;
+            }
+            else {
+                // Error while reading from the pipe
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // No data available yet, continue waiting
+                    usleep(100000);
+                    continue;
+                }
+                else {
+                    std::cerr << "Error reading from pipe: " << strerror(errno)
+                              << std::endl;
+                    break;
+                }
+            }
+            break;
+        }
+        usleep(100000);
+    }
+
 
     close(fd[0]);
     return (res_body);
-}
-
-static char** headers_to_env(const map<string, string>& headers)
-{
-    std::vector<char*> envVector;
-
-    // Iterate through headers
-    map<string, string>::const_iterator end = headers.end();
-    for (map<string, string>::const_iterator it = headers.begin(); it != end; ++it) {
-        size_t len      = it->first.size() + it->second.size() + 2;
-        char*  envEntry = new char[len];
-        std::snprintf(envEntry, len, "%s=%s", it->first.c_str(), it->second.c_str());
-        envVector.push_back(envEntry);
-    }
-
-    // Allocate memory for char* array
-    char** envp = new char*[envVector.size() + 1];
-
-    // Copy pointers from vector to char* array
-    for (size_t i = 0; i < envVector.size(); ++i)
-        envp[i] = envVector[i];
-    envp[envVector.size()] = NULL;
-
-    return envp;
-}
-
-static string get_uri(string res)
-{
-    string resn;
-    size_t qu;
-
-    qu   = res.find('?', 0);
-    resn = res.substr(0, qu);
-    // result = const_cast<char *>(res.substr(0,qu).c_str());
-    return (resn);
-}
-
-static string get_query_string(string res)
-{
-    string resn;
-    size_t qu;
-    size_t length;
-
-    qu     = res.find('?', 0);
-    length = res.length();
-    resn   = res.substr(qu + 1, length);
-    return (resn);
 }

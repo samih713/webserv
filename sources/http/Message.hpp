@@ -137,7 +137,7 @@ enum STATUS_CODE {
     NOT_EXTENDED
 };
 
-static const std::string sample_response =
+static const string sample_response =
     "HTTP/1.1 200 OK\r\n"                        // status line
     "Content-Type: text/html; charset=UTF-8\r\n" // headers
     "Content-Length: 23\r\n"
@@ -170,7 +170,7 @@ static const std::string sample_request =
     "duis.\r\n"
     "\r\n";
 
-static const std::string sample_request_cgi =
+static const string sample_request_cgi =
     "GET /Users/hashim/Desktop/42curses/webserv/sources/CGI/.tests/file.sh?name=hashim&lastname=mohamed HTTP/1.1\r\n" // request-line
     "Host: Linode.com\r\n" // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
