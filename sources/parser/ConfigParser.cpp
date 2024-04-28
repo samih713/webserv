@@ -4,18 +4,17 @@ ConfigParser::ConfigParser(const string& configFile)
 {
     // checking file extension
     if (configFile.find(".conf") == string::npos)
-        THROW_EXCEPTION_WITH_INFO(ERR_FILE);
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE_EXTENSION);
 
     // check if file exists and is a regular file
-    struct stat fileStat;
-    if (stat(configFile.c_str(), &fileStat) == -1 || !S_ISREG(fileStat.st_mode))
-        THROW_EXCEPTION_WITH_INFO(ERR_STAT);
+    if (get_file_type(configFile) != FILE)
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE + configFile);
 
     // open file
     ifstream file(configFile.c_str());
     if (!file.is_open())
         THROW_EXCEPTION_WITH_INFO(ERR_OPEN);
-    else if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
+    if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
         THROW_EXCEPTION_WITH_INFO(ERR_EMPTY);
 
     string line;
@@ -66,9 +65,6 @@ void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
     ++_itr; // move to error code
-    if (*_itr == ";")
-        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ERROR_CODE);
-
     vector<STATUS_CODE> codes;
     while (is_number(*_itr)) {
         codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
@@ -116,6 +112,9 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
     indexFile = (root + "/" + *_itr);
+    if (get_file_type(indexFile) != FILE)
+        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_INDEX);
+
     --_itr; // move back to last file
     check_semicolon();
 }
@@ -184,6 +183,9 @@ void ConfigParser::parse_root(string& root)
 
     root = *_itr;
 
+    if (get_file_type(root) != DIR)
+        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
+
     check_semicolon();
 }
 
@@ -220,10 +222,9 @@ size_t ConfigParser::parse_client_max_body_size(void)
         multiplier = 1000000000;
 
     string value = maxBodySize.substr(0, maxBodySize.find_first_not_of("0123456789."));
-    if (value.size() > 13)
+    double size  = std::strtod(value.c_str(), NULL);
+    if (size >= std::numeric_limits<int>::max())
         THROW_EXCEPTION_WITH_INFO(ERR_BODY_SIZE_OVERFLOW);
-
-    double size = std::strtod(value.c_str(), NULL);
 
     check_semicolon();
 
