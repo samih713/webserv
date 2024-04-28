@@ -1,6 +1,6 @@
 # http makefile
 
-HTTP_SRCS:= $(HTTP_DIR)/request/parse_request.cpp $(HTTP_DIR)/request/recv.cpp $(HTTP_DIR)/request/Request.cpp $(HTTP_DIR)/response/Response.cpp $(HTTP_DIR)/handler/GetRequestHandler.cpp
+HTTP_SRCS:= $(HTTP_DIR)/request/parse_request.cpp $(HTTP_DIR)/request/recv.cpp $(HTTP_DIR)/request/Request.cpp $(HTTP_DIR)/response/Response.cpp $(HTTP_DIR)/handler/GetRequestHandler.cpp $(HTTP_DIR)/handler/DeleteRequestHandler.cpp
 HTTP_OBJS:= $(HTTP_SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
 OBJS += $(HTTP_OBJS)
 
