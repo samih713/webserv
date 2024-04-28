@@ -11,8 +11,8 @@ using std::set;
 using std::stack;
 
 // file related error messages
-static const string ERR_FILE("Config: invalid file");
-static const string ERR_STAT("Config: not a regular file");
+static const string ERR_FILE_EXTENSION("Config: invalid file extension");
+static const string ERR_FILE("Config: invalid file ");
 static const string ERR_OPEN("Config: cannot open file");
 static const string ERR_EMPTY("Config: file is empty");
 
@@ -44,12 +44,19 @@ static const string ERR_MULTIPLE_COLON("Config: multiple colons used");
 static const string ERR_HOST("Config: invalid host value");
 static const string ERR_PORT("Config: invalid port value");
 
-// generic directive error messages
+// server_name directive error messages
 static const string ERR_SERVER_NAME("Config: invalid server_name directive");
-static const string ERR_ROOT("Config: invalid root directive");
-static const string ERR_MISSING_ROOT("Config: missing root directive");
-static const string ERR_INDEX("Config: invalid index directive");
+
+// autoindex directive error messages
 static const string ERR_AUTOINDEX("Config: invalid autoindex directive");
+
+// root directive error messages
+static const string ERR_ROOT("Config: invalid root");
+static const string ERR_MISSING_ROOT("Config: missing root directive");
+
+// index directive error messages
+static const string ERR_INDEX("Config: invalid index directive");
+static const string ERR_INVALID_INDEX("Config: invalid index file");
 
 // client_max_body_size directive error messages
 static const string ERR_INVALID_CHAR("Config: invalid character in client_max_body_size");
@@ -99,11 +106,11 @@ private:
     Location             parse_location_context(void);
 
     // parsing config directives
-    vector<string> parse_index(const string& root);
+    void   parse_index(string& indexFile, const string& root);
     void   parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
     fd     parse_listen(in_addr_t& host);
     void   parse_server_name(string& serverName);
-    string parse_root(void);
+    void   parse_root(string& root);
     size_t parse_client_max_body_size(void);
     bool   parse_autoindex(void);
     void   parse_allow_methods(vector<string>& methods);
@@ -127,8 +134,7 @@ private:
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
     }
-    void check_duplicate_directive(set<string>& parsedDirectives,
-        const string&                            directive)
+    void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
     {
         if (parsedDirectives.find(directive) != parsedDirectives.end())
             THROW_EXCEPTION_WITH_INFO("Config: duplicate " + directive + " found");
