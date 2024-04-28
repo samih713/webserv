@@ -76,19 +76,21 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
         else {
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
+			{
                 add_header(
                     make_pair<string, string>("Content-Type", resource_type.c_str()));
-                body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
-                    std::istreambuf_iterator<char>());
-                resource_file.seekg(0, std::ios_base::end);
-                resource_size = resource_file.tellg();
-                add_header(
-                    make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
-                resource_file.seekg(0, std::ios_base::beg);
-                if (deleteResource(resource))
-                    status = OK;
-                else
-                    status = NOT_FOUND;
+			}
+			body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
+				std::istreambuf_iterator<char>());
+			resource_file.seekg(0, std::ios_base::end);
+			resource_size = resource_file.tellg();
+			add_header(
+				make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
+			resource_file.seekg(0, std::ios_base::beg);
+			if (deleteResource(resource))
+				status = OK;
+			else
+				status = NOT_FOUND;
                 // content type
                 // content length
         }
