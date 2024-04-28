@@ -94,40 +94,40 @@ private:
     vector<string>::const_iterator _itr;
 
     // parsing config contexts
-    vector<ServerConfig> _parse_HTTP_context(void);
-    ServerConfig         _parse_server_context(void);
-    Location             _parse_location_context(void);
+    vector<ServerConfig> parse_HTTP_context(void);
+    ServerConfig         parse_server_context(void);
+    Location             parse_location_context(void);
 
     // parsing config directives
-    vector<string> _parse_index(const string& root);
-    void   _parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
-    fd     _parse_listen(in_addr_t& host);
-    void   _parse_server_name(string& serverName);
-    string _parse_root(void);
-    size_t _parse_client_max_body_size(void);
-    bool   _parse_autoindex(void);
-    void   _parse_allow_methods(vector<string>& methods);
+    vector<string> parse_index(const string& root);
+    void   parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
+    fd     parse_listen(in_addr_t& host);
+    void   parse_server_name(string& serverName);
+    string parse_root(void);
+    size_t parse_client_max_body_size(void);
+    bool   parse_autoindex(void);
+    void   parse_allow_methods(vector<string>& methods);
 
-    bool _is_number(const string& str)
+    bool is_number(const string& str)
     {
         if (str.find_first_not_of("0123456789") != string::npos)
             return false;
         return true;
     }
-    bool _is_keyword(const string& str)
+    bool is_keyword(const string& str)
     {
         for (size_t i = 0; i < NUM_KEYWORDS; ++i)
             if (str == keywords[i])
                 return true;
         return false;
     }
-    void _check_semicolon(void)
+    void check_semicolon(void)
     {
         if (*(_itr + 1) != ";")
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
         ++_itr; // move to semicolon
     }
-    void _check_duplicate_directive(set<string>& parsedDirectives,
+    void check_duplicate_directive(set<string>& parsedDirectives,
         const string&                            directive)
     {
         if (parsedDirectives.find(directive) != parsedDirectives.end())

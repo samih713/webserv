@@ -59,7 +59,7 @@ ConfigParser::ConfigParser(const string& configFile)
     }
 }
 
-void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
+void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
     const string&                                              root)
 {
     if (root.empty())
@@ -102,10 +102,10 @@ void ConfigParser::_parse_error_page(map<STATUS_CODE, string>& errorPages,
         errorPages[*itr] = page;
     }
 
-    _check_semicolon();
+    check_semicolon();
 }
 
-vector<string> ConfigParser::_parse_index(const string& root)
+vector<string> ConfigParser::parse_index(const string& root)
 {
     vector<string> indexFiles;
 
@@ -114,17 +114,17 @@ vector<string> ConfigParser::_parse_index(const string& root)
 
     ++_itr; // move to index file
     while (*_itr != ";") {
-        if (_is_keyword(*_itr))
+        if (is_keyword(*_itr))
             THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
         indexFiles.push_back(root + "/" + *_itr);
         ++_itr;
     }
+    check_semicolon();
 
     return indexFiles;
 }
 
-
-fd ConfigParser::_parse_listen(in_addr_t& host)
+fd ConfigParser::parse_listen(in_addr_t& host)
 {
     ++_itr; // move to host:port
 
@@ -139,7 +139,7 @@ fd ConfigParser::_parse_listen(in_addr_t& host)
     }
     else if (_itr->find(".") != string::npos)
         hostStr = *_itr;
-    else if (_is_number(*_itr))
+    else if (is_number(*_itr))
         portStr = *_itr;
     else if (_itr->find_first_of(":") != _itr->find_last_of(":"))
         THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_COLON);
@@ -167,32 +167,32 @@ fd ConfigParser::_parse_listen(in_addr_t& host)
             THROW_EXCEPTION_WITH_INFO(ERR_PORT);
     }
 
-    _check_semicolon();
+    check_semicolon();
 
     return port;
 }
 
-void ConfigParser::_parse_server_name(string& serverName)
+void ConfigParser::parse_server_name(string& serverName)
 {
     ++_itr; // move to server name
-    if (_is_keyword(*_itr))
+    if (is_keyword(*_itr))
         THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
     serverName = *_itr;
 
-    _check_semicolon();
+    check_semicolon();
 }
 
-string ConfigParser::_parse_root(void)
+string ConfigParser::parse_root(void)
 {
     ++_itr; // move to root path
 
     string rootPath = *_itr;
-    _check_semicolon();
+    check_semicolon();
 
     return rootPath;
 }
 
-size_t ConfigParser::_parse_client_max_body_size(void)
+size_t ConfigParser::parse_client_max_body_size(void)
 {
     ++_itr; // move to max body size
 
@@ -203,7 +203,7 @@ size_t ConfigParser::_parse_client_max_body_size(void)
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SIZE);
     else if (maxBodySize.find_first_of("kKmMgG") == string::npos) {
         if (maxBodySize == "0") {
-            _check_semicolon();
+            check_semicolon();
             return 0; // disable body size checking
         }
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SUFFIX);
@@ -230,22 +230,22 @@ size_t ConfigParser::_parse_client_max_body_size(void)
 
     double size = std::strtod(value.c_str(), NULL);
 
-    _check_semicolon();
+    check_semicolon();
 
     return size * multiplier;
 }
 
-bool ConfigParser::_parse_autoindex(void)
+bool ConfigParser::parse_autoindex(void)
 {
     ++_itr; // move to on/off
     string autoindex = *_itr;
     if (autoindex != "on" && autoindex != "off")
         THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX);
-    _check_semicolon();
+    check_semicolon();
     return autoindex == "on";
 }
 
-void ConfigParser::_parse_allow_methods(vector<string>& methods)
+void ConfigParser::parse_allow_methods(vector<string>& methods)
 {
     ++_itr; // move to methods
 
@@ -262,10 +262,10 @@ void ConfigParser::_parse_allow_methods(vector<string>& methods)
         THROW_EXCEPTION_WITH_INFO(ERR_EMPTY_METHODS);
 
     --_itr; // move back to last method
-    _check_semicolon();
+    check_semicolon();
 }
 
-Location ConfigParser::_parse_location_context(void)
+Location ConfigParser::parse_location_context(void)
 {
     ++_itr; // move to location modifier/path
 
@@ -284,22 +284,22 @@ Location ConfigParser::_parse_location_context(void)
     set<string> parsedLocationDirectives;
     while (*_itr != "}") {
         if (*_itr == "root") {
-            location.root = _parse_root();
-            _check_duplicate_directive(parsedLocationDirectives, "root");
+            location.root = parse_root();
+            check_duplicate_directive(parsedLocationDirectives, "root");
         }
         else if (*_itr == "autoindex") {
-            location.autoindex = _parse_autoindex();
-            _check_duplicate_directive(parsedLocationDirectives, "autoindex");
+            location.autoindex = parse_autoindex();
+            check_duplicate_directive(parsedLocationDirectives, "autoindex");
         }
         else if (*_itr == "index")
-            location.indexFiles = _parse_index(location.root);
+            location.indexFiles = parse_index(location.root);
         else if (*_itr == "client_max_body_size") {
-            location.maxBodySize = _parse_client_max_body_size();
-            _check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
+            location.maxBodySize = parse_client_max_body_size();
+            check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
         }
         else if (*_itr == "allow_methods") {
-            _parse_allow_methods(location.methods);
-            _check_duplicate_directive(parsedLocationDirectives, "allow_methods");
+            parse_allow_methods(location.methods);
+            check_duplicate_directive(parsedLocationDirectives, "allow_methods");
         }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
@@ -310,7 +310,7 @@ Location ConfigParser::_parse_location_context(void)
     return location;
 }
 
-ServerConfig ConfigParser::_parse_server_context(void)
+ServerConfig ConfigParser::parse_server_context(void)
 {
     ++_itr; // move to {
     if (*_itr != "{")
@@ -321,28 +321,28 @@ ServerConfig ConfigParser::_parse_server_context(void)
     ServerConfig _serverConfig;
     while (*_itr != "}") {
         if (*_itr == "listen") {
-            _serverConfig.port = _parse_listen(_serverConfig.host);
-            _check_duplicate_directive(parsedServerDirectives, "listen");
+            _serverConfig.port = parse_listen(_serverConfig.host);
+            check_duplicate_directive(parsedServerDirectives, "listen");
         }
         else if (*_itr == "server_name")
-            _parse_server_name(_serverConfig.serverName);
+            parse_server_name(_serverConfig.serverName);
         else if (*_itr == "error_page")
-            _parse_error_page(_serverConfig.errorPages, _serverConfig.root);
+            parse_error_page(_serverConfig.errorPages, _serverConfig.root);
         else if (*_itr == "root") {
-            _serverConfig.root = _parse_root();
-            _check_duplicate_directive(parsedServerDirectives, "root");
+            _serverConfig.root = parse_root();
+            check_duplicate_directive(parsedServerDirectives, "root");
         }
         else if (*_itr == "client_max_body_size") {
-            _serverConfig.maxBodySize = _parse_client_max_body_size();
-            _check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
+            _serverConfig.maxBodySize = parse_client_max_body_size();
+            check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
         }
         else if (*_itr == "index")
-            _serverConfig.indexFiles = _parse_index(_serverConfig.root);
+            _serverConfig.indexFiles = parse_index(_serverConfig.root);
         else if (*_itr == "location")
-            _serverConfig.locations.push_back(_parse_location_context());
+            _serverConfig.locations.push_back(parse_location_context());
         else if (*_itr == "autoindex") {
-            _serverConfig.autoindex = _parse_autoindex();
-            _check_duplicate_directive(parsedServerDirectives, "autoindex");
+            _serverConfig.autoindex = parse_autoindex();
+            check_duplicate_directive(parsedServerDirectives, "autoindex");
         }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
@@ -353,7 +353,7 @@ ServerConfig ConfigParser::_parse_server_context(void)
     return _serverConfig;
 }
 
-vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
+vector<ServerConfig> ConfigParser::parse_HTTP_context(void)
 {
     // setting values for Config object
     _itr = _tokens.begin();
@@ -369,22 +369,22 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
     vector<ServerConfig> serverConfigs;
     while (*_itr != "}") {
         if (*_itr == "server")
-            serverConfigs.push_back(_parse_server_context());
+            serverConfigs.push_back(parse_server_context());
         else if (*_itr == "root") {
-            // _serverConfig.root = _parse_root();
-            _check_duplicate_directive(parsedHTTPDirectives, "root");
+            // _serverConfig.root = parse_root();
+            check_duplicate_directive(parsedHTTPDirectives, "root");
         }
         else if (*_itr == "index")
             ; // index here will be default index for all servers
         else if (*_itr == "error_page")
             ; // error_page here will be default error_page for all servers
         else if (*_itr == "client_max_body_size") {
-            // _serverConfig.maxBodySize = _parse_client_max_body_size();
-            _check_duplicate_directive(parsedHTTPDirectives, "client_max_body_size");
+            // _serverConfig.maxBodySize = parse_client_max_body_size();
+            check_duplicate_directive(parsedHTTPDirectives, "client_max_body_size");
         }
         else if (*_itr == "autoindex") {
-            // _serverConfig.autoindex = _parse_autoindex();
-            _check_duplicate_directive(parsedHTTPDirectives, "autoindex");
+            // _serverConfig.autoindex = parse_autoindex();
+            check_duplicate_directive(parsedHTTPDirectives, "autoindex");
         }
         else
             THROW_EXCEPTION_WITH_INFO(ERR_HTTP_TOKENS);
@@ -426,5 +426,5 @@ vector<ServerConfig> ConfigParser::parse(void)
     if (!braces.empty()) // missing closing brace
         THROW_EXCEPTION_WITH_INFO(ERR_CLOSING_BRACE);
 
-    return _parse_HTTP_context();
+    return parse_HTTP_context();
 }
