@@ -267,14 +267,11 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
 
 Location ConfigParser::parse_location_context(void)
 {
-    ++_itr; // move to location modifier/path
+    ++_itr; // move to location uri
 
     Location location;
-    if (*_itr == "=" || *_itr == "~") {
-        location.modifier = *_itr;
-        ++_itr; // move to path
-    }
-    location.path = *_itr;
+    //! validate uri
+    location.uri = *_itr;
 
     ++_itr; // move to {
     if (*_itr != "{")

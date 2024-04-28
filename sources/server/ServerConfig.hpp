@@ -5,8 +5,7 @@
 #define CONFIG_HPP
 
 struct Location {
-    string         path;
-    string         modifier;
+    string         uri;
     string         root;
     vector<string> indexFiles;
     bool           autoindex;

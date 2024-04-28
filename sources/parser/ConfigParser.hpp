@@ -34,7 +34,7 @@ static const string ERR_MISSING_SERVER("Config: missing server context");
 static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server context");
 
 // location context error messages
-static const string ERR_LOCATION("Config: invalid location context");
+static const string ERR_LOCATION("Config: invalid character in location uri");
 static const string ERR_LOCATION_PATH("Config: location path missing");
 static const string ERR_LOCATION_TOKENS("Config: Unexpected tokens in location context");
 
