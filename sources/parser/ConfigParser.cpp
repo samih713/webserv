@@ -397,20 +397,19 @@ vector<ServerConfig> ConfigParser::parse(void)
 {
     // check braces
     stack<string> braces;
-    for (vector<string>::const_iterator itr = _tokens.begin(); itr != _tokens.end();
-         ++itr)
+    for (vector<string>::const_iterator vecItr = _tokens.begin(); vecItr != _tokens.end();
+         ++vecItr)
     {
-        if (*itr == "{") {
-            if (itr - 1 >= _tokens.begin() && *(itr - 1) != "server" &&
-                *(itr - 1) != "http" &&
-                (itr - 2 >= _tokens.begin() && *(itr - 2) != "location") &&
-                (itr - 3 >= _tokens.begin() && *(itr - 3) != "location"))
+        if (*vecItr == "{") {
+            if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
+                *(vecItr - 1) != "http" && vecItr - 2 >= _tokens.begin() &&
+                *(vecItr - 2) != "location")
             {
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
             }
             braces.push("{");
         }
-        else if (*itr == "}") {
+        else if (*vecItr == "}") {
             if (braces.empty()) // missing opening brace
                 THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
             braces.pop();
