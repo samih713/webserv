@@ -126,19 +126,20 @@ void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
 
 void ConfigParser::parse_index(string& indexFile, const string& root)
 {
-    if (root.empty())
+    if (root.empty()) // root can be empty if not set
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
     ++_itr; // move to index file
-
     if (is_keyword(*_itr))
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
-    indexFile = (root + "/" + *_itr);
+    if (*(root.end() - 1) == '/')
+        indexFile = root + *_itr;
+    else
+        indexFile = root + "/" + *_itr;
     if (get_file_type(indexFile) != FILE)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_INDEX);
 
-    --_itr; // move back to last file
     check_semicolon();
 }
 
@@ -193,25 +194,18 @@ fd ConfigParser::parse_listen(in_addr_t& host)
 void ConfigParser::parse_server_name(string& serverName)
 {
     ++_itr; // move to server name
-
     serverName = *_itr;
     if (is_keyword(serverName))
         THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
-
-    //! any other validation + default server?!
-
     check_semicolon();
 }
 
 void ConfigParser::parse_root(string& root)
 {
     ++_itr; // move to root path
-
     root = *_itr;
-
     if (get_file_type(root) != DIR)
         THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
-
     check_semicolon();
 }
 
