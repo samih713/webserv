@@ -28,6 +28,7 @@ sub_dirs=(
     "duplicate_check"
     "empty_check"
     "listen_check"
+    "location_check"
     "missing_check"
 )
 
