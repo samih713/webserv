@@ -31,8 +31,7 @@ public:
                     std::istreambuf_iterator<char>());
         }
         // load the indexDefault page
-        //! indexFiles is a vector of strings and indexFiles[0] usually holds /index.html
-        ifstream indexDefault(config.indexFiles[0].c_str(), std::ios_base::binary);
+        ifstream indexDefault(config.indexFile.c_str(), std::ios_base::binary);
         if (indexDefault.fail()) {
             DEBUG_MSG("Index page failed to load", B);
         }

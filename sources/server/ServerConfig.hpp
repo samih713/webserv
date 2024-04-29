@@ -11,23 +11,25 @@ struct Location {
     bool           autoindex;
     size_t         maxBodySize;
     vector<string> methods;
-    Location() : autoindex(false), maxBodySize(1000000) {}
+    Location()
+        : root("./"), indexFile("index.html"), autoindex(false), maxBodySize(1000000)
+    {}
 };
 
 struct ServerConfig {
     fd                       port;
     in_addr_t                host;
     string                   serverName;
-    size_t                   maxBodySize;
     string                   root;
     string                   indexFile;
     bool                     autoindex;
+    size_t                   maxBodySize;
     map<STATUS_CODE, string> errorPages;
     vector<Location>         locations;
 
     ServerConfig()
-        : port(8080), host(htonl(INADDR_ANY)), maxBodySize(1000000), root("./"),
-          indexFile("index.html"), autoindex(false)
+        : port(8080), host(htonl(INADDR_ANY)), root("./"), indexFile("index.html"),
+          autoindex(false), maxBodySize(1000000)
     {}
 
     void print(void) const

@@ -170,9 +170,12 @@ fd ConfigParser::parse_listen(in_addr_t& host)
 void ConfigParser::parse_server_name(string& serverName)
 {
     ++_itr; // move to server name
-    if (is_keyword(*_itr))
-        THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
+
     serverName = *_itr;
+    if (is_keyword(serverName))
+        THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
+
+    //! any other validation + default server?!
 
     check_semicolon();
 }
@@ -261,7 +264,7 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
     check_semicolon();
 }
 
-Location ConfigParser::parse_location_context(void)
+Location ConfigParser::parse_location_context(ServerConfig& server)
 {
     ++_itr; // move to location uri
 
@@ -269,10 +272,20 @@ Location ConfigParser::parse_location_context(void)
     //! validate uri
     location.uri = *_itr;
 
+    static set<string> parsedLocationURIs;
+    if (parsedLocationURIs.find(location.uri) != parsedLocationURIs.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
+    parsedLocationURIs.insert(location.uri);
+
     ++_itr; // move to {
     if (*_itr != "{")
         THROW_EXCEPTION_WITH_INFO(ERR_LOCATION);
     ++_itr; // move to location content
+
+    location.root        = server.root;
+    location.autoindex   = server.autoindex;
+    location.indexFile   = server.indexFile;
+    location.maxBodySize = server.maxBodySize;
 
     set<string> parsedLocationDirectives;
     while (*_itr != "}") {
@@ -281,6 +294,8 @@ Location ConfigParser::parse_location_context(void)
             check_duplicate_directive(parsedLocationDirectives, "root");
         }
         else if (*_itr == "autoindex") {
+            if (location.uri == "/cgi-bin")
+                THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX_CGI);
             location.autoindex = parse_autoindex();
             check_duplicate_directive(parsedLocationDirectives, "autoindex");
         }
@@ -300,6 +315,11 @@ Location ConfigParser::parse_location_context(void)
     }
     ++_itr; // move to next directive
 
+    if (parsedLocationDirectives.find("root") == parsedLocationDirectives.end() && location.root == "./")
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
+    else if (parsedLocationDirectives.find("allow_methods") ==
+             parsedLocationDirectives.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
     return location;
 }
 
@@ -332,7 +352,7 @@ ServerConfig ConfigParser::parse_server_context(void)
         else if (*_itr == "index")
             parse_index(serverConfig.indexFile, serverConfig.root);
         else if (*_itr == "location")
-            serverConfig.locations.push_back(parse_location_context());
+            serverConfig.locations.push_back(parse_location_context(serverConfig));
         else if (*_itr == "autoindex") {
             serverConfig.autoindex = parse_autoindex();
             check_duplicate_directive(parsedServerDirectives, "autoindex");
@@ -342,6 +362,9 @@ ServerConfig ConfigParser::parse_server_context(void)
         if (*_itr == ";")
             ++_itr;
     }
+
+    if (serverConfig.locations.empty())
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_LOCATION);
 
     return serverConfig;
 }
@@ -360,23 +383,24 @@ vector<ServerConfig> ConfigParser::parse_HTTP_context(void)
 
     set<string>          parsedHTTPDirectives;
     vector<ServerConfig> serverConfigs;
+    ServerConfig         http;
     while (*_itr != "}") {
         if (*_itr == "server")
             serverConfigs.push_back(parse_server_context());
         else if (*_itr == "root") {
-            // serverConfig.root = parse_root();
+            parse_root(http.root);
             check_duplicate_directive(parsedHTTPDirectives, "root");
         }
         else if (*_itr == "index")
-            ; // index here will be default index for all servers
+            parse_index(http.indexFile, http.root);
         else if (*_itr == "error_page")
-            ; // error_page here will be default error_page for all servers
+            parse_error_page(http.errorPages, http.root);
         else if (*_itr == "client_max_body_size") {
-            // serverConfig.maxBodySize = parse_client_max_body_size();
+            http.maxBodySize = parse_client_max_body_size();
             check_duplicate_directive(parsedHTTPDirectives, "client_max_body_size");
         }
         else if (*_itr == "autoindex") {
-            // serverConfig.autoindex = parse_autoindex();
+            http.autoindex = parse_autoindex();
             check_duplicate_directive(parsedHTTPDirectives, "autoindex");
         }
         else

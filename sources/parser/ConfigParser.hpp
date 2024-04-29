@@ -23,7 +23,7 @@ static const string ERR_EMPTY("Config: file is empty");
 // brace related error messages
 static const string ERR_CLOSING_BRACE("Config: } missing");
 static const string ERR_OPENING_BRACE("Config: { missing");
-static const string ERR_MISSING_SEMICOLON("Config: missing semicolon");
+static const string ERR_MISSING_SEMICOLON("Config: missing semicolon after ");
 static const string ERR_MISSING_CONTEXT("Config: missing context");
 
 // global context error messages
@@ -41,6 +41,8 @@ static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server c
 static const string ERR_LOCATION("Config: invalid character in location uri");
 static const string ERR_LOCATION_PATH("Config: location path missing");
 static const string ERR_LOCATION_TOKENS("Config: Unexpected tokens in location context");
+static const string ERR_DUPLICATE_LOCATION("Config: duplicate location");
+static const string ERR_MISSING_LOCATION("Config: location context missing");
 
 // listen directive error messages
 static const string ERR_LISTEN("Config: invalid listen directive");
@@ -53,6 +55,7 @@ static const string ERR_SERVER_NAME("Config: invalid server_name directive");
 
 // autoindex directive error messages
 static const string ERR_AUTOINDEX("Config: invalid autoindex directive");
+static const string ERR_AUTOINDEX_CGI("Config: autoindex is not allowed for CGI");
 
 // root directive error messages
 static const string ERR_ROOT("Config: invalid root");
@@ -76,15 +79,13 @@ static const string ERR_ERROR_PATH("Config: invalid error page path");
 
 // allow_methods directive error messages
 static const string ERR_METHOD("Config: invalid method");
+static const string ERR_MISSING_METHODS("Config: missing allow_methods");
 static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] check for duplicate locations
-// [ ] check for duplicate indexes
 // [ ] check for duplicate error pages
-// [ ] empty root can cause problems even if it's valid
 // [ ] handle cgi related directives
 
 #define NUM_KEYWORDS 15
@@ -107,7 +108,7 @@ private:
     // parsing config contexts
     vector<ServerConfig> parse_HTTP_context(void);
     ServerConfig         parse_server_context(void);
-    Location             parse_location_context(void);
+    Location             parse_location_context(ServerConfig& server);
 
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);
@@ -123,10 +124,10 @@ private:
     {
         struct stat fileInfo;
         if (stat(file.c_str(), &fileInfo) == -1)
-            THROW_EXCEPTION_WITH_INFO(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(file + ": " + strerror(errno));
 
         if (access(file.c_str(), R_OK | W_OK) == -1)
-            THROW_EXCEPTION_WITH_INFO(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(file + ": " + strerror(errno));
 
         if (S_ISDIR(fileInfo.st_mode))
             return DIR;
@@ -150,7 +151,7 @@ private:
     void check_semicolon(void)
     {
         if (*(_itr + 1) != ";")
-            THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON);
+            THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON + *_itr);
         ++_itr; // move to semicolon
     }
     void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
