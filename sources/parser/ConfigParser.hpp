@@ -29,10 +29,6 @@ static const string ERR_MISSING_CONTEXT("Config: missing context");
 // global context error messages
 static const string ERR_TOKENS("Config: Unexpected tokens found in the global context");
 
-// http context error messages
-static const string ERR_MISSING_HTTP("Config: missing HTTP context");
-static const string ERR_HTTP_TOKENS("Config: Unexpected tokens in the HTTP context");
-
 // server context error messages
 static const string ERR_MISSING_SERVER("Config: missing server context");
 static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server context");
@@ -90,9 +86,8 @@ static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 
 #define NUM_KEYWORDS 15
 
-const string keywords[NUM_KEYWORDS] = { "http", "server", "listen", "server_name",
-    "location", "root", "index", "error_page", "client_max_body_size", "autoindex",
-    "allow_methods" };
+const string keywords[NUM_KEYWORDS] = { "server", "listen", "server_name", "location",
+    "root", "index", "error_page", "client_max_body_size", "autoindex", "allow_methods" };
 
 class ConfigParser {
 public:
@@ -106,9 +101,8 @@ private:
     vector<string>::const_iterator _itr;
 
     // parsing config contexts
-    vector<ServerConfig> parse_HTTP_context(void);
-    ServerConfig         parse_server_context(void);
-    Location             parse_location_context(ServerConfig& server);
+    ServerConfig parse_server_context(void);
+    Location     parse_location_context(ServerConfig& server);
 
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);

@@ -56,6 +56,29 @@ ConfigParser::ConfigParser(const string& configFile)
         else
             currentToken.push_back(*itr); // add character to current token
     }
+
+    // check braces
+    stack<string> braces;
+    for (vector<string>::const_iterator vecItr = _tokens.begin(); vecItr != _tokens.end();
+         ++vecItr)
+    {
+        if (*vecItr == "{") {
+            if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
+                *(vecItr - 1) != "http" && vecItr - 2 >= _tokens.begin() &&
+                *(vecItr - 2) != "location")
+            {
+                THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
+            }
+            braces.push("{");
+        }
+        else if (*vecItr == "}") {
+            if (braces.empty()) // missing opening brace
+                THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
+            braces.pop();
+        }
+    }
+    if (!braces.empty()) // missing closing brace
+        THROW_EXCEPTION_WITH_INFO(ERR_CLOSING_BRACE);
 }
 
 void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
@@ -369,78 +392,25 @@ ServerConfig ConfigParser::parse_server_context(void)
     return serverConfig;
 }
 
-vector<ServerConfig> ConfigParser::parse_HTTP_context(void)
+vector<ServerConfig> ConfigParser::parse(void)
 {
-    // setting values for Config object
-    _itr = _tokens.begin();
-    if (*_itr != "http")
-        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_HTTP);
-
-    ++_itr; // move to {
-    if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
-    ++_itr; // move to first directive
-
     set<string>          parsedHTTPDirectives;
-    vector<ServerConfig> serverConfigs;
-    ServerConfig         http;
+    vector<ServerConfig> servers;
+
+    _itr = _tokens.begin(); // setting iterator to the first token
+
     while (*_itr != "}") {
         if (*_itr == "server")
-            serverConfigs.push_back(parse_server_context());
-        else if (*_itr == "root") {
-            parse_root(http.root);
-            check_duplicate_directive(parsedHTTPDirectives, "root");
-        }
-        else if (*_itr == "index")
-            parse_index(http.indexFile, http.root);
-        else if (*_itr == "error_page")
-            parse_error_page(http.errorPages, http.root);
-        else if (*_itr == "client_max_body_size") {
-            http.maxBodySize = parse_client_max_body_size();
-            check_duplicate_directive(parsedHTTPDirectives, "client_max_body_size");
-        }
-        else if (*_itr == "autoindex") {
-            http.autoindex = parse_autoindex();
-            check_duplicate_directive(parsedHTTPDirectives, "autoindex");
-        }
+            servers.push_back(parse_server_context());
         else
-            THROW_EXCEPTION_WITH_INFO(ERR_HTTP_TOKENS);
+            THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
         ++_itr;
     }
 
-    // after http context no more tokens should be present
+    // after server contexts no more tokens should be present
     if ((_itr + 1) != _tokens.end())
         THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
-    else if (serverConfigs.empty())
+    else if (servers.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SERVER);
-
-    return serverConfigs;
-}
-
-vector<ServerConfig> ConfigParser::parse(void)
-{
-    // check braces
-    stack<string> braces;
-    for (vector<string>::const_iterator vecItr = _tokens.begin(); vecItr != _tokens.end();
-         ++vecItr)
-    {
-        if (*vecItr == "{") {
-            if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
-                *(vecItr - 1) != "http" && vecItr - 2 >= _tokens.begin() &&
-                *(vecItr - 2) != "location")
-            {
-                THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
-            }
-            braces.push("{");
-        }
-        else if (*vecItr == "}") {
-            if (braces.empty()) // missing opening brace
-                THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
-            braces.pop();
-        }
-    }
-    if (!braces.empty()) // missing closing brace
-        THROW_EXCEPTION_WITH_INFO(ERR_CLOSING_BRACE);
-
-    return parse_HTTP_context();
+    return servers;
 }
