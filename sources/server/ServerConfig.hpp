@@ -11,9 +11,7 @@ struct Location {
     bool           autoindex;
     size_t         maxBodySize;
     vector<string> methods;
-    Location()
-        : root("./"), indexFile("index.html"), autoindex(false), maxBodySize(1000000)
-    {}
+    Location() : indexFile("index.html"), autoindex(false), maxBodySize(1000000) {}
 };
 
 struct ServerConfig {
@@ -28,8 +26,8 @@ struct ServerConfig {
     vector<Location>         locations;
 
     ServerConfig()
-        : port(8080), host(htonl(INADDR_ANY)), root("./"), indexFile("index.html"),
-          autoindex(false), maxBodySize(1000000)
+        : port(8080), host(htonl(INADDR_ANY)), indexFile("index.html"), autoindex(false),
+          maxBodySize(1000000)
     {}
 
     void print(void) const

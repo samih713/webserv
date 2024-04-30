@@ -84,7 +84,7 @@ ConfigParser::ConfigParser(const string& configFile)
 void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
     const string&                                             root)
 {
-    if (root.empty())
+    if (root.empty()) // root can be empty if not set
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
     ++_itr; // move to error code
@@ -295,9 +295,6 @@ Location ConfigParser::parse_location_context(ServerConfig& server)
     parsedLocationURIs.insert(location.uri);
 
     ++_itr; // move to {
-    if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_LOCATION);
-    ++_itr; // move to location content
 
     location.root        = server.root;
     location.autoindex   = server.autoindex;
@@ -316,8 +313,6 @@ Location ConfigParser::parse_location_context(ServerConfig& server)
             location.autoindex = parse_autoindex();
             check_duplicate_directive(parsedLocationDirectives, "autoindex");
         }
-        else if (*_itr == "index")
-            parse_index(location.indexFile, location.root);
         else if (*_itr == "client_max_body_size") {
             location.maxBodySize = parse_client_max_body_size();
             check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
@@ -326,38 +321,38 @@ Location ConfigParser::parse_location_context(ServerConfig& server)
             parse_allow_methods(location.methods);
             check_duplicate_directive(parsedLocationDirectives, "allow_methods");
         }
+        else if (*_itr == "index")
+            parse_index(location.indexFile, location.root);
+        else if (*_itr == ";" || *_itr == "{")
+            ++_itr;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
-        ++_itr;
     }
-    ++_itr; // move to next directive
 
-    if (parsedLocationDirectives.find("root") == parsedLocationDirectives.end() && location.root == "./")
-        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
+    if (parsedLocationDirectives.find("root") == parsedLocationDirectives.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
     else if (parsedLocationDirectives.find("allow_methods") ==
              parsedLocationDirectives.end())
+    {
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
+    }
+
+    ++_itr; // move to next directive
+
     return location;
 }
 
 ServerConfig ConfigParser::parse_server_context(void)
 {
     ++_itr; // move to {
-    if (*_itr != "{")
-        THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
-    ++_itr; // move to first directive
 
     set<string>  parsedServerDirectives;
     ServerConfig serverConfig;
-    while (*_itr != "}") {
+    while (*_itr != "}")
         if (*_itr == "listen") {
             serverConfig.port = parse_listen(serverConfig.host);
             check_duplicate_directive(parsedServerDirectives, "listen");
         }
-        else if (*_itr == "server_name")
-            parse_server_name(serverConfig.serverName);
-        else if (*_itr == "error_page")
-            parse_error_page(serverConfig.errorPages, serverConfig.root);
         else if (*_itr == "root") {
             parse_root(serverConfig.root);
             check_duplicate_directive(parsedServerDirectives, "root");
@@ -366,33 +361,38 @@ ServerConfig ConfigParser::parse_server_context(void)
             serverConfig.maxBodySize = parse_client_max_body_size();
             check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
         }
-        else if (*_itr == "index")
-            parse_index(serverConfig.indexFile, serverConfig.root);
-        else if (*_itr == "location")
-            serverConfig.locations.push_back(parse_location_context(serverConfig));
         else if (*_itr == "autoindex") {
             serverConfig.autoindex = parse_autoindex();
             check_duplicate_directive(parsedServerDirectives, "autoindex");
         }
+        else if (*_itr == "index")
+            parse_index(serverConfig.indexFile, serverConfig.root);
+        else if (*_itr == "server_name")
+            parse_server_name(serverConfig.serverName);
+        else if (*_itr == "error_page")
+            parse_error_page(serverConfig.errorPages, serverConfig.root);
+        else if (*_itr == "location")
+            serverConfig.locations.push_back(parse_location_context(serverConfig));
+        else if (*_itr == ";" || *_itr == "{")
+            ++_itr;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
-        if (*_itr == ";")
-            ++_itr;
-    }
 
     if (serverConfig.locations.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_LOCATION);
+    else if (parsedServerDirectives.find("root") == parsedServerDirectives.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
+    else if (parsedServerDirectives.find("error_page") == parsedServerDirectives.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
 
     return serverConfig;
 }
 
 vector<ServerConfig> ConfigParser::parse(void)
 {
-    set<string>          parsedHTTPDirectives;
-    vector<ServerConfig> servers;
-
     _itr = _tokens.begin(); // setting iterator to the first token
 
+    vector<ServerConfig> servers;
     while (*_itr != "}") {
         if (*_itr == "server")
             servers.push_back(parse_server_context());
@@ -406,5 +406,6 @@ vector<ServerConfig> ConfigParser::parse(void)
         THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
     else if (servers.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SERVER);
+
     return servers;
 }
