@@ -51,64 +51,47 @@ bool restrict_path(const string& resourcePath)
 
 
     // TODO resource handling for get-requests, is broken
-void DeleteRequestHandler::get_resource(const Request& request,
+const vector<char> DeleteRequestHandler::get_resource(const Request& request,
         const CachedPages* cachedPages, const ServerConfig& config)
 {
     vsp          requestHeaders = request.get_headers();
     string       resource       = request.get_resource();
-    string       defaultPage    = config.serverRoot + "/";
+   
 
-
+	(void)cachedPages;
     add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
-    ifstream resource_file;
-    size_t   resource_size = 0;
-    status                 = OK;
-    if (resource == defaultPage) {
-        add_header(make_pair<string, string>("Content-Type",
-            cachedPages->home.contentType.c_str()));
-
+    if (restrict_path(resource)) {
+        status = NOT_FOUND;
+		add_header(make_pair<string, string>("Content-Type",
+                cachedPages->notFound.contentType.c_str()));
         add_header(make_pair<string, string>("Content-Length",
-            ws_itoa(cachedPages->home.contentLength)));
+            ws_itoa(cachedPages->notFound.contentLength)));
+		body = cachedPages->notFound.data;
+		 DEBUG_MSG("Restricted", W);
     }
     else {
-        resource_file.open(resource.c_str(), std::ios_base::binary);
-        if (resource_file.fail() || restrict_path(resource)) {
-            status = NOT_FOUND;
-            add_header(make_pair<string, string>("Content-Type",
+
+		if (remove(resource.c_str()) != 0) {
+	        cerr << "Error deleting resource: " << resource << endl;
+			DEBUG_MSG("Resource '" + resource + "' : [ Error deleting resource ]", R);
+	        	status = OK;
+	    }
+	    else {
+	     	  DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
+	      	 status = NOT_FOUND;
+			 add_header(make_pair<string, string>("Content-Type",
                 cachedPages->notFound.contentType.c_str()));
             add_header(make_pair<string, string>("Content-Length",
                 ws_itoa(cachedPages->notFound.contentLength)));
-        }
-        else {
-            string resource_type = find_resource_type(resource);
-            if (resource_type.length() != 0)
-			{
-                add_header(
-                    make_pair<string, string>("Content-Type", resource_type.c_str()));
-			}
-			resource_file.seekg(0, std::ios_base::end);
-			resource_size = resource_file.tellg();
-			add_header(
-				make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
-			resource_file.seekg(0, std::ios_base::beg);
-			if (deleteResource(resource))
-				status = OK;
-			else
-				status = NOT_FOUND;
-                // content type
-                // content length
-        }
+			 body = cachedPages->notFound.data;
+	    }
+	      
+	
     }
     /* authentication function goes here for the requested resource */
-    DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
-    /* caching control */
-
-    /* compression/encoding
-     * */
-
-    /* support range requests, usefull for large files
-     * */
+    DEBUG_MSG("Resource '" + resource, W);
+	return body;
 }
 
 
@@ -118,6 +101,6 @@ Response DeleteRequestHandler::handle_request(const Request& request,
     DEBUG_MSG("Handling Delete request ... ", B);
 
     vsp request_headers = request.get_headers();
-	get_resource(request, cachedPages, config);
+	body                = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

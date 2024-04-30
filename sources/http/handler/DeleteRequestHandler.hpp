@@ -15,7 +15,7 @@ public:
         const ServerConfig& config);
 
 private:
-    void get_resource(const Request& request,
+    const vector<char> get_resource(const Request& request,
         const CachedPages* cachedPages, const ServerConfig& config);
 };
 
