@@ -91,7 +91,11 @@ const string keywords[NUM_KEYWORDS] = { "server", "listen", "server_name", "loca
 
 class ConfigParser {
 public:
-    ConfigParser(const string& filepath);
+    static ConfigParser& get_instance(const string& filepath)
+    {
+        static ConfigParser singleton(filepath);
+        return singleton;
+    }
     ~ConfigParser() {}
 
     vector<ServerConfig> parse(void);
@@ -99,6 +103,8 @@ public:
 private:
     vector<string>                 _tokens;
     vector<string>::const_iterator _itr;
+
+    ConfigParser(const string& filepath);
 
     // parsing config contexts
     ServerConfig parse_server_context(void);

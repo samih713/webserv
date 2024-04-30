@@ -12,10 +12,12 @@ int main(int argc, char** argv)
     }
 
     try {
-        string       configFile = (argc == 2) ? argv[1] : "./configs/default.conf";
-        ConfigParser parser(configFile);
-        Logger::log_message("Parsing " + configFile, INFO);
+        string configFile = (argc == 2) ? argv[1] : "./configs/default.conf";
+
+        ConfigParser&        parser  = ConfigParser::get_instance(configFile);
         vector<ServerConfig> configs = parser.parse();
+        Logger::log_message("Parsing " + configFile, INFO);
+
         // configs[0].print();
         Server& webserv = Server::get_instance(configs[0], 10);
 #if defined(__LINUX__)

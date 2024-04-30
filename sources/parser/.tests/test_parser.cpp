@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
     }
 
     try {
-        ConfigParser parser(argv[1]);
+        ConfigParser parser = ConfigParser::get_instance(argv[1]);
         vector<ServerConfig> configurations = parser.parse();
         for (vector<ServerConfig>::const_iterator itr = configurations.begin(); itr != configurations.end(); ++itr)
             itr->print();
