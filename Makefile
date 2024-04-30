@@ -56,7 +56,7 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)$(BOLD)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $@ $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
+	@mkdir -p $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
 
 run: re
 	./$(NAME) configs/webserv.conf
