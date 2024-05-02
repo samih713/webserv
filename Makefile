@@ -39,11 +39,11 @@ SUB_DIRS:= $(shell find $(SRCS_DIR) -type d -name $(TESTS_DIR) -prune -o -type d
 INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES)) $(patsubst %,-I./%,$(SUB_DIRS))
 
 ### SOURCES ###
-SRCS:= $(SRCS_DIR)/main.cpp
-
-### OBJECTS & SUBDIRS ###
 include $(patsubst %,%/module.mk,$(MODULES))
-OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
+SRCS += $(SRCS_DIR)/main.cpp
+
+### OBJECTS ###
+OBJS:= $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
 
 all: $(NAME)
 
