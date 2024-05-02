@@ -17,17 +17,18 @@ struct Location {
 struct ServerConfig {
     fd                       port;
     in_addr_t                host;
+    bool                     defaultServer;
     string                   serverName;
     string                   root;
     string                   indexFile;
     bool                     autoindex;
     size_t                   maxBodySize;
-    map<STATUS_CODE, string> errorPages;
+    map<STATUS_CODE, string> errorPages; //! maybe need default values
     vector<Location>         locations;
 
     ServerConfig()
-        : port(8080), host(htonl(INADDR_ANY)), indexFile("index.html"), autoindex(false),
-          maxBodySize(1000000)
+        : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
+          indexFile("index.html"), autoindex(false), maxBodySize(1000000)
     {}
 
     void print(void) const
@@ -35,11 +36,12 @@ struct ServerConfig {
         cout << "ServerConfig {" << endl;
         cout << "  port: " << port << endl;
         cout << "  host: " << inet_ntoa(*(struct in_addr*) &host) << endl;
-        cout << "  maxBodySize: " << maxBodySize << endl;
-        cout << "  indexFile: " << indexFile << endl;
-        cout << "  autoindex: " << autoindex << endl;
+        cout << "  default_server: " << (defaultServer == true ? "yes" : "no") << endl;
         cout << "  serverName: [" << serverName << "]" << endl;
         cout << "  root: " << root << endl;
+        cout << "  indexFile: " << indexFile << endl;
+        cout << "  autoindex: " << (autoindex == true ? "yes" : "no") << endl;
+        cout << "  maxBodySize: " << maxBodySize << endl;
         cout << "  locations: [" << endl;
         for (vector<Location>::const_iterator itr = locations.begin();
              itr != locations.end(); ++itr)
@@ -48,7 +50,7 @@ struct ServerConfig {
             cout << "      uri: " << itr->uri << endl;
             cout << "      root: " << itr->root << endl;
             cout << "      indexFile: " << indexFile << endl;
-            cout << "      autoindex: " << itr->autoindex << endl;
+            cout << "      autoindex: " << (autoindex == true ? "yes" : "no") << endl;
             cout << "      maxBodySize: " << itr->maxBodySize << endl;
             cout << "      methods: [";
             for (vector<string>::const_iterator itr2 = itr->methods.begin();
