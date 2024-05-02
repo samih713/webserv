@@ -35,10 +35,13 @@ static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server c
 
 // location context error messages
 static const string ERR_LOCATION("Config: invalid character in location uri");
-static const string ERR_LOCATION_PATH("Config: location path missing");
+static const string ERR_MISSING_URI("Config: location URI missing");
+static const string ERR_URI_MISSING_SLASH("Config: location uri is missing a / in the beginning");
+static const string ERR_URI_DUPLICATE_SLASH("Config: location uri contains multiple /");
 static const string ERR_LOCATION_TOKENS("Config: Unexpected tokens in location context");
-static const string ERR_DUPLICATE_LOCATION("Config: duplicate location");
+static const string ERR_DUPLICATE_LOCATION("Config: duplicate location URI");
 static const string ERR_MISSING_LOCATION("Config: location context missing");
+static const string ERR_LOCATION_INDEX("Config: cannot use index for this URI");
 
 // listen directive error messages
 static const string ERR_LISTEN("Config: invalid listen directive");
@@ -108,7 +111,7 @@ private:
 
     // parsing config contexts
     ServerConfig parse_server_context(void);
-    Location     parse_location_context(ServerConfig& server);
+    void         parse_location_context(ServerConfig& server);
 
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);
@@ -154,12 +157,14 @@ private:
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON + *_itr);
         ++_itr; // move to semicolon
     }
-    void check_duplicate_directive(set<string>& parsedDirectives, const string& directive)
+    void check_duplicate_element(set<string>& container, const string& element,
+        const string& context)
     {
-        if (parsedDirectives.find(directive) != parsedDirectives.end())
-            THROW_EXCEPTION_WITH_INFO("Config: duplicate " + directive + " found");
+        if (container.find(element) != container.end())
+            THROW_EXCEPTION_WITH_INFO(
+                "Config: duplicate " + element + " found in " + context + " context");
 
-        parsedDirectives.insert(directive);
+        container.insert(element);
     }
 };
 

@@ -281,90 +281,81 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
     check_semicolon();
 }
 
-Location ConfigParser::parse_location_context(ServerConfig& server)
+void ConfigParser::parse_location_context(ServerConfig& server)
 {
     ++_itr; // move to location uri
 
     Location location;
-    //! validate uri
     location.uri = *_itr;
+    if (location.uri[0] != '/')
+        THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH);
+    else if (location.uri.find_first_of("/") != location.uri.find_last_of("/"))
+        THROW_EXCEPTION_WITH_INFO(ERR_URI_DUPLICATE_SLASH);
 
-    static set<string> parsedLocationURIs;
-    if (parsedLocationURIs.find(location.uri) != parsedLocationURIs.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
-    parsedLocationURIs.insert(location.uri);
+    for (size_t i = 0; i < server.locations.size(); i++)
+        if (server.locations[i].uri == location.uri)
+            THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
 
     ++_itr; // move to {
 
     location.root        = server.root;
-    location.autoindex   = server.autoindex;
     location.indexFile   = server.indexFile;
+    location.autoindex   = server.autoindex;
     location.maxBodySize = server.maxBodySize;
 
-    set<string> parsedLocationDirectives;
+    set<string> parsedDirectives;
     while (*_itr != "}") {
-        if (*_itr == "root") {
+        if (*_itr != ";" && *_itr != "}")
+            check_duplicate_element(parsedDirectives, *_itr, "location");
+        if (*_itr == "root")
             parse_root(location.root);
-            check_duplicate_directive(parsedLocationDirectives, "root");
+        else if (*_itr == "client_max_body_size")
+            location.maxBodySize = parse_client_max_body_size();
+        else if (*_itr == "allow_methods")
+            parse_allow_methods(location.methods);
+        else if (*_itr == "index") {
+            if (get_file_type(location.root + location.uri) != DIR)
+                THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_INDEX);
+            parse_index(location.indexFile, location.root + location.uri);
         }
         else if (*_itr == "autoindex") {
             if (location.uri == "/cgi-bin")
                 THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX_CGI);
             location.autoindex = parse_autoindex();
-            check_duplicate_directive(parsedLocationDirectives, "autoindex");
         }
-        else if (*_itr == "client_max_body_size") {
-            location.maxBodySize = parse_client_max_body_size();
-            check_duplicate_directive(parsedLocationDirectives, "client_max_body_size");
-        }
-        else if (*_itr == "allow_methods") {
-            parse_allow_methods(location.methods);
-            check_duplicate_directive(parsedLocationDirectives, "allow_methods");
-        }
-        else if (*_itr == "index")
-            parse_index(location.indexFile, location.root);
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
     }
 
-    if (parsedLocationDirectives.find("root") == parsedLocationDirectives.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
-    else if (parsedLocationDirectives.find("allow_methods") ==
-             parsedLocationDirectives.end())
-    {
+    if (parsedDirectives.find("root") == parsedDirectives.end() && location.root.empty())
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
+    else if (parsedDirectives.find("allow_methods") == parsedDirectives.end())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
-    }
+
+    server.locations.push_back(location);
 
     ++_itr; // move to next directive
-
-    return location;
 }
 
 ServerConfig ConfigParser::parse_server_context(void)
 {
     ++_itr; // move to {
 
-    set<string>  parsedServerDirectives;
+    set<string>  parsedDirectives;
     ServerConfig serverConfig;
-    while (*_itr != "}")
-        if (*_itr == "listen") {
+    while (*_itr != "}") {
+        if (*_itr != ";" && *_itr != "}" && *_itr != "error_page" && *_itr != "location")
+            check_duplicate_element(parsedDirectives, *_itr, "server");
+        if (*_itr == "listen")
             serverConfig.port = parse_listen(serverConfig.host);
-            check_duplicate_directive(parsedServerDirectives, "listen");
-        }
-        else if (*_itr == "root") {
+        else if (*_itr == "root")
             parse_root(serverConfig.root);
-            check_duplicate_directive(parsedServerDirectives, "root");
-        }
-        else if (*_itr == "client_max_body_size") {
+        else if (*_itr == "client_max_body_size")
             serverConfig.maxBodySize = parse_client_max_body_size();
-            check_duplicate_directive(parsedServerDirectives, "client_max_body_size");
-        }
-        else if (*_itr == "autoindex") {
+        else if (*_itr == "autoindex")
             serverConfig.autoindex = parse_autoindex();
-            check_duplicate_directive(parsedServerDirectives, "autoindex");
-        }
         else if (*_itr == "index")
             parse_index(serverConfig.indexFile, serverConfig.root);
         else if (*_itr == "server_name")
@@ -372,18 +363,17 @@ ServerConfig ConfigParser::parse_server_context(void)
         else if (*_itr == "error_page")
             parse_error_page(serverConfig.errorPages, serverConfig.root);
         else if (*_itr == "location")
-            serverConfig.locations.push_back(parse_location_context(serverConfig));
+            parse_location_context(serverConfig);
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
+    }
 
     if (serverConfig.locations.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_LOCATION);
-    else if (parsedServerDirectives.find("root") == parsedServerDirectives.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
-    else if (parsedServerDirectives.find("error_page") == parsedServerDirectives.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
+
+    ++_itr; // move to next context
 
     return serverConfig;
 }
@@ -393,18 +383,13 @@ vector<ServerConfig> ConfigParser::parse(void)
     _itr = _tokens.begin(); // setting iterator to the first token
 
     vector<ServerConfig> servers;
-    while (*_itr != "}") {
+    while (_itr != _tokens.end())
         if (*_itr == "server")
             servers.push_back(parse_server_context());
         else
             THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
-        ++_itr;
-    }
 
-    // after server contexts no more tokens should be present
-    if ((_itr + 1) != _tokens.end())
-        THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
-    else if (servers.empty())
+    if (servers.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SERVER);
 
     return servers;
