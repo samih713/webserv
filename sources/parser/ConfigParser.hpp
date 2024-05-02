@@ -28,16 +28,15 @@ static const string ERR_MISSING_CONTEXT("Config: missing context");
 
 // global context error messages
 static const string ERR_TOKENS("Config: Unexpected tokens found in the global context");
+static const string ERR_MULTIPLE_DEFAULT("Config: multiple default servers found");
 
 // server context error messages
 static const string ERR_MISSING_SERVER("Config: missing server context");
 static const string ERR_SERVER_TOKENS("Config: Unexpected tokens in the server context");
 
 // location context error messages
-static const string ERR_LOCATION("Config: invalid character in location uri");
-static const string ERR_MISSING_URI("Config: location URI missing");
-static const string ERR_URI_MISSING_SLASH("Config: location uri is missing a / in the beginning");
-static const string ERR_URI_DUPLICATE_SLASH("Config: location uri contains multiple /");
+static const string ERR_URI_MISSING_SLASH("Config: URI is missing / in the beginning");
+static const string ERR_URI_DUPLICATE_SLASH("Config: location URI contains multiple /");
 static const string ERR_LOCATION_TOKENS("Config: Unexpected tokens in location context");
 static const string ERR_DUPLICATE_LOCATION("Config: duplicate location URI");
 static const string ERR_MISSING_LOCATION("Config: location context missing");
@@ -62,7 +61,6 @@ static const string ERR_MISSING_ROOT("Config: missing root directive");
 
 // index directive error messages
 static const string ERR_INDEX("Config: invalid index directive");
-static const string ERR_INVALID_INDEX("Config: invalid index file");
 
 // client_max_body_size directive error messages
 static const string ERR_INVALID_CHAR("Config: invalid character in client_max_body_size");
@@ -84,8 +82,10 @@ static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 #define MAX_PORT 65535
 
 // TODO:
-// [ ] check for duplicate error pages
-// [ ] handle cgi related directives
+// check for duplicate error pages
+// handle cgi related directives
+// parse error codes and pages better
+// checking if root and root+index is valid or not
 
 #define NUM_KEYWORDS 15
 
@@ -116,7 +116,7 @@ private:
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);
     void   parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
-    fd     parse_listen(in_addr_t& host);
+    fd     parse_listen(in_addr_t& host, bool& defaultServer);
     void   parse_server_name(string& serverName);
     void   parse_root(string& root);
     size_t parse_client_max_body_size(void);

@@ -137,13 +137,12 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
         indexFile = root + *_itr;
     else
         indexFile = root + "/" + *_itr;
-    if (get_file_type(indexFile) != FILE)
-        THROW_EXCEPTION_WITH_INFO(ERR_INVALID_INDEX);
+        //! removed index file checking
 
     check_semicolon();
 }
 
-fd ConfigParser::parse_listen(in_addr_t& host)
+fd ConfigParser::parse_listen(in_addr_t& host, bool& defaultServer)
 {
     ++_itr; // move to host:port
 
@@ -186,6 +185,11 @@ fd ConfigParser::parse_listen(in_addr_t& host)
             THROW_EXCEPTION_WITH_INFO(ERR_PORT);
     }
 
+    if (*(_itr + 1) == "default_server") {
+        defaultServer = true;
+        ++_itr; // move to default_server
+    }
+
     check_semicolon();
 
     return port;
@@ -204,7 +208,7 @@ void ConfigParser::parse_root(string& root)
 {
     ++_itr; // move to root path
     root = *_itr;
-    if (get_file_type(root) != DIR)
+    if (get_file_type(root) != DIR) //!
         THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
     check_semicolon();
 }
@@ -314,7 +318,7 @@ void ConfigParser::parse_location_context(ServerConfig& server)
         else if (*_itr == "allow_methods")
             parse_allow_methods(location.methods);
         else if (*_itr == "index") {
-            if (get_file_type(location.root + location.uri) != DIR)
+            if (get_file_type(location.root + location.uri) != DIR) //!
                 THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_INDEX);
             parse_index(location.indexFile, location.root + location.uri);
         }
@@ -344,38 +348,38 @@ ServerConfig ConfigParser::parse_server_context(void)
     ++_itr; // move to {
 
     set<string>  parsedDirectives;
-    ServerConfig serverConfig;
+    ServerConfig server;
     while (*_itr != "}") {
         if (*_itr != ";" && *_itr != "}" && *_itr != "error_page" && *_itr != "location")
             check_duplicate_element(parsedDirectives, *_itr, "server");
         if (*_itr == "listen")
-            serverConfig.port = parse_listen(serverConfig.host);
+            server.port = parse_listen(server.host, server.defaultServer);
         else if (*_itr == "root")
-            parse_root(serverConfig.root);
+            parse_root(server.root);
         else if (*_itr == "client_max_body_size")
-            serverConfig.maxBodySize = parse_client_max_body_size();
+            server.maxBodySize = parse_client_max_body_size();
         else if (*_itr == "autoindex")
-            serverConfig.autoindex = parse_autoindex();
+            server.autoindex = parse_autoindex();
         else if (*_itr == "index")
-            parse_index(serverConfig.indexFile, serverConfig.root);
+            parse_index(server.indexFile, server.root);
         else if (*_itr == "server_name")
-            parse_server_name(serverConfig.serverName);
+            parse_server_name(server.serverName);
         else if (*_itr == "error_page")
-            parse_error_page(serverConfig.errorPages, serverConfig.root);
+            parse_error_page(server.errorPages, server.root);
         else if (*_itr == "location")
-            parse_location_context(serverConfig);
+            parse_location_context(server);
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
     }
 
-    if (serverConfig.locations.empty())
+    if (server.locations.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_LOCATION);
 
     ++_itr; // move to next context
 
-    return serverConfig;
+    return server;
 }
 
 vector<ServerConfig> ConfigParser::parse(void)
@@ -383,14 +387,25 @@ vector<ServerConfig> ConfigParser::parse(void)
     _itr = _tokens.begin(); // setting iterator to the first token
 
     vector<ServerConfig> servers;
-    while (_itr != _tokens.end())
+    bool                 foundDefaultServer = false;
+    while (_itr != _tokens.end()) {
         if (*_itr == "server")
             servers.push_back(parse_server_context());
         else
             THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
 
+        if (servers[servers.size() - 1].defaultServer == true) {
+            if (foundDefaultServer == true)
+                THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_DEFAULT);
+            foundDefaultServer = true;
+        }
+    }
+
     if (servers.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SERVER);
+
+    if (foundDefaultServer == false)
+        servers[0].defaultServer = true;
 
     return servers;
 }
