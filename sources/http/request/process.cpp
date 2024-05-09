@@ -21,8 +21,12 @@ bool Request::process(const ServerConfig& config)
             header.state = PARSED;
             apply_config(config);
         }
-        if (header(PARSED) && parse_body())
+        if (header(PARSED) && parse_body()) {
+            // DEBUG_MSG(">>>>>Request processed successfully<<<<<", R);
+            // DEBUG_MSG(*this, R);
+            // DEBUG_MSG(">>>>>------------------------------<<<<<", R);
             return true;
+        }
     } catch (std::ios_base::failure& f) {
         set_status(BAD_REQUEST);
         DEBUG_MSG(ERR_PARSE + string(f.what()), R);

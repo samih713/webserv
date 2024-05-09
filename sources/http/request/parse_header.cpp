@@ -14,10 +14,10 @@ void Header::parse_header(stringstream& message)
     // Request line
     parse_request_line(message);
     // Headers Fields
-    while (true && !message.eof() && !peek_line_terminator(message, CRLF))
+    while (true && !message.eof() && !peek_terminator(message, CRLF))
         add_header(message);
     // end of header fields
-    check_line_terminator(message, CRLF);
+    validate_terminator(message, CRLF);
     // after all headers are completed
     process_content();
     if (state == BAD)
@@ -38,7 +38,7 @@ void Header::parse_request_line(stringstream& message)
     if (strncmp(acceptedVersion.c_str(), version.c_str(),
             std::max(version.length(), acceptedVersion.length())))
         message.setstate(std::ios::failbit);
-    check_line_terminator(message, CRLF);
+    validate_terminator(message, CRLF);
     replace_spaces(resource);
 }
 
@@ -103,10 +103,7 @@ void Header::is_chunked(const HeaderMap::const_iterator it)
         chunked = true;
     if (exists && !chunked)
         state = BAD;
-
     // if not set status to 400
-
-    DEBUGASSERT(false && "not yet implemented");
 }
 
 void Header::find_content_length(const HeaderMap::const_iterator it)

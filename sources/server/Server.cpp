@@ -81,13 +81,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         r.recv(incoming);
         if (!r.process(config))
             return;
-
-        // delete
-        // printing request for debugging
         DEBUG_MSG(r, Y);
-        // delete
-
-        // handle requests based on status here
 
         if (check_cgi_request(r.get_resource())) {
             id = fork();

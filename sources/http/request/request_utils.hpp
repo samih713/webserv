@@ -9,7 +9,14 @@ inline void to_lower(string& str)
         str[i] = std::tolower(str[i]);
 }
 
-inline void check_line_terminator(stringstream& message, const string& check)
+/**
+ * Checks and consumes "check" if the next characters in the input stream match. If the
+ * characters do not match, the input stream is marked as failed.
+ *
+ * @param message The input stream to check.
+ * @param check The string to compare against the characters in the input stream.
+ */
+inline void validate_terminator(stringstream& message, const string& check)
 {
     string line_terminator;
     std::noskipws(message);
@@ -25,7 +32,28 @@ inline void check_line_terminator(stringstream& message, const string& check)
     std::skipws(message);
 }
 
-inline bool peek_line_terminator(stringstream& message, const string& check)
+/**
+ * Checks if the given string `check` is present in the remaining part of the `message`
+ * stream.
+ *
+ * @param message The input stringstream containing the message.
+ * @param check The string to search for in the message.
+ * @return `true` if the `check` string is found in the remaining part of the `message`
+ * stream, `false` otherwise.
+ */
+inline bool find_terminator(stringstream& message, const string& check)
+{
+    return message.str().find(check, message.tellg()) != string::npos;
+}
+
+/**
+ * Checks if the next character[s] in the given stringstream matches the specified string.
+ *
+ * @param message The stringstream to read from.
+ * @param check The string to compare against the characters in the stringstream.
+ * @return True if the next characters matches the specified string, false otherwise.
+ */
+inline bool peek_terminator(stringstream& message, const string& check)
 {
     string         line_terminator;
     std::streampos initialPos = message.tellg();
