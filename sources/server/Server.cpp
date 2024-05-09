@@ -96,7 +96,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 // Child process
                 IRequestHandler* handler =
                     RequestHandlerFactory::MakeRequestHandler(r.get_method());
-                Response response = handler->handle_request(r, cachedPages, config);
+                Response response = handler->handle_request(r, _cachedPages, _config);
 
                 response.send_response(incoming);
                 r.setCompleted();
@@ -106,7 +106,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         }else{
             IRequestHandler* handler =
                 RequestHandlerFactory::MakeRequestHandler(r.get_method());
-            Response response = handler->handle_request(r, cachedPages, config);
+            Response response = handler->handle_request(r, _cachedPages, _config);
 
             response.send_response(incoming);
            // r.setCompleted();
