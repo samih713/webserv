@@ -159,10 +159,10 @@ void Cgi::execute(const string& outputFile)
     if (outFile.is_open()) {
         outFile << res_body;
         outFile.close();
-        DEBUG_MSG("Response saved to: " outputFile, Y);
+        DEBUG_MSG("Response saved to: " + outputFile, Y);
     }
     else {
-        DEBUG_MSG("Error opening output file: " + strerror(errno), Y);
+        DEBUG_MSG("Error opening output file: " + string(strerror(errno)), Y);
     }
 
     close(fd[0]);
