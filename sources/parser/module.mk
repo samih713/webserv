@@ -1,8 +1,7 @@
 # parser makefile
 
-PARSER_SRCS:= $(PARSER_DIR)/ConfigParser.cpp
-PARSER_OBJS:= $(PARSER_SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
-OBJS += $(PARSER_OBJS)
+PARSER_SRCS:= $(addprefix $(PARSER_DIR)/, ConfigParser.cpp)
+SRCS += $(PARSER_SRCS)
 
 # tester mains
 TEST_PARSER:= $(PARSER_DIR)/$(TESTS_DIR)/test_parser

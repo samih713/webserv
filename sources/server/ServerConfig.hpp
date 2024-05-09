@@ -5,63 +5,62 @@
 #define CONFIG_HPP
 
 struct Location {
-    string         path;
-    string         modifier;
+    string         uri;
     string         root;
-    vector<string> indexFiles;
+    string         indexFile;
     bool           autoindex;
     size_t         maxBodySize;
-    Location() : autoindex(false), maxBodySize(1000000) {}
+    vector<string> methods;
+    Location() : indexFile("index.html"), autoindex(false), maxBodySize(1000000) {}
 };
 
 struct ServerConfig {
-    fd                       listenerPort;
-    size_t                   maxBodySize;
+    fd                       port;
+    in_addr_t                host;
+    bool                     defaultServer;
     string                   serverName;
-    string                   serverRoot;
-    vector<string>           indexFiles;
-    vector<Location>         locations;
-    map<STATUS_CODE, string> errorPages;
+    string                   root;
+    string                   indexFile;
     bool                     autoindex;
-    in_addr_t                serverAddr;
+    size_t                   maxBodySize;
+    map<STATUS_CODE, string> errorPages; //! maybe need default values
+    vector<Location>         locations;
 
-    ServerConfig() : listenerPort(8080), maxBodySize(1000000), autoindex(false) {}
+    ServerConfig()
+        : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
+          indexFile("index.html"), autoindex(false), maxBodySize(1000000)
+    {}
 
     void print(void) const
     {
         cout << "ServerConfig {" << endl;
-        cout << "  listenerPort: " << listenerPort << endl;
-        cout << "  maxBodySize: " << maxBodySize << endl;
-        cout << "  indexFiles: [";
-        for (vector<string>::const_iterator itr = indexFiles.begin();
-             itr != indexFiles.end(); ++itr)
-        {
-            cout << *itr;
-            if (itr + 1 != indexFiles.end())
-                cout << ", ";
-        }
-        cout << "]" << endl;
-        cout << "  autoindex: " << autoindex << endl;
+        cout << "  port: " << port << endl;
+        cout << "  host: " << inet_ntoa(*(struct in_addr*) &host) << endl;
+        cout << "  default_server: " << (defaultServer == true ? "yes" : "no") << endl;
         cout << "  serverName: [" << serverName << "]" << endl;
-        cout << "  serverRoot: " << serverRoot << endl;
+        cout << "  root: " << root << endl;
+        cout << "  indexFile: " << indexFile << endl;
+        cout << "  autoindex: " << (autoindex == true ? "yes" : "no") << endl;
+        cout << "  maxBodySize: " << maxBodySize << endl;
         cout << "  locations: [" << endl;
         for (vector<Location>::const_iterator itr = locations.begin();
              itr != locations.end(); ++itr)
         {
             cout << "    Location {" << endl;
-            cout << "      path: " << itr->path << endl;
-            cout << "      modifier: " << itr->modifier << endl;
+            cout << "      uri: " << itr->uri << endl;
             cout << "      root: " << itr->root << endl;
-            cout << "      indexFiles: [";
-            for (vector<string>::const_iterator itr2 = itr->indexFiles.begin();
-                 itr2 != itr->indexFiles.end(); ++itr2)
+            cout << "      indexFile: " << indexFile << endl;
+            cout << "      autoindex: " << (autoindex == true ? "yes" : "no") << endl;
+            cout << "      maxBodySize: " << itr->maxBodySize << endl;
+            cout << "      methods: [";
+            for (vector<string>::const_iterator itr2 = itr->methods.begin();
+                 itr2 != itr->methods.end(); ++itr2)
             {
                 cout << *itr2;
-                if (itr2 + 1 != itr->indexFiles.end())
+                if (itr2 + 1 != itr->methods.end())
                     cout << ", ";
             }
             cout << "]" << endl;
-            cout << "      autoindex: " << itr->autoindex << endl;
             cout << "    }" << endl;
         }
         cout << "  ]" << endl;

@@ -31,7 +31,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
     int option = 1;
     setsockopt(socketFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if (socketFD == invalidFD)
-        throw Socket::Exception(ERR_CREAT);
+        THROW_EXCEPTION_WITH_INFO(ERR_CREAT);
 
     std::memset(&address, 0, sizeof(address));
 
@@ -46,7 +46,7 @@ Socket::Socket(int family, int type, int protocol, int flags)
  *
  * @return void
  */
-Socket::~Socket() throw()
+Socket::~Socket()
 {
     if (socketFD != invalidFD) {
         DEBUG_MSG("socket fd[" << socketFD << "] closed!!", R);
@@ -56,8 +56,6 @@ Socket::~Socket() throw()
 }
 
 /* -------------------------------- Interface ------------------------------- */
-
-#define MAX_PORT 65535
 
 /**
  * Sets the port for the Socket object.
@@ -71,15 +69,12 @@ Socket::~Socket() throw()
  */
 void Socket::set_port(int port)
 {
-    if (port < 0 || port > MAX_PORT)
-        throw Socket::Exception("Invalid Socket descriptor\n");
-
     // cast address to socketaddr_in and set sin_port
     ((struct sockaddr_in*) (&address))->sin_port = htons(port);
 }
 
 
-fd Socket::get_fd() const throw()
+fd Socket::get_fd() const
 {
     return socketFD;
 }
@@ -95,7 +90,7 @@ fd Socket::get_fd() const throw()
 void Socket::bind() const
 {
     if (::bind(socketFD, (struct sockaddr*) &address, sizeof(address)) == -1)
-        throw Socket::Exception(ERR_BIND);
+        THROW_EXCEPTION_WITH_INFO(ERR_BIND);
     isBound = true;
 }
 
@@ -109,10 +104,10 @@ void Socket::bind() const
 void Socket::listen(int backlog) const
 {
     if (!isBound)
-        throw Socket::Exception(ERR_NBIND);
+        THROW_EXCEPTION_WITH_INFO(ERR_NBIND);
 
     if (::listen(socketFD, backlog) == -1)
-        throw Socket::Exception(ERR_LIST);
+        THROW_EXCEPTION_WITH_INFO(ERR_LIST);
     isListening = true;
 }
 
@@ -131,7 +126,7 @@ void Socket::listen(int backlog) const
 fd Socket::accept()
 {
     if (!isListening)
-        throw Socket::Exception(ERR_NLIST);
+        THROW_EXCEPTION_WITH_INFO(ERR_NLIST);
 
     // This structure is filled in with the address of the peer socket,
     struct sockaddr peerInfo; // does this need to be stored?
@@ -145,50 +140,7 @@ fd Socket::accept()
     if (newSocket == invalidFD) {
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
         if (errno != EAGAIN && errno != EWOULDBLOCK)
-            throw Socket::Exception(ERR_ACCP);
+            THROW_EXCEPTION_WITH_INFO(ERR_ACCP);
     }
     return newSocket;
-}
-
-/* ---------------------------- Socket Exception ---------------------------- */
-
-/**
- * @brief Constructor for the Socket Exception class
- *
- * This constructor initializes a new instance of the Socket Exception class with the
- * provided error message.
- *
- * @param error_message The error message associated with the exception
- * @return A new instance of the Socket Exception class
- *
- * @throws None
- */
-Socket::Exception::Exception(const string& error_message)
-{
-    this->error_message = compose_msg(error_message);
-};
-
-/**
- * @brief Returns a C-style string describing the error message associated with this
- * exception.
- *
- * @return const char* a C-style string containing the error message.
- */
-const char* Socket::Exception::what() const throw()
-{
-    return error_message.c_str();
-}
-
-/**
- * Composes an error message by combining the provided message with the system error
- * message corresponding to the current value of errno.
- *
- * @param message The message to be included in the error message.
- * @return A string containing the composed error message.
- */
-string Socket::Exception::compose_msg(const string& message)
-{
-    stringstream _msg;
-    _msg << message << (errno ? ": " + string(strerror(errno)) : "");
-    return _msg.str();
 }

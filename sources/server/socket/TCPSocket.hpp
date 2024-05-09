@@ -13,7 +13,7 @@
  */
 class TCPSocket: public Socket {
 public:
-    TCPSocket(int port, int backlog);
+    TCPSocket(fd port, int backlog, in_addr_t serverIP);
     ~TCPSocket() throw();
 
 private:

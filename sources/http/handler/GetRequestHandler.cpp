@@ -1,8 +1,9 @@
 #include "GetRequestHandler.hpp"
-#include "debug.hpp"
-#include "FileType.hpp"
 #include "CachedPages.hpp"
 #include "Cgi.hpp"
+#include "FileType.hpp"
+#include "debug.hpp"
+#include "webserv.hpp"
 
 GetRequestHandler::GetRequestHandler()
 {
@@ -71,7 +72,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 {
     vsp          requestHeaders = request.get_headers();
     string       resource       = request.get_resource();
-    string       defaultPage    = config.serverRoot + "/";
+    string       defaultPage    = config.root + "/";
     vector<char> body;
 	string		plain_res		= geturis(resource);
 
@@ -83,9 +84,8 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     status                 = OK;
     if (plain_res == defaultPage) {
         body = cachedPages->home.data;
-        add_header(
-            make_pair<string, string>("Content-Type", cachedPages->home.contentType.c_str()));
-
+        add_header(make_pair<string, string>("Content-Type",
+            cachedPages->home.contentType.c_str()));
         add_header(make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
     }

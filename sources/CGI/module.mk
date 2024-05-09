@@ -1,8 +1,7 @@
 # CGI makefile
 
-CGI_SRCS:= $(CGI_DIR)/Cgi.cpp
-CGI_OBJS:= $(CGI_SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
-OBJS += $(CGI_OBJS)
+CGI_SRCS:= $(addprefix $(CGI_DIR)/, Cgi.cpp)
+SRCS += $(CGI_SRCS)
 
 # tester mains
 TEST_CGI:= $(CGI_DIR)/test_cgi
