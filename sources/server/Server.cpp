@@ -4,7 +4,7 @@
 #include "IRequestHandler.hpp"
 #include "Request.hpp"
 #include "RequestHandlerFactory.hpp"
-#include "debug.hpp"
+#include "webserv.hpp"
 #include <algorithm>
 #include <sys/select.h>
 #include <utility>
@@ -27,6 +27,10 @@
 Server& Server::get_instance(const ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
+    string        host = inet_ntoa(*(struct in_addr*) &config.host);
+    Logger::log_message("Server created successfully on port [" + host + ":" +
+                            ws_itoa(config.port) + "]",
+        INFO);
     return instance;
 }
 
@@ -53,8 +57,8 @@ bool Server::check_cgi_request(string res)
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
 Server::Server(const ServerConfig& config, int backLog)
-    : listener(config.listenerPort, backLog), config(config),
-      cachedPages(new CachedPages(config))
+    : _listener(config.port, backLog, config.host), _config(config),
+      _cachedPages(new CachedPages(config))
 {
     DEBUG_MSG("Server was created successfully", B);
 }
@@ -66,7 +70,7 @@ Server::Server(const ServerConfig& config, int backLog)
  */
 Server::~Server()
 {
-    delete cachedPages;
+    delete _cachedPages;
 }
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
@@ -79,7 +83,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
         r.recv(incoming);
-        if (!r.parse_request(config))
+        if (!r.parse_request(_config))
             return;
 
 		if(check_cgi_request(r.get_resource()))
@@ -113,9 +117,9 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
 
     } catch (std::ios_base::failure& f) {
         DEBUG_MSG(ERR_PARSE, R);
-    } catch (std::exception& e) {
+    } catch (std::exception& error) {
         ConnectionManager::remove_connection(incoming, activeSockets);
-        DEBUG_MSG(e.what(), R);
+        DEBUG_MSG(error.what(), R);
     }
 }
 
@@ -133,7 +137,7 @@ void Server::select_strat()
     struct timeval selectTimeOut = { .tv_sec = SELECTWAITTIME, .tv_usec = 0 };
 
     fd       incoming;
-    const fd listenerFd = listener.get_fd();
+    const fd listenerFd = _listener.get_fd();
 
     fd_set activeSockets;
     fd_set readytoRead;
@@ -158,7 +162,7 @@ void Server::select_strat()
         {
             if (FD_ISSET(currentSocket, &readytoRead)) {
                 if (currentSocket == listenerFd) {
-                    incoming            = listener.accept();
+                    incoming            = _listener.accept();
                     maxSocketDescriptor = std::max(maxSocketDescriptor, incoming);
                 }
                 else
@@ -180,10 +184,10 @@ void Server::kqueue_strat()
 #elif defined(__MAC__)
 void Server::kqueue_strat()
 {
-    const fd socketFD = listener.get_fd();
+    const fd              socketFD      = _listener.get_fd();
     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0 };
 
-    struct kevent changeList; // list of events to monitor
+    struct kevent changeList;            // list of events to monitor
     struct kevent eventList[MAX_EVENTS]; // list of events that have occurred
 
     // creating kqueue
@@ -213,20 +217,17 @@ void Server::kqueue_strat()
         else if (numEvents == 0) // timeout
             continue;
 
-        for (int i = 0; i < numEvents; i++)
-        {
-            if (eventList[i].ident == static_cast<uintptr_t>(socketFD))
-            {
+        for (int i = 0; i < numEvents; i++) {
+            if (eventList[i].ident == static_cast<uintptr_t>(socketFD)) {
                 // add new connection to kqueue
-                fd newConnection = listener.accept();
+                fd newConnection = _listener.accept();
                 EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);
                 if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
                     close(kq);
                     THROW_EXCEPTION_WITH_INFO(strerror(errno));
                 }
             }
-            else if (eventList[i].flags & EV_EOF)
-            {
+            else if (eventList[i].flags & EV_EOF) {
                 // remove connection from kqueue
                 EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
                 if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
@@ -236,31 +237,31 @@ void Server::kqueue_strat()
                 close(eventList[i].ident);
                 // this should be done in handle_connection
             }
-            else if (eventList[i].flags & EVFILT_READ)
-            {
+            else if (eventList[i].flags & EVFILT_READ) {
                 DEBUG_MSG("reading from connection", M);
                 //! this is not a good fix at all and is very hard-cody
                 try {
                     Request req;
                     req.recv(eventList[i].ident);
-                    if (!req.parse_request(config))
+                    if (!req.parse_request(_config))
                         continue;
-                    
-                    IRequestHandler* handler = RequestHandlerFactory::MakeRequestHandler(req.get_method());
-                    Response response = handler->handle_request(req, cachedPages, config);
+
+                    IRequestHandler* handler =
+                        RequestHandlerFactory::MakeRequestHandler(req.get_method());
+                    Response response =
+                        handler->handle_request(req, _cachedPages, _config);
                     response.send_response(eventList[i].ident);
                     delete handler;
-                }
-                catch (std::ios_base::failure& f) {
+                } catch (std::ios_base::failure& f) {
                     DEBUG_MSG(ERR_PARSE, R);
-                }
-                catch (std::exception& e) {
-                    EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, 0);
+                } catch (std::exception& error) {
+                    EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0,
+                        0);
                     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
                         close(kq);
                         THROW_EXCEPTION_WITH_INFO(strerror(errno));
                     }
-                    DEBUG_MSG(e.what(), R);
+                    DEBUG_MSG(error.what(), R);
                 }
             }
         }

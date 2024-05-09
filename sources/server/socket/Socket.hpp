@@ -24,25 +24,13 @@ static const int SOCK_FLAG = 0;
  */
 class Socket {
 public:
-    virtual ~Socket() throw();
+    virtual ~Socket();
     /* -------------------------------- Interface ------------------------------- */
     void set_port(int port);
-    fd   get_fd() const throw();
+    fd   get_fd() const;
     void bind() const;
     void listen(int backlog) const;
     fd   accept();
-
-    /* ---------------------------- Socket Exception ---------------------------- */
-    class Exception: public std::exception {
-    public:
-        explicit Exception(const string& error_message);
-        ~Exception() throw() {};
-        const char* what() const throw();
-
-    private:
-        string error_message;
-        string compose_msg(const string& message);
-    };
 
 protected:
     /* ------------------------------- Constructor ------------------------------ */

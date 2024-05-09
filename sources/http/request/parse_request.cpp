@@ -69,8 +69,8 @@ void Request::parse_header()
 // applies the configuration parameters to the request
 void Request::apply_config(const ServerConfig& config)
 {
-    resource = config.serverRoot + resource;
-    cgiResource = config.serverRoot + resource; // change to cgi root
+    resource = config.root + resource;
+    cgiResource = config.root + resource; // change to cgi root
 }
 
 // TODO handle chunked encoding

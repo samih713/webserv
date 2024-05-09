@@ -39,11 +39,11 @@ SUB_DIRS:= $(shell find $(SRCS_DIR) -type d -name $(TESTS_DIR) -prune -o -type d
 INCLUDES:= -I./includes/ $(patsubst %,-I./%,$(MODULES)) $(patsubst %,-I./%,$(SUB_DIRS))
 
 ### SOURCES ###
-SRCS:= $(SRCS_DIR)/main.cpp
-
-### OBJECTS & SUBDIRS ###
 include $(patsubst %,%/module.mk,$(MODULES))
-OBJS += $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
+SRCS += $(SRCS_DIR)/main.cpp
+
+### OBJECTS ###
+OBJS:= $(patsubst $(SRCS_DIR)%.cpp,$(OBJS_DIR)%.o,$(SRCS))
 
 all: $(NAME)
 
@@ -56,7 +56,7 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(OBJS_DIR)
 	@echo "$(GREEN)$(BOLD)[ COMPILE ]$(RESET) $<."
 
 $(OBJS_DIR):
-	@mkdir -p $@ $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
+	@mkdir -p $(patsubst $(SRCS_DIR)%,$(OBJS_DIR)%,$(SUB_DIRS))
 
 run: re
 	./$(NAME) configs/webserv.conf
@@ -107,10 +107,7 @@ test_cgi:
 
 format:
 	@echo "$(BLUE)$(BOLD)[ FORMAT ]$(RESET) Formatting code..."
-	@find ./$(SRCS_DIR) -name "*.cpp" -o -name "*.hpp" \
-		-exec clang-format -i {} +
-	@find ./includes -name "*.hpp" \
-		-exec clang-format -i {} +
+	@find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {} +
 	@echo "$(BLUE)$(BOLD)[ FORMAT ]$(RESET) Code has been formatted."
 
 -include $(OBJS:.o=.d)
