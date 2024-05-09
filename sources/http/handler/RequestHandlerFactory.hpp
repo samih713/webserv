@@ -1,6 +1,6 @@
+#include "DeleteRequestHandler.hpp"
 #include "FindHeaderKey.hpp"
 #include "GetRequestHandler.hpp"
-#include "DeleteRequestHandler.hpp"
 #include "IRequestHandler.hpp"
 
 #ifndef REQUESTHANDLERFACTORY_HPP
@@ -18,9 +18,9 @@ public:
     static IRequestHandler* MakeRequestHandler(METHOD m)
     {
         switch (m) {
-            case GET: return new GetRequestHandler;
+            case GET:    return new GetRequestHandler;
             case DELETE: return new DeleteRequestHandler;
-            default:  THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
+            default:     THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
         }
     }
 };
