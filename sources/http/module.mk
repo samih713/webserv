@@ -1,6 +1,6 @@
 # http makefile
 
-HTTP_SRCS := $(addprefix $(HTTP_DIR)/, request/parse_request.cpp request/recv.cpp request/Request.cpp response/Response.cpp handler/GetRequestHandler.cpp, handler/DeleteRequestHandler.cpp)
+HTTP_SRCS := $(addprefix $(HTTP_DIR)/, request/parse_request.cpp request/recv.cpp request/Request.cpp response/Response.cpp handler/GetRequestHandler.cpp handler/DeleteRequestHandler.cpp)
 SRCS += $(HTTP_SRCS)
 
 # tester mains
