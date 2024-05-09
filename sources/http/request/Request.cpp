@@ -33,6 +33,11 @@ const string& Request::get_resource() const
     return resource;
 }
 
+const string &Request::get_body() const
+{
+    return body;
+}
+
 void Request::setCompleted()
 {
     completed = true;
