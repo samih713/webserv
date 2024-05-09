@@ -33,7 +33,7 @@ const string& Request::get_resource() const
     return resource;
 }
 
-const string &Request::get_body() const
+const string& Request::get_body() const
 {
     return body;
 }

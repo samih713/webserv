@@ -77,7 +77,7 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-	int id;
+    int id;
 
     try {
         ConnectionManager::check_connection(incoming);
@@ -86,8 +86,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         if (!r.parse_request(_config))
             return;
 
-		if(check_cgi_request(r.get_resource()))
-		{
+        if (check_cgi_request(r.get_resource())) {
             id = fork();
             if (id == -1) {
                 std::cerr << "Error forking process: " << strerror(errno) << std::endl;
@@ -101,19 +100,19 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 response.send_response(incoming);
                 r.setCompleted();
                 delete handler;
-				exit(0);
+                exit(0);
             }
-        }else{
+        }
+        else {
             IRequestHandler* handler =
                 RequestHandlerFactory::MakeRequestHandler(r.get_method());
             Response response = handler->handle_request(r, _cachedPages, _config);
 
             response.send_response(incoming);
-           // r.setCompleted();
+            // r.setCompleted();
             delete handler;
         }
         r.setCompleted();
-
 
     } catch (std::ios_base::failure& f) {
         DEBUG_MSG(ERR_PARSE, R);

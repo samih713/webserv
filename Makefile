@@ -107,7 +107,8 @@ test_cgi:
 
 format:
 	@echo "$(BLUE)$(BOLD)[ FORMAT ]$(RESET) Formatting code..."
-	@find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {} +
+	@find . -name "*.cpp" -exec clang-format -i {} +
+	@find . -name "*.hpp" -exec clang-format -i {} +
 	@echo "$(BLUE)$(BOLD)[ FORMAT ]$(RESET) Code has been formatted."
 
 -include $(OBJS:.o=.d)

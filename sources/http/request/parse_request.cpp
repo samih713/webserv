@@ -15,7 +15,7 @@ static bool   peek_line_terminator(istream& is, const string& check);
 static string find_value(stringstream& message);
 
 // throws ios failure
-bool Request::parse_request(const ServerConfig &config)
+bool Request::parse_request(const ServerConfig& config)
 {
     message.exceptions(std::ios::failbit | std::ios::badbit);
     if (headerReady && expectedBodySize == NOT_SET) {
@@ -69,7 +69,7 @@ void Request::parse_header()
 // applies the configuration parameters to the request
 void Request::apply_config(const ServerConfig& config)
 {
-    resource = config.root + resource;
+    resource    = config.root + resource;
     cgiResource = config.root + resource; // change to cgi root
 }
 

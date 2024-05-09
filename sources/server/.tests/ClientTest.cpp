@@ -4,8 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-const string      crlf("\r\n");
-const string      version("HTTP/1.1");
+const string crlf("\r\n");
+const string version("HTTP/1.1");
 const string request("GET /index.html " + version + crlf + crlf);
 #define BUFFER_SIZE 4096
 

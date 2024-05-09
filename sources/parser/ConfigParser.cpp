@@ -137,7 +137,7 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
         indexFile = root + *_itr;
     else
         indexFile = root + "/" + *_itr;
-        //! removed index file checking
+    //! removed index file checking
 
     check_semicolon();
 }
