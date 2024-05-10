@@ -3,7 +3,6 @@
 #include "debug.hpp"
 #include "request_utils.hpp"
 #include "webserv.hpp"
-#include <string>
 
 #define IS_SET(x) ((x) != NOT_SPECIFIED)
 

@@ -146,16 +146,26 @@ static const string sample_response =
     "<head><title>Sample Page</title></head>\r\n"
     "<body><h1>Hello, World!</h1><p>This is a sample webpage.</p></body>\r\n"
     "</html>\r\n";
+
+    
 static const std::string sample_request =
     "GET resource/resource HTTP/1.1\r\n" // request-line
     "Host: Linode.com\r\n"               // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
     "Gecko/20091102 Firefox/3.5.5 \r\n"
     "Content-Length: 69\r\n"
-    "Accept-Encoding: gzip,deflate\r\n"
+    "Transfer-Encoding: chunked\r\n"
     "Accept-Charset: ISO-8859-1,utf-8\r\n"
     "Cache-Control: no-cache\r\n"
     "\r\n" //
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "0\r\n"
+    "\r\n"
     "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit\r\n"
     "enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet.\r\n"
     "Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem\r\n"

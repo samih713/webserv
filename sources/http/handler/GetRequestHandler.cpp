@@ -152,6 +152,7 @@ Response GetRequestHandler::handle_request(const Request& r,
     DEBUG_MSG("Handling get request ... ", B);
 
     HeaderMap requestHeaders = r.get_headers();
+    // ! reply to invalid requests
     body                     = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);
 }
