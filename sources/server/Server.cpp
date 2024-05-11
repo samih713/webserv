@@ -34,17 +34,6 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
     return instance;
 }
 
-bool Server::check_cgi_request(string res)
-{
-    // Find the position of the word in the string
-    size_t pos = res.find("cgi-bin");
-
-    if (pos != std::string::npos)
-        return (true);
-    else
-        return (false);
-}
-
 /**
  * @brief Constructor for the Server class.
  *
@@ -86,11 +75,11 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         if (!r.parse_request(_config))
             return;
 
-        if (check_cgi_request(r.get_resource())) {
+        if (r.get_resource().find("/cgi-bin") != string::npos) {
+            DEBUG_MSG("Handling CGI", M);
             id = fork();
-            if (id == -1) {
+            if (id == -1)
                 std::cerr << "Error forking process: " << strerror(errno) << std::endl;
-            }
             else if (id == 0) {
                 // Child process
                 IRequestHandler* handler =

@@ -170,7 +170,7 @@ static string find_value(stringstream& message)
     return fieldValue;
 }
 
-/*
+/**
  * @brief Replaces all occurrences of "%20" in the resource string with a space character.
  *
  * @param resource The resource string to replace "%20" with a space character.
