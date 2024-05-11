@@ -27,60 +27,22 @@ inline const string find_resource_type(const string& resource)
     return (fileTypes.find(file_extension)->second);
 }
 
-// bool check_cgi_request(const string &res)
-// {
-// 	string filetype;
-
-// 	filetype = find_resource_type(res);
-// 	if(filetype == "bash" || filetype == "python")
-// 		return true;
-// 	else
-// 		return false;
-// }
-
-bool check_cgi_request(string res)
-{
-    // Find the position of the word in the string
-    size_t pos = res.find("cgi-bin");
-
-    if (pos != string::npos)
-        return (true);
-    else
-        return (false);
-}
-
-// fuction to get url without the query string
-string geturis(string res)
-{
-    string resn;
-    size_t qu;
-
-    qu   = res.find('?', 0);
-    resn = res.substr(0, qu);
-    // result = const_cast<char *>(res.substr(0,qu).c_str());
-    cout << resn << endl;
-    cout << "test" << qu << endl;
-    return (resn);
-}
-
-
 // TODO resource handling for get-requests, is broken
 const vector<char> GetRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    vsp          requestHeaders = request.get_headers();
-    string       resource       = request.get_resource();
-    string       defaultPage    = config.root + "/";
+    string       resource    = request.get_resource();
+    string       defaultPage = config.root + "/";
     vector<char> body;
-    string       plain_res = geturis(resource);
 
+    if (resource.find('?') != string::npos)
+        resource = resource.substr(0, resource.find('?')); // removing query string
 
     add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
-    ifstream resource_file;
-    size_t   resource_size = 0;
-    status                 = OK;
-    if (plain_res == defaultPage) {
+    size_t resource_size = 0;
+    status               = OK;
+    if (resource == defaultPage) {
         body = cachedPages->home.data;
         add_header(make_pair<string, string>("Content-Type",
             cachedPages->home.contentType.c_str()));
@@ -88,7 +50,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
             ws_itoa(cachedPages->home.contentLength)));
     }
     else {
-        resource_file.open(plain_res.c_str(), std::ios_base::binary);
+        ifstream resource_file(resource.c_str(), std::ios_base::binary);
         if (resource_file.fail()) {
             status = NOT_FOUND;
             add_header(make_pair<string, string>("Content-Type",
@@ -98,16 +60,14 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
             body = cachedPages->notFound.data;
         }
         else {
-            string resource_type = find_resource_type(plain_res);
+            string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(
                     make_pair<string, string>("Content-Type", resource_type.c_str()));
-            if (check_cgi_request(plain_res)) {
-                Cgi    cgi(request, config);
-                string result;
-
-                result = cgi.execute();
-                body   = vector<char>(result.begin(), result.end());
+            if (resource.find("cgi-bin") != string::npos) {
+                CGI cgi(request, config);
+                string result = cgi.execute();
+                body          = vector<char>(result.begin(), result.end());
                 add_header(
                     make_pair<string, string>("Content-Length", ws_itoa(body.size())));
             }
@@ -136,7 +96,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
      * */
     return body;
 }
-
 
 Response GetRequestHandler::handle_request(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)

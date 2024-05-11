@@ -6,23 +6,22 @@
 #include "TimeOut.hpp"
 #include "webserv.hpp"
 
-class Cgi {
+class CGI {
 public:
-    Cgi(const Request& request, const ServerConfig& config);
-    ~Cgi();
-    void    execute(const string& outputFile);
-    char**  headersToEnv(const Request& request, const string res,
-         const ServerConfig& config);
-    TimeOut timer;
-    string  execute(void);
+    CGI(const Request& request, const ServerConfig& config);
+    ~CGI();
+
+    string execute(void);
+    char** headers_to_env(const Request& request, const ServerConfig& config);
+
 
 private:
-    vsp    headers;
-    string queryString;
-    string filePath;
-    string body;
-    char** arguments;
-    char** environment;
+    string  _queryString;
+    char*   _filePath;
+    string  _body;
+    char**  _arguments;
+    char**  _environment;
+    TimeOut _timer;
 };
 
 #endif

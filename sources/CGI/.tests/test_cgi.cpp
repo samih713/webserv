@@ -67,7 +67,7 @@ int main(int argc, char** argv, char** envp)
         //     cout << it->first << ": " << it->second << endl;
         // }
 
-        Cgi cgi(request);
+        CGI cgi(request);
 
         res = cgi.execute();
         cout << "this return exce CGI : " << res << endl;
@@ -91,7 +91,7 @@ int main(int argc, char** argv, char** envp)
 
     // // Create an instance of the CGI class
     // char* scriptArguments[] = { const_cast<char*>(pythonScriptPath), nullptr };
-    // Cgi cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
+    // CGI cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
 
     // // Execute the Python script
     // cgi.execute("std");
