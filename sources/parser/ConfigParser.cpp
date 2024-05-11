@@ -3,7 +3,7 @@
 ConfigParser::ConfigParser(const string& configFile)
 {
     // checking file extension
-    if (configFile.find(".conf") == string::npos)
+    if (configFile.substr(configFile.find('.')) != ".conf")
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_EXTENSION);
 
     // check if file exists and is a regular file
