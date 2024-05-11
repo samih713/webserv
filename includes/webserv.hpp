@@ -38,6 +38,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
 #include <sstream>
+#include <signal.h>
 #include <stdexcept>
 #include <string>
 #include <sys/select.h>

@@ -4,7 +4,6 @@
 #include "Request.hpp"
 #include "Server.hpp"
 #include "TimeOut.hpp"
-#include "signal.h"
 #include "webserv.hpp"
 
 class Cgi {
