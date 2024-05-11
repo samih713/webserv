@@ -64,8 +64,7 @@ ConfigParser::ConfigParser(const string& configFile)
     {
         if (*vecItr == "{") {
             if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
-                *(vecItr - 1) != "http" && vecItr - 2 >= _tokens.begin() &&
-                *(vecItr - 2) != "location")
+                vecItr - 2 >= _tokens.begin() && *(vecItr - 2) != "location") //!
             {
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
             }
@@ -289,19 +288,19 @@ void ConfigParser::parse_location_context(ServerConfig& server)
 {
     ++_itr; // move to location uri
 
-    Location location;
-    location.uri = *_itr;
-    if (location.uri[0] != '/')
+    string uri;
+    uri = *_itr;
+    if (uri[0] != '/') // uri should begin with /
         THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH);
-    else if (location.uri.find_first_of("/") != location.uri.find_last_of("/"))
+    else if (uri.find_first_of("/") != uri.find_last_of("/"))
         THROW_EXCEPTION_WITH_INFO(ERR_URI_DUPLICATE_SLASH);
 
-    for (size_t i = 0; i < server.locations.size(); i++)
-        if (server.locations[i].uri == location.uri)
-            THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
+    if (server.locations.find(uri) != server.locations.end())
+        THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
 
     ++_itr; // move to {
 
+    Location location;
     location.root        = server.root;
     location.indexFile   = server.indexFile;
     location.autoindex   = server.autoindex;
@@ -318,12 +317,12 @@ void ConfigParser::parse_location_context(ServerConfig& server)
         else if (*_itr == "allow_methods")
             parse_allow_methods(location.methods);
         else if (*_itr == "index") {
-            if (get_file_type(location.root + location.uri) != DIR) //!
+            if (get_file_type(location.root + uri) != DIR) //!
                 THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_INDEX);
-            parse_index(location.indexFile, location.root + location.uri);
+            parse_index(location.indexFile, location.root + uri);
         }
         else if (*_itr == "autoindex") {
-            if (location.uri == "/cgi-bin")
+            if (uri == "/cgi-bin") //?
                 THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX_CGI);
             location.autoindex = parse_autoindex();
         }
@@ -338,7 +337,7 @@ void ConfigParser::parse_location_context(ServerConfig& server)
     else if (parsedDirectives.find("allow_methods") == parsedDirectives.end())
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
 
-    server.locations.push_back(location);
+    server.locations[uri] = location;
 
     ++_itr; // move to next directive
 }
