@@ -79,11 +79,11 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
     ConnectionManager::check_connection(incoming);
     Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-	int id;
+    int      id;
 
     try {
         r.recv(incoming);
-        if (!r.process(config))
+        if (!r.process(_config))
             return;
         DEBUG_MSG(r, Y);
 
@@ -96,7 +96,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 // Child process
                 IRequestHandler* handler =
                     RequestHandlerFactory::MakeRequestHandler(r.get_method());
-                Response response = handler->handle_request(r, cachedPages, config);
+                Response response = handler->handle_request(r, _cachedPages, _config);
                 response.send_response(incoming);
                 ConnectionManager::remove_connection(incoming,
                     activeSockets); // after completing remove
@@ -107,7 +107,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         else {
             IRequestHandler* handler =
                 RequestHandlerFactory::MakeRequestHandler(r.get_method());
-            Response response = handler->handle_request(r, cachedPages, config);
+            Response response = handler->handle_request(r, _cachedPages, _config);
             response.send_response(incoming);
             ConnectionManager::remove_connection(incoming,
                 activeSockets); // after completing remove

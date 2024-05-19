@@ -43,7 +43,7 @@ bool Request::process(const ServerConfig& config)
  */
 void Request::apply_config(const ServerConfig& config)
 {
-    header.resource    = config.serverRoot + header.resource;
-    header.cgiResource = config.serverRoot + header.resource; // change to cgi root
+    header.resource    = config.root + header.resource;
+    header.cgiResource = config.root + header.resource; // change to cgi root
     header.bodySize    = std::min(header.bodySize, config.maxBodySize);
 }
