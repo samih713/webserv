@@ -4,18 +4,19 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
-// [ ] handle chunked encoding for Requests/Responses
+// [ ] handle chunked encoding for Responses
 // [ ] resource handling for get-requests, is broken
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
 // [ ] client sends an infinite loop test this case
+// [x] handle chunked encoding for Requests
 
 // REQUEST
 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
+// [ ] sets status for 400, 501 ... etc
 // [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
-// [ ] sets status for 400, 501 ... etc
 // [ ] optimizing in case of similar request, no need to parse again
 // [x] handle transfer size
 // [x] headers to parse multiple line field-values, and multi-line
