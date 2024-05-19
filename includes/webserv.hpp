@@ -13,12 +13,11 @@
 
 // REQUEST
 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
-// [ ] handle transfer size
 // [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
 // [ ] sets status for 400, 501 ... etc
-// [ ] parsing needs to be reviewed for white space parsing
 // [ ] optimizing in case of similar request, no need to parse again
+// [x] handle transfer size
 // [x] headers to parse multiple line field-values, and multi-line
 
 // CGI

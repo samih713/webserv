@@ -3,31 +3,23 @@
 #include "request_utils.hpp"
 #include "webserv.hpp"
 
-// helpers
 static void   replace_spaces(string& resource);
 static string get_field_value(stringstream& message);
 
 void Header::parse_header(stringstream& message)
 {
-    // Request line
     parse_request_line(message);
-    // Headers Fields
     while (true && !message.eof() && !peek_terminator(message, CRLF))
         add_header(message);
-    // end of header fields
     validate_terminator(message, CRLF);
-    // after all headers are completed
-    process_content();
-	//! unifiy error handling sometimes its set-state sometimes its set to BAD
+    process_fields();
     if (state == BAD)
         message.setstate(std::ios::failbit);
 }
 
 void Header::parse_request_line(stringstream& message)
 {
-    // accepted version
     static const string acceptedVersion("HTTP/1.1");
-
     char singleSpace[2] = { 0 };
 
     std::noskipws(message);
@@ -49,7 +41,7 @@ void Header::add_header(stringstream& message)
     std::getline(message, fieldName, ':');
 
     if (fieldName.find(' ') != string::npos)
-        message.setstate(std::ios::failbit);
+		state = BAD;
     to_lower(fieldName);
     fieldValue = get_field_value(message);
 
@@ -60,7 +52,7 @@ void Header::add_header(stringstream& message)
         fields.insert(std::make_pair(fieldName, fieldValue));
 }
 
-void Header::process_content()
+void Header::process_fields()
 {
     // body size
     const HeaderMap::iterator encoding      = fields.find("transfer-encoding");
@@ -136,7 +128,6 @@ static string get_field_value(stringstream& message)
     return fieldValue;
 }
 
-// replace %20 with space
 // TODO replace all other special characters
 static void replace_spaces(string& resource)
 {

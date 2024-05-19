@@ -39,7 +39,7 @@ struct Header {
 private:
     void parse_request_line(stringstream& message);
     void add_header(stringstream& message);
-    void process_content();
+    void process_fields();
     void is_chunked(const HeaderMap::const_iterator it);
     void find_content_length(HeaderMap::const_iterator it);
 };

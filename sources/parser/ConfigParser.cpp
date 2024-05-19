@@ -315,7 +315,7 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         THROW_EXCEPTION_WITH_INFO(ERR_OPENINING_BRACE);
     ++_itr; // move to first directive
 
-    set<string> parsedHTTPDirectives;
+    set<string>          parsedHTTPDirectives;
     vector<ServerConfig> serverConfigs;
     while (*_itr != "}") {
         if (*_itr == "server")
@@ -341,7 +341,8 @@ vector<ServerConfig> ConfigParser::_parse_HTTP_context(void)
         ++_itr;
     }
 
-    if ((_itr + 1) != _tokens.end()) // after http context no more tokens should be present
+    if ((_itr + 1) !=
+        _tokens.end()) // after http context no more tokens should be present
         THROW_EXCEPTION_WITH_INFO(ERR_UNEXPECTED_TOKENS_OUT);
 
     return serverConfigs;
