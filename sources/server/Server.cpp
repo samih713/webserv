@@ -239,7 +239,7 @@ void Server::kqueue_strat()
                 try {
                     Request req;
                     req.recv(eventList[i].ident);
-                    if (!req.parse_request(_config))
+                    if (!req.process(_config))
                         continue;
 
                     IRequestHandler* handler =
