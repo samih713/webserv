@@ -79,7 +79,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
     ConnectionManager::check_connection(incoming);
     Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-    int      id;
+	int id;
 
     try {
         r.recv(incoming);
@@ -180,11 +180,9 @@ void Server::kqueue_strat()
 #elif defined(__MAC__)
 void Server::kqueue_strat()
 {
-    const fd              socketFD      = listener.get_fd();
     const fd              socketFD      = _listener.get_fd();
     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0 };
 
-    struct kevent changeList;            // list of events to monitor
     struct kevent changeList;            // list of events to monitor
     struct kevent eventList[MAX_EVENTS]; // list of events that have occurred
 
