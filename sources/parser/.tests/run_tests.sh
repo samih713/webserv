@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Compiling test_parser
 c++ -Wall -Werror -Wextra -std=c++98 -ggdb3 -D__DEBUG__ -I../ -I../../../includes/ -I../../server/ -I../../http/ ../ConfigParser.cpp ./test_parser.cpp -o test_parser
@@ -22,11 +22,14 @@ if [ ! -d "$test_dir" ]; then
 fi
 
 sub_dirs=(
+    "allow_methods_check"
     "brace_check"
     "client_body_size_check"
-    "empty_check"
-    "missing_check"
     "duplicate_check"
+    "empty_check"
+    "listen_check"
+    "location_check"
+    "missing_check"
 )
 
 # Prompt user to select a test directory
@@ -62,7 +65,7 @@ find_tests() {
         if [ -d "$file" ]; then
             find_tests "$file"
         elif [ -f "$file" ]; then
-            echo "Running test: $file"
+            echo "Running test: `tput setaf 7``tput bold`$file`tput sgr0`"
             ./test_parser "$file"
             echo "--------------------------------"
         fi
@@ -74,7 +77,7 @@ for dir in "${selected_dirs[@]}"; do
     if [ ! -d "test_files/$dir" ]; then
         echo "Test directory '$dir' not found. Skipping."
     else
-        find_tests "test_files$dir"
+        find_tests "test_files/$dir"
     fi
 done
 

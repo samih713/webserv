@@ -72,18 +72,18 @@ char** Cgi::headersToEnv(const Request& request, const string res,
 
     envVector.push_back(strdup("GATEWAY_INTERFACE=CGI/1.1"));
     envVector.push_back(strdup("SERVER_PROTOCOL=HTTP/1.1"));
-    string val;
-    val = "SERVER_NAME=" + config.serverName;
-    envVector.push_back(strdup(val.c_str()));
-    val = "SERVER_SOFTWARE=" + config.serverName + "/1.0";
-    envVector.push_back(strdup(val.c_str()));
-    val = "SERVER_PORT=" + ws_itoa(config.listenerPort);
-    envVector.push_back(strdup(val.c_str()));
-    val = "REQUEST_URI=" + request.get_resource();
-    envVector.push_back(strdup(val.c_str()));
-    queryString = getStingQuery(res);
-    // val = "QUERY_STRING=" + queryString;
-    // envVector.push_back(strdup(val.c_str()));
+	string val;
+	val = "SERVER_NAME=" + config.serverName;
+	envVector.push_back(strdup(val.c_str()));
+	val = "SERVER_SOFTWARE=" + config.serverName + "/1.0";
+	envVector.push_back(strdup(val.c_str()));
+	val = "SERVER_PORT=" + ws_itoa(config.port);
+	envVector.push_back(strdup(val.c_str()));
+	val = "REQUEST_URI=" + request.get_resource();
+	envVector.push_back(strdup(val.c_str()));
+	queryString = getStingQuery(res);
+	// val = "QUERY_STRING=" + queryString;
+	// envVector.push_back(strdup(val.c_str()));
     // "REQUEST_METHOD"
     // "PATH_INFO"
     // "PATH_TRANSLATED"

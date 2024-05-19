@@ -44,24 +44,22 @@ bool check_cgi_request(string res)
     size_t pos = res.find("cgi-bin");
 
     if (pos != std::string::npos)
-        return(true);
+        return (true);
     else
-        return(false);
-
-
+        return (false);
 }
 
-//fuction to get url without the query string
+// fuction to get url without the query string
 string geturis(string res)
 {
-	string resn;
-	size_t qu;
+    string resn;
+    size_t qu;
 
-	qu = res.find('?', 0); 
-	resn = res.substr(0, qu);
-	//result = const_cast<char *>(res.substr(0,qu).c_str());
-	// cout << resn << endl;
-	// cout<< "test" << qu <<endl;
+    qu   = res.find('?', 0);
+    resn = res.substr(0, qu);
+    // result = const_cast<char *>(res.substr(0,qu).c_str());
+    //  cout << resn << endl;
+    //  cout<< "test" << qu <<endl;
     return (resn);
 }
 
@@ -72,9 +70,9 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
 {
     HeaderMap    requestHeaders = r.get_headers();
     string       resource       = r.get_resource();
-    string        defaultPage       = config.serverRoot + "/";
-    vector<char> body(0);
-	string		plain_res		= geturis(resource);
+    string       defaultPage    = config.root + "/";
+    vector<char> body;
+    string       plain_res = geturis(resource);
 
 
     // add_general_headers()
@@ -90,9 +88,8 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
     //  a URI thats too long is 414
     if (plain_res == defaultPage) { //!
         body = cachedPages->home.data;
-        add_header(
-            make_pair<string, string>("Content-Type", cachedPages->home.contentType.c_str()));
-
+        add_header(make_pair<string, string>("Content-Type",
+            cachedPages->home.contentType.c_str()));
         add_header(make_pair<string, string>("Content-Length",
             ws_itoa(cachedPages->home.contentLength)));
     }
@@ -109,7 +106,8 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
         else {
             string resource_type = find_resource_type(plain_res);
             if (resource_type.length() != 0)
-                add_header(make_pair<string, string>("Content-Type", resource_type.c_str()));
+                add_header(
+                    make_pair<string, string>("Content-Type", resource_type.c_str()));
             if (check_cgi_request(plain_res)) {
                 Cgi    cgi(r, config);
                 string result;
@@ -153,6 +151,6 @@ Response GetRequestHandler::handle_request(const Request& r,
 
     HeaderMap requestHeaders = r.get_headers();
     // ! reply to invalid requests
-    body                     = get_resource(r, cachedPages, config);
+    body = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);
 }

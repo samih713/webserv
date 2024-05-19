@@ -1,8 +1,8 @@
 # server makefile
 
-SERVER_SRCS:= $(SERVER_DIR)/socket/Socket.cpp $(SERVER_DIR)/socket/TCPSocket.cpp $(SERVER_DIR)/connection_manager/ConnectionManager.cpp $(SERVER_DIR)/Server.cpp
-SERVER_OBJS:= $(SERVER_SRCS:$(SRCS_DIR)/%.cpp=$(OBJS_DIR)/%.o)
-OBJS += $(SERVER_OBJS)
+SERVER_SRCS:= $(addprefix $(SERVER_DIR)/, socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp)
+
+SRCS += $(SERVER_SRCS)
 
 # tester mains
 TEST_SOCKET:= $(SERVER_DIR)/test_socket

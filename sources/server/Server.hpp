@@ -1,5 +1,6 @@
 #include "CachedPages.hpp"
 #include "ConnectionManager.hpp"
+#include "Logger.hpp"
 #include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
 
@@ -35,9 +36,9 @@ protected:
     Server(const ServerConfig& config, int backLog);
 
 private:
-    TCPSocket           listener;
-    const ServerConfig& config;
-    CachedPages*        cachedPages;
+    TCPSocket           _listener;
+    const ServerConfig& _config;
+    CachedPages*        _cachedPages;
 
     void handle_connection(fd incoming, fd_set& activeSockets);
 

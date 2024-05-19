@@ -29,7 +29,8 @@
 // [ ] testing (with a testing framework)
 
 /* -------------------------------- INCLUDES -------------------------------- */
-#include "./debug.hpp"
+#include "debug.hpp"
+#include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>

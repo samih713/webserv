@@ -13,14 +13,15 @@
  *
  * @param port The port number to bind the socket to.
  * @param backLog The maximum length of the queue of pending connections.
+ * @param serverIP The address that the socket binds to.
  *
  * @throws Socket::Exception if there is an error in creating or setting up the socket.
  */
-TCPSocket::TCPSocket(int port, int backLog) : Socket(family, type, 0, SOCK_FLAG)
+TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP) : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
     // prep up the struct
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_addr.s_addr = serverIP;
     addr.sin_family      = family;
     std::memcpy(&address, &addr, sizeof(addr));
 

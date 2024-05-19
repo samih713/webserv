@@ -1,4 +1,5 @@
 #include "GetRequestHandler.hpp"
+#include "DeleteRequestHandler.hpp"
 #include "IRequestHandler.hpp"
 #include <algorithm>
 
@@ -19,6 +20,7 @@ public:
         METHOD m = find_method(method);
         switch (m) {
             case GET: return new GetRequestHandler;
+            case DELETE: return new DeleteRequestHandler;
             default:  THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
         }
     }

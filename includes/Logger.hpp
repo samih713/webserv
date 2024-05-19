@@ -15,8 +15,8 @@ class Logger {
 public:
     static void log_message(const string& message, LogLevel level, bool toFile = false)
     {
-        string logMessage =
-            "[" + _get_current_time() + "]" + _level_to_string(level) + ": " + message;
+        string logMessage = "[" + _get_current_time() + "]\t[" + _level_to_string(level) +
+                            "]\t" + message;
         if (toFile) {
             ofstream _logFile;
             _logFile.open(LOG_FILE, std::ios_base::app);
@@ -42,15 +42,16 @@ private:
         time(&rawtime);
         timeInfo = localtime(&rawtime);
 
-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d  %H:%M:%S", timeInfo);
         return string(buffer);
     }
     static string _level_to_string(LogLevel level)
     {
         switch (level) {
-            case INFO:  return "INFO";
-            case DEBUG: return "DEBUG";
-            case ERROR: return "ERROR";
+            case INFO:  return string(B "INFO" RE);
+            case DEBUG: return string(M "DEBUG" RE);
+            case ERROR: return string(R "ERROR" RE);
+            default:    return string(W "NULL" RE);
         }
     }
 
