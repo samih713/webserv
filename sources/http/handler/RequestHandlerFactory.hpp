@@ -1,7 +1,7 @@
 #include "DeleteRequestHandler.hpp"
-#include "FindHeaderKey.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
+#include <algorithm>
 
 #ifndef REQUESTHANDLERFACTORY_HPP
 #define REQUESTHANDLERFACTORY_HPP
@@ -15,14 +15,48 @@
  */
 class RequestHandlerFactory {
 public:
-    static IRequestHandler* MakeRequestHandler(METHOD m)
+    static IRequestHandler* MakeRequestHandler(string method)
     {
+        METHOD m = find_method(method);
         switch (m) {
             case GET:    return new GetRequestHandler;
             case DELETE: return new DeleteRequestHandler;
             default:     THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
         }
     }
+
+private:
+    enum METHOD {
+        GET = 0,
+        POST,
+        PUT,
+        DELETE,
+        HEAD,
+        CONNECT,
+        OPTIONS,
+        TRACE,
+        PATCH
+    };
+    static METHOD find_method(string method)
+    {
+        vector<string> methods;
+        init_methods(methods);
+        vector<string>::iterator it = std::find(methods.begin(), methods.end(), method);
+        return static_cast<METHOD>(std::distance(methods.begin(), it));
+    }
+    static void init_methods(vector<string>& methods);
 };
 
+void RequestHandlerFactory::init_methods(vector<string>& methods)
+{
+    methods.push_back("GET");
+    methods.push_back("POST");
+    methods.push_back("PUT");
+    methods.push_back("DELETE");
+    methods.push_back("HEAD");
+    methods.push_back("CONNECT");
+    methods.push_back("OPTIONS");
+    methods.push_back("TRACE");
+    methods.push_back("PATCH");
+};
 #endif // REQUESTHANDLERFACTORY_HPP

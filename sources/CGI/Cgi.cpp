@@ -1,9 +1,9 @@
 #include "Cgi.hpp"
 
-CGI::CGI(const Request& request, const ServerConfig& config) : _body(request.get_body())
+CGI::CGI(const Request& request, const ServerConfig& config)
+    : _body(request.get_body()), _timer(request.timer)
 {
     string resource = request.get_resource();
-
     _filePath       = const_cast<char*>(resource.c_str());
     size_t queryPos = resource.find('?');
     if (queryPos != string::npos) {
@@ -11,7 +11,6 @@ CGI::CGI(const Request& request, const ServerConfig& config) : _body(request.get
         _queryString = resource.substr(queryPos + 1);
     }
     _environment = headers_to_env(request, config);
-    _timer       = request.timer;
 
     // Check if the Python script exists
     //  if (access(_filePath, X_OK) == -1)
@@ -37,10 +36,11 @@ char** CGI::headers_to_env(const Request& request, const ServerConfig& config)
 {
     (void) request; //! used in REQUEST_METHOD but for now its voided for compiler
     vector<string> envStrings;
-    vsp            headers = request.get_headers();
+    HeaderMap      headers = request.get_headers();
 
     // Iterate through headers
-    for (vsp::iterator header = headers.begin(); header != headers.end(); ++header) {
+    for (HeaderMap::iterator header = headers.begin(); header != headers.end(); ++header)
+    {
         string envEntry = header->first + "=" + header->second;
         envStrings.push_back(envEntry);
     }
@@ -84,7 +84,6 @@ string CGI::execute(void)
     int    fd[2];
     int    id;
     string res_body;
-
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {

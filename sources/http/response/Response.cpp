@@ -1,7 +1,6 @@
 #include "Response.hpp"
 #include "Server.hpp"
 #include "debug.hpp"
-#include "enum_utils.hpp"
 
 /**
  * This constant string represents the HTTP version "HTTP/1.1" that is used in the
@@ -105,7 +104,7 @@ void Response::send_response(fd recv_socket) const
     vector<char> message(headerString.begin(), headerString.end());
     // add the body
     message.insert(message.end(), body.begin(), body.end());
-    // send all
+    //! send all but not in a loop, so it doesn't block
     while (bytesSent < message.size()) {
         result = send(recv_socket, &message[bytesSent], message.size() - bytesSent, 0);
         if (result == -1)

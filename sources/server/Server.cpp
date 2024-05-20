@@ -66,14 +66,15 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-    int id;
+    ConnectionManager::check_connection(incoming);
+    Request& r = ConnectionManager::add_connection(incoming, activeSockets);
+	int id;
 
     try {
-        ConnectionManager::check_connection(incoming);
-        Request& r = ConnectionManager::add_connection(incoming, activeSockets);
         r.recv(incoming);
-        if (!r.parse_request(_config))
+        if (!r.process(_config))
             return;
+        DEBUG_MSG(r, Y);
 
         if (r.get_resource().find("/cgi-bin") != string::npos) {
             DEBUG_MSG("Handling CGI", M);
@@ -85,9 +86,9 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 IRequestHandler* handler =
                     RequestHandlerFactory::MakeRequestHandler(r.get_method());
                 Response response = handler->handle_request(r, _cachedPages, _config);
-
                 response.send_response(incoming);
-                r.setCompleted();
+                ConnectionManager::remove_connection(incoming,
+                    activeSockets); // after completing remove
                 delete handler;
                 exit(0);
             }
@@ -96,16 +97,12 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             IRequestHandler* handler =
                 RequestHandlerFactory::MakeRequestHandler(r.get_method());
             Response response = handler->handle_request(r, _cachedPages, _config);
-
             response.send_response(incoming);
-            // r.setCompleted();
+            ConnectionManager::remove_connection(incoming,
+                activeSockets); // after completing remove
             delete handler;
         }
-        r.setCompleted();
-
-    } catch (std::ios_base::failure& f) {
-        DEBUG_MSG(ERR_PARSE, R);
-    } catch (std::exception& error) {
+    } catch (std::exception& e) {
         ConnectionManager::remove_connection(incoming, activeSockets);
         DEBUG_MSG(error.what(), R);
     }
@@ -231,7 +228,7 @@ void Server::kqueue_strat()
                 try {
                     Request req;
                     req.recv(eventList[i].ident);
-                    if (!req.parse_request(_config))
+                    if (!req.process(_config))
                         continue;
 
                     IRequestHandler* handler =

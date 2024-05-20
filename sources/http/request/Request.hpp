@@ -1,3 +1,4 @@
+#include "Header.hpp"
 #include "Message.hpp"
 #include "ServerConfig.hpp"
 #include "TimeOut.hpp"
@@ -8,13 +9,6 @@
 
 static const int BUFFER_SIZE(4096);
 
-// should be mask bits
-static const int NOT_SET(-1);
-static const int NOT_SPECIFIED(0);
-
-static const string ERR_PARSE("Request_parser: failed to parse request");
-
-// Request class to parse an incoming message
 class Request {
 public:
     Request();
@@ -22,45 +16,36 @@ public:
     Request(const Request& other);
 
     void recv(fd socket);
+    bool process(const ServerConfig& config);
 
-    METHOD        get_method() const;
-    const string& get_resource() const;
-    const string& get_body() const;
-    const vsp&    get_headers() const;
+    STATUS_CODE      get_status() const;
+    const string&    get_method() const;
+    const string&    get_resource() const;
+    const string&    get_body() const;
+    const HeaderMap& get_headers() const;
 
-    bool parse_request(const ServerConfig& config);
-
-    bool isCompleted();
-    void setCompleted();
+    void set_status(STATUS_CODE);
 
     TimeOut timer;
 
     friend ostream& operator<<(ostream& os, const Request& r);
 
 private:
-    void parse_body();
-    void parse_header();
-    void apply_config(const ServerConfig& config);
-    void parse_content_length(const string& contentLength);
+    bool        parse_body();
+    bool        parse_chunked_body();
+    void        apply_config(const ServerConfig& config);
+    STATUS_CODE status;
+    Header      header;
 
     stringstream message;
 
-    bool headerReady;
-    bool parsed;
-    bool completed;
-    int  expectedBodySize;
-
-    METHOD method;
-    string resource;
-    string cgiResource;
-    string http_version;
-
-    vsp    header_fields;
-    vsp    trailer_fields;
     string body;
 
     // deleted copy assigment
     void operator=(const Request&);
 };
+
+// errors
+static const string ERR_PARSE("Request_parser: failed to parse request");
 
 #endif // REQUEST_HPP

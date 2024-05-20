@@ -43,14 +43,14 @@ bool endsWith(const string& str, const string& suffix)
 }
 
 
-// TODO resource handling for get-requests, is broken
 const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    vsp    requestHeaders = request.get_headers();
-    string resource       = request.get_resource();
+    HeaderMap requestHeaders = request.get_headers();
+    string    resource       = request.get_resource();
 
 
+    (void) cachedPages;
     add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
     if (restrict_path(resource)) {
@@ -110,7 +110,8 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
             }
             else {
                 // No write permission
-                cerr << "Write permission is not granted for " << resource << endl;
+                std::cerr << "Write permission is not granted for " << resource
+                          << std::endl;
                 status = FORBIDDEN; // Forbidden
             }
         }
@@ -126,7 +127,7 @@ Response DeleteRequestHandler::handle_request(const Request& request,
 {
     DEBUG_MSG("Handling Delete request ... ", B);
 
-    vsp request_headers = request.get_headers();
-    body                = get_resource(request, cachedPages, config);
+    HeaderMap request_headers = request.get_headers();
+    body                      = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

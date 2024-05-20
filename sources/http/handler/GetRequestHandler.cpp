@@ -28,21 +28,29 @@ inline const string find_resource_type(const string& resource)
 }
 
 // TODO resource handling for get-requests, is broken
-const vector<char> GetRequestHandler::get_resource(const Request& request,
+const vector<char> GetRequestHandler::get_resource(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    string       resource    = request.get_resource();
-    string       defaultPage = config.root + "/";
+    HeaderMap    requestHeaders = r.get_headers();
+    string       resource       = r.get_resource();
+    string       defaultPage    = config.root + "/";
     vector<char> body;
 
     if (resource.find('?') != string::npos)
         resource = resource.substr(0, resource.find('?')); // removing query string
 
+    // add_general_headers()
     add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
-    size_t resource_size = 0;
-    status               = OK;
-    if (resource == defaultPage) {
+    ifstream resource_file;
+    size_t   resource_size = 0;
+    status                 = r.get_status();
+
+    // if (status != OK) handle other bad cases
+    //     return body;
+    // a non implemented method is 501
+    //  a URI thats too long is 414
+    if (resource == defaultPage) { //!
         body = cachedPages->home.data;
         add_header(make_pair<string, string>("Content-Type",
             cachedPages->home.contentType.c_str()));
@@ -65,7 +73,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
                 add_header(
                     make_pair<string, string>("Content-Type", resource_type.c_str()));
             if (resource.find("cgi-bin") != string::npos) {
-                CGI cgi(request, config);
+                CGI cgi(r, config);
                 string result = cgi.execute();
                 body          = vector<char>(result.begin(), result.end());
                 add_header(
@@ -97,12 +105,14 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     return body;
 }
 
-Response GetRequestHandler::handle_request(const Request& request,
+
+Response GetRequestHandler::handle_request(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
     DEBUG_MSG("Handling get request ... ", B);
 
-    vsp request_headers = request.get_headers();
-    body                = get_resource(request, cachedPages, config);
+    HeaderMap requestHeaders = r.get_headers();
+    // ! reply to invalid requests
+    body = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);
 }

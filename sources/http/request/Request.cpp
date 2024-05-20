@@ -1,36 +1,24 @@
 #include "Request.hpp"
 #include "debug.hpp"
-#include "enum_utils.hpp"
 
-Request::Request()
-    : message(""), headerReady(false), parsed(false), completed(false),
-      expectedBodySize(NOT_SET)
-{}
+Request::Request() : status(OK) {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : message(other.message.str()), headerReady(other.headerReady), parsed(other.parsed),
-      completed(other.completed), expectedBodySize(other.expectedBodySize),
-      method(other.method), resource(other.resource), http_version(other.http_version),
-      header_fields(other.header_fields), trailer_fields(other.trailer_fields)
-
+    : status(other.status), header(other.header), message(other.message.str()),
+      body(other.body)
 {}
 
 
-METHOD Request::get_method() const
+const string& Request::get_method() const
 {
-    return method;
+    return header.method;
 }
 
-const vsp& Request::get_headers() const
+const HeaderMap& Request::get_headers() const
 {
-    return header_fields;
-}
-
-const string& Request::get_resource() const
-{
-    return resource;
+    return header.fields;
 }
 
 const string& Request::get_body() const
@@ -38,26 +26,31 @@ const string& Request::get_body() const
     return body;
 }
 
-void Request::setCompleted()
+const string& Request::get_resource() const
 {
-    completed = true;
+    return header.resource;
 }
 
-bool Request::isCompleted()
+STATUS_CODE Request::get_status() const
 {
-    return completed;
+    return status;
+}
+
+void Request::set_status(STATUS_CODE s)
+{
+    status = s;
 }
 
 ostream& operator<<(ostream& os, const Request& r)
 {
-    os << "Method: " << enumToString(r.method) << endl;
-    os << "Request-Target: " << r.resource << endl;
-    os << "HTTP-Version: " << r.http_version << endl;
+    os << "Method: " << r.header.method << std::endl;
+    os << "Request-Target: " << r.header.resource << std::endl;
+    os << "HTTP-Version: " << r.header.version << std::endl;
     os << "************ fields *************\n";
-    for (size_t i = 0; i < r.header_fields.size(); i++) {
-        os << "[" << r.header_fields[i].first << "]" << ": " << r.header_fields[i].second
-           << endl;
-    }
+    for (HeaderMap::const_iterator it = r.header.fields.begin();
+         it != r.header.fields.end(); ++it)
+        os << "[" << it->first << "]"
+           << ": " << it->second << std::endl;
     os << "************ body *************\n";
     os << r.body << endl;
     return os;

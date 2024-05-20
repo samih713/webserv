@@ -4,17 +4,22 @@
 /* ---------------------------------- TODO ---------------------------------- */
 
 // SERVER
+// [ ] handle chunked encoding for Responses
 // [ ] resource handling for get-requests, is broken
 // [ ] better option handling
 // [ ] add vector<page> to CachedPages
 // [ ] ensure that the backlog isn't greater than 1024 due to select limitation
+// [ ] client sends an infinite loop test this case
+// [x] handle chunked encoding for Requests
 
 // REQUEST
+// https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
+// [ ] sets status for 400, 501 ... etc
+// [ ] replace all other special characters
 // [ ] better error messages, stream throws no way to know where is error
-// [ ] headers to parse multiple line field-values, and multi-line
-// [ ] need to form proper error response in case of parsing failure
-// [ ] handle chunked encoding
-// [ ] parsing needs to be reviewed for white space parsing
+// [ ] optimizing in case of similar request, no need to parse again
+// [x] handle transfer size
+// [x] headers to parse multiple line field-values, and multi-line
 
 // CGI
 // [ ] fix forking here for sleep
@@ -37,8 +42,9 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> /* superset of previous */
-#include <sstream>
 #include <signal.h>
+#include <sstream>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <sys/select.h>
@@ -62,12 +68,14 @@ using std::ostream;
 using std::ostringstream;
 using std::pair;
 using std::runtime_error;
+using std::stack;
 using std::string;
 using std::stringstream;
 using std::vector;
 /* -------------------------------- TYPEDEFS -------------------------------- */
 // clang-format off
 typedef vector<pair<string, string> > vsp;
+typedef map<string, string> HeaderMap;
 // clang-format on
 // socket_descriptor type
 typedef int fd;

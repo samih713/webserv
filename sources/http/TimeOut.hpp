@@ -1,5 +1,4 @@
 #include <ctime>
-
 #ifndef TIMOUT_HPP
 #define TIMOUT_HPP
 
