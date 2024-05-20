@@ -147,7 +147,7 @@ static const string sample_response =
     "<body><h1>Hello, World!</h1><p>This is a sample webpage.</p></body>\r\n"
     "</html>\r\n";
 
-    
+
 static const std::string sample_request =
     "GET resource/resource HTTP/1.1\r\n" // request-line
     "Host: Linode.com\r\n"               // headers fields

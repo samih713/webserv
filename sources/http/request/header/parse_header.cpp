@@ -20,12 +20,12 @@ void Header::parse_header(stringstream& message)
 void Header::parse_request_line(stringstream& message)
 {
     static const string acceptedVersion("HTTP/1.1");
-    char singleSpace[2] = { 0 };
+    char                singleSpace[2] = { 0 };
 
     std::noskipws(message);
     message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> version;
     if (strcmp(singleSpace, "  ") || acceptedVersion != version)
-		state = BAD;
+        state = BAD;
     validate_terminator(message, CRLF);
     replace_spaces(resource);
 }
@@ -41,7 +41,7 @@ void Header::add_header(stringstream& message)
     std::getline(message, fieldName, ':');
 
     if (fieldName.find(' ') != string::npos)
-		state = BAD;
+        state = BAD;
     to_lower(fieldName);
     fieldValue = get_field_value(message);
 
@@ -97,8 +97,8 @@ void Header::find_content_length(const HeaderMap::const_iterator it)
 {
     if (it == fields.end()) {
         bodySize = NOT_SPECIFIED;
-		return ;
-	}
+        return;
+    }
 
     istringstream length(it->second);
     length.exceptions(std::ios::failbit | std::ios::badbit);
@@ -106,8 +106,8 @@ void Header::find_content_length(const HeaderMap::const_iterator it)
 
     if (!length.eof()) {
         length.setstate(std::ios::failbit);
-		// DEBUG_MSG("failed here", R);
-	}
+        // DEBUG_MSG("failed here", R);
+    }
 }
 
 // helper utils

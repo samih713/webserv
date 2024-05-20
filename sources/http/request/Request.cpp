@@ -49,8 +49,7 @@ ostream& operator<<(ostream& os, const Request& r)
     os << "************ fields *************\n";
     for (HeaderMap::const_iterator it = r.header.fields.begin();
          it != r.header.fields.end(); ++it)
-        os << "[" << it->first << "]"
-           << ": " << it->second << std::endl;
+        os << "[" << it->first << "]" << ": " << it->second << std::endl;
     os << "************ body *************\n";
     os << r.body << endl;
     return os;

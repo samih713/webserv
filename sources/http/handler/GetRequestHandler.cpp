@@ -73,7 +73,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
                 add_header(
                     make_pair<string, string>("Content-Type", resource_type.c_str()));
             if (resource.find("cgi-bin") != string::npos) {
-                CGI cgi(r, config);
+                CGI    cgi(r, config);
                 string result = cgi.execute();
                 body          = vector<char>(result.begin(), result.end());
                 add_header(

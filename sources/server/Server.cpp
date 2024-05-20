@@ -68,7 +68,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
     ConnectionManager::check_connection(incoming);
     Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-	int id;
+    int      id;
 
     try {
         r.recv(incoming);
