@@ -41,6 +41,7 @@ private:
     CachedPages*        _cachedPages;
 
     void handle_connection(fd incoming, fd_set& activeSockets);
+
     /* polling strats */
     void select_strat();
     void kqueue_strat();

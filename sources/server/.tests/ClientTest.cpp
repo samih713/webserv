@@ -4,10 +4,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-const string      crlf("\r\n");
-const string      version("HTTP/1.1");
-const string request("GET /index.html " + version + crlf + crlf);
-#define BUFFER_SIZE 4096
+const string crlf("\r\n");
+const string version("HTTP/1.1");
+// const std::string request("GET /index.html " + version + crlf + crlf);
+#define BUFFER_SIZE 1000
 
 int main()
 {
@@ -32,30 +32,33 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    if (send(sockfd, request.c_str(), strlen(request.c_str()), 0) < 0) {
-        cerr << "Failed to send the message. errno: " << errno << endl;
-        exit(EXIT_FAILURE);
+    int sent(0);
+    int totalSent(0);
+    int lengthTosend = strlen(sample_request.c_str());
+    while (totalSent < lengthTosend) {
+        sent = send(sockfd, sample_request.substr(totalSent).c_str(),
+            lengthTosend - totalSent, 0);
+        if (sent == -1) {
+            cerr << "Failed to send the message. errno: " << errno << endl;
+            exit(EXIT_FAILURE);
+        }
+        totalSent += sent;
     }
     cout << "Message sent to server successfully." << endl;
 
     // Receive a response back from the server
-    char    buffer[BUFFER_SIZE] = { 0 };
-    ssize_t bytesReceived       = 0;
-    ssize_t result              = 0;
+    string response;
+    char   buffer[BUFFER_SIZE + 1] = { 0 };
+    int    bytesReceived           = 0;
 
-    while (1) {
-        result = recv(sockfd, &buffer[bytesReceived], 200, 0);
-        sleep(1);
-        if (result == 0)
+    while (true) {
+        bytesReceived = recv(sockfd, buffer, BUFFER_SIZE, 0);
+        if (bytesReceived <= 0) 
             break;
-        bytesReceived += result;
+        response.append(buffer, bytesReceived);
     }
 
-    if (bytesReceived < 0) {
-        cerr << "Failed to receive the message. errno: " << errno << endl;
-        exit(EXIT_FAILURE);
-    }
-    cout << "Server's response: " << string(buffer, bytesReceived) << endl;
+    cout << "Server's response: " << response << endl;
 
     // Close the connection
     close(sockfd);

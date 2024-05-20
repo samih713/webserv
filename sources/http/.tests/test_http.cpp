@@ -17,7 +17,7 @@ int main()
 #endif // parsing test
 
 #if 0  // basic test
-	METHOD m = GET;
+	string m = GET;
 	string path;
 	string version;
 
@@ -30,7 +30,7 @@ int main()
 	if (line.fail())
 		cout << "Failed to parse" << endl;
 	else {
-		cout << "METHOD is : " << enumToString(m) << endl;
+		cout << "METHOD is : " << m << endl;
 		cout << "PATH is : " << path << endl;
 		cout << "VERSION is : " << version << endl;
 	}

@@ -1,23 +1,26 @@
-#include "../../server/Server.hpp"
 #include "Request.hpp"
+#include "Server.hpp"
 
+static bool find_header_end(const stringstream& message);
+
+// TODO use expectedBodySize in recv instead of during parsing
 /**
- * @brief receives data from the specified socket and processes it. It reads the
- * data into a buffer, checks for any errors, and updates the message accordingly. It also
- * checks if the header is ready to be processed.
+ * @brief Receives data from a socket.
  *
- * @param socket The file descriptor of the socket to receive data from
- * @return The connection status after processing the received data (CLOSE_CONNECTION or
- * KEEP_ALIVE)
+ * This function is responsible for receiving data from a socket and storing it in the
+ * Request object.
  *
- * @throws std::runtime_error if an error occurs during the receive operation
+ * @param socket The file descriptor of the socket to receive data from.
+ *
+ * @throws std::runtime_error if an error occurs during the receive operation.
  */
 void Request::recv(fd socket)
 {
-    char buffer[BUFFER_SIZE] = { 0 };
-    int  bytesReceived;
+    static char buffer[BUFFER_SIZE];
+    int         bytesReceived = 0;
 
-    bytesReceived = ::recv(socket, &buffer[0], BUFFER_SIZE - 1, 0);
+    std::memset(buffer, 0, BUFFER_SIZE);
+    bytesReceived = ::recv(socket, buffer, BUFFER_SIZE, 0);
 
     if (bytesReceived == 0)
         THROW_EXCEPTION_WITH_INFO(R "no data recieved - closing connection" RE);
@@ -25,11 +28,13 @@ void Request::recv(fd socket)
     if (bytesReceived == -1)
         THROW_EXCEPTION_WITH_INFO(R "Recieve failed:" + string(strerror(errno)) + RE);
 
-    if (!message.str().empty())
-        message.str().append(buffer, bytesReceived);
-    else
-        message.str(string(buffer).substr(0, bytesReceived));
+    message << string(buffer, bytesReceived);
 
-    if (message.str().find(CRLF + CRLF) != string::npos)
-        headerReady = true;
+    if (header(NOT_READY) && find_header_end(message))
+        header.state = READY_TO_PARSE;
+}
+
+static bool find_header_end(const stringstream& message)
+{
+    return message.str().find(CRLF + CRLF) != string::npos;
 }

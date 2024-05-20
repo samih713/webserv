@@ -57,25 +57,21 @@ inline void ConnectionManager::remove_connection(fd currentSocket, fd_set& activ
     DEBUG_MSG("Connection closed", L);
 }
 
+
 /**
- * @brief Adds a connection to the connection map by updating the
- * activeSockets set and creating a new Request object or returns an existing one.
- * If the Request object for the connection is already completed remove it
- * and create a new one.
+ * @brief Adds a new connection to the connection manager.
  *
- * @param newConnection The file descriptor of the new connection to be added
- * @param activeSockets The set of active file descriptors for the connections
+ * This function adds a new connection to the connection manager and updates the active
+ * sockets.
  *
- * @return A reference to the Request object
+ * @param newConnection The file descriptor of the new connection.
+ * @param activeSockets The set of active sockets.
+ * @return A reference to the Request object associated with the new connection.
  */
 inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& activeSockets)
 {
     FD_SET(newConnection, &activeSockets);
     Request& r = connectionMap.insert(make_pair(newConnection, Request())).first->second;
-    if (r.isCompleted()) {
-        connectionMap.erase(newConnection);
-        return (connectionMap.insert(make_pair(newConnection, Request())).first->second);
-    }
     r.timer.update_time();
     return (r);
 }
