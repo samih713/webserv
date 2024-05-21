@@ -80,7 +80,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             DEBUG_MSG("Handling CGI", M);
             id = fork();
             if (id == -1)
-                std::cerr << "Error forking process: " << strerror(errno) << std::endl;
+                cerr << "Error forking process: " << strerror(errno) << endl; //!
             else if (id == 0) {
                 // Child process
                 IRequestHandler* handler =

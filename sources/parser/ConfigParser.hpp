@@ -9,7 +9,6 @@
 #define CONFIG_PARSER_HPP
 
 using std::set;
-using std::stack;
 
 #define DIR  1
 #define FILE 2

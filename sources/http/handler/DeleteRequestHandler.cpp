@@ -50,7 +50,6 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     string    resource       = request.get_resource();
 
 
-    (void) cachedPages;
     add_header(make_pair<string, string>("Server", config.serverName.c_str()));
 
     if (restrict_path(resource)) {
@@ -110,8 +109,7 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
             }
             else {
                 // No write permission
-                std::cerr << "Write permission is not granted for " << resource
-                          << std::endl;
+                cerr << "Write permission is not granted for " << resource << endl;
                 status = FORBIDDEN; // Forbidden
             }
         }

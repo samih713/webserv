@@ -148,7 +148,7 @@ static const string sample_response =
     "</html>\r\n";
 
 
-static const std::string sample_request =
+static const string sample_request =
     "GET resource/resource HTTP/1.1\r\n" // request-line
     "Host: Linode.com\r\n"               // headers fields
     "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "

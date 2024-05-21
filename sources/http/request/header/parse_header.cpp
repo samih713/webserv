@@ -49,7 +49,7 @@ void Header::add_header(stringstream& message)
     if (fields.find(fieldName) != fields.end())
         fields.at(fieldName).append(", " + fieldValue);
     else
-        fields.insert(std::make_pair(fieldName, fieldValue));
+        fields.insert(make_pair(fieldName, fieldValue));
 }
 
 void Header::process_fields()
@@ -120,9 +120,9 @@ static string get_field_value(stringstream& message)
     string::size_type begin = fieldValue.find_first_not_of(" ");
     string::size_type end   = fieldValue.find_last_not_of(CRLF);
 
-    if (begin != std::string::npos && end != std::string::npos)
+    if (begin != string::npos && end != string::npos)
         fieldValue = fieldValue.substr(begin, end - begin + 1);
-    else if (begin != std::string::npos)
+    else if (begin != string::npos)
         fieldValue = fieldValue.substr(begin);
 
     return fieldValue;
@@ -132,6 +132,6 @@ static string get_field_value(stringstream& message)
 static void replace_spaces(string& resource)
 {
     size_t pos;
-    while ((pos = resource.find("%20")) != std::string::npos)
+    while ((pos = resource.find("%20")) != string::npos)
         resource.replace(pos, 3, " ");
 }
