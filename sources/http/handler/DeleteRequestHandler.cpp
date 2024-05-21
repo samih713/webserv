@@ -50,14 +50,13 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     string    resource       = request.get_resource();
 
 
-    add_header(make_pair<string, string>("Server", config.serverName.c_str()));
+    add_header(make_pair("Server", config.serverName.c_str()));
 
     if (restrict_path(resource)) {
         status = FORBIDDEN;
-        add_header(make_pair<string, string>("Content-Type",
-            cachedPages->notFound.contentType.c_str()));
-        add_header(make_pair<string, string>("Content-Length",
-            ws_itoa(cachedPages->notFound.contentLength)));
+        add_header(make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
+        add_header(
+            make_pair("Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
         body = cachedPages->notFound.data;
         DEBUG_MSG("Restricted", W);
     }
@@ -72,9 +71,9 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
             else {
                 DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
                 status = NOT_FOUND;
-                add_header(make_pair<string, string>("Content-Type",
-                    cachedPages->notFound.contentType.c_str()));
-                add_header(make_pair<string, string>("Content-Length",
+                add_header(
+                    make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
+                add_header(make_pair("Content-Length",
                     ws_itoa(cachedPages->notFound.contentLength)));
                 body = cachedPages->notFound.data;
             }
@@ -100,9 +99,9 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
                     // Deletion successful
                     DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
                     status = NO_CONTENT;
-                    add_header(make_pair<string, string>("Content-Type",
+                    add_header(make_pair("Content-Type",
                         cachedPages->notFound.contentType.c_str()));
-                    add_header(make_pair<string, string>("Content-Length",
+                    add_header(make_pair("Content-Length",
                         ws_itoa(cachedPages->notFound.contentLength)));
                     body = cachedPages->notFound.data;
                 }

@@ -1,6 +1,7 @@
 #include "DeleteRequestHandler.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
+#include "PostRequestHandler.hpp"
 #include <algorithm>
 
 #ifndef REQUESTHANDLERFACTORY_HPP
@@ -21,7 +22,10 @@ public:
         switch (m) {
             case GET:    return new GetRequestHandler;
             case DELETE: return new DeleteRequestHandler;
-            default:     THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
+            case POST:   return new PostRequestHandler;
+            default:
+                //! return 501 Not implemented
+                THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
         }
     }
 

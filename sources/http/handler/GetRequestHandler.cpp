@@ -40,7 +40,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
         resource = resource.substr(0, resource.find('?')); // removing query string
 
     // add_general_headers()
-    add_header(make_pair<string, string>("Server", config.serverName.c_str()));
+    add_header(make_pair("Server", config.serverName.c_str()));
 
     ifstream resource_file;
     size_t   resource_size = 0;
@@ -52,40 +52,35 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
     //  a URI thats too long is 414
     if (resource == defaultPage) { //!
         body = cachedPages->home.data;
-        add_header(make_pair<string, string>("Content-Type",
-            cachedPages->home.contentType.c_str()));
-        add_header(make_pair<string, string>("Content-Length",
-            ws_itoa(cachedPages->home.contentLength)));
+        add_header(make_pair("Content-Type", cachedPages->home.contentType.c_str()));
+        add_header(make_pair("Content-Length", ws_itoa(cachedPages->home.contentLength)));
     }
     else {
         ifstream resource_file(resource.c_str(), std::ios_base::binary);
         if (resource_file.fail()) {
             status = NOT_FOUND;
-            add_header(make_pair<string, string>("Content-Type",
-                cachedPages->notFound.contentType.c_str()));
-            add_header(make_pair<string, string>("Content-Length",
+            add_header(
+                make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
+            add_header(make_pair("Content-Length",
                 ws_itoa(cachedPages->notFound.contentLength)));
             body = cachedPages->notFound.data;
         }
         else {
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
-                add_header(
-                    make_pair<string, string>("Content-Type", resource_type.c_str()));
+                add_header(make_pair("Content-Type", resource_type.c_str()));
             if (resource.find("cgi-bin") != string::npos) {
                 CGI    cgi(r, config);
                 string result = cgi.execute();
                 body          = vector<char>(result.begin(), result.end());
-                add_header(
-                    make_pair<string, string>("Content-Length", ws_itoa(body.size())));
+                add_header(make_pair("Content-Length", ws_itoa(body.size())));
             }
             else {
                 body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
                     std::istreambuf_iterator<char>());
                 resource_file.seekg(0, std::ios_base::end);
                 resource_size = resource_file.tellg();
-                add_header(
-                    make_pair<string, string>("Content-Length", ws_itoa(resource_size)));
+                add_header(make_pair("Content-Length", ws_itoa(resource_size)));
                 resource_file.seekg(0, std::ios_base::beg);
             }
             // content type

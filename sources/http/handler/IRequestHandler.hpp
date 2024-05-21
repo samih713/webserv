@@ -4,7 +4,7 @@
 #ifndef IRequestHandler_HPP
 #define IRequestHandler_HPP
 
-// interface
+// interface for request handlers
 class IRequestHandler {
 public:
     virtual ~IRequestHandler() { DEBUG_MSG("IRequestHandler destructor called", M); };

@@ -3,6 +3,7 @@
 #ifndef REQUESTHANDLERBASE_HPP
 #define REQUESTHANDLERBASE_HPP
 
+// Base class for request handlers
 class RequestHandlerBase: public IRequestHandler {
 public:
     RequestHandlerBase() {};
@@ -17,4 +18,5 @@ protected:
     vector<char> body;
     vsp          response_headers;
 };
+
 #endif // REQUESTHANDLERBASE_HPP

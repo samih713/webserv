@@ -11,7 +11,7 @@ class PostRequestHandler: public RequestHandlerBase {
 public:
     PostRequestHandler();
     ~PostRequestHandler();
-    Response handle_post_request(const Request& request, const CachedPages* cachedPages,
+    Response handle_request(const Request& request, const CachedPages* cachedPages,
         const ServerConfig& config);
 
 private:
