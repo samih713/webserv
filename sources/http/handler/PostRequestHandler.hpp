@@ -15,6 +15,8 @@ public:
         const ServerConfig& config);
 
 private:
+    void create_resource(const Request& request, const CachedPages* cachedPages,
+        const ServerConfig& config);
 };
 
 #endif // POSTREQUESTHANDLER_HPP
