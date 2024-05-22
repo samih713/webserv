@@ -31,7 +31,6 @@ inline const string find_resource_type(const string& resource)
 const vector<char> GetRequestHandler::get_resource(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    HeaderMap    requestHeaders = r.get_headers();
     string       resource       = r.get_resource();
     string       defaultPage    = config.root + "/";
     vector<char> body; //? data member body exists so why make it again?
@@ -69,7 +68,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
             string resource_type = find_resource_type(resource);
             if (resource_type.length() != 0)
                 add_header(make_pair("Content-Type", resource_type.c_str()));
-            if (resource.find("cgi-bin") != string::npos) { //! cgi check again
+            if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
                 CGI    cgi(r, config);
                 string result = cgi.execute();
                 body          = vector<char>(result.begin(), result.end());
@@ -106,7 +105,6 @@ Response GetRequestHandler::handle_request(const Request& r,
 {
     DEBUG_MSG("Handling GET request ... ", B);
 
-    HeaderMap requestHeaders = r.get_headers(); //? not being used
     // ! reply to invalid requests
     body = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);

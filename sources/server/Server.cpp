@@ -66,11 +66,11 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-    ConnectionManager::check_connection(incoming);
-    Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-    int      id;
-
     try {
+        ConnectionManager::check_connection(incoming);
+        Request& r = ConnectionManager::add_connection(incoming, activeSockets);
+        int      id;
+
         r.recv(incoming);
         if (!r.process(_config))
             return;
@@ -102,7 +102,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 activeSockets); // after completing remove
             delete handler;
         }
-    } catch (std::exception& e) {
+    } catch (std::exception& error) {
         ConnectionManager::remove_connection(incoming, activeSockets);
         DEBUG_MSG(error.what(), R);
     }
