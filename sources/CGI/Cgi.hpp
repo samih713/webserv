@@ -17,7 +17,7 @@ public:
 
 private:
     string  _queryString;
-    char*   _filePath;
+    string  _filePath;
     string  _body;
     char**  _arguments;
     char**  _environment;

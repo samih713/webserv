@@ -4,7 +4,7 @@ CGI::CGI(const Request& request, const ServerConfig& config)
     : _body(request.get_body()), _timer(request.timer)
 {
     string resource = request.get_resource();
-    _filePath       = const_cast<char*>(resource.c_str());
+    _filePath       = resource;
     size_t queryPos = resource.find('?');
     if (queryPos != string::npos) {
         _filePath    = const_cast<char*>(resource.substr(0, queryPos).c_str());
@@ -12,15 +12,8 @@ CGI::CGI(const Request& request, const ServerConfig& config)
     }
     _environment = headers_to_env(request, config);
 
-    // Check if the Python script exists
-    //  if (access(_filePath, X_OK) == -1)
-    //  {
-    //      cerr << "Error: Python script not found or does not have execution
-    //      permission." << endl;
-    //  	return ;
-    //  }
     _arguments    = new char*[2];
-    _arguments[0] = _filePath;
+    _arguments[0] = strdup(_filePath.c_str());
     _arguments[1] = NULL;
 }
 
@@ -29,6 +22,8 @@ CGI::~CGI()
     for (int i = 0; _environment[i] != NULL; ++i)
         delete[] _environment[i];
     delete[] _environment;
+    for (int i = 0; _arguments[i] != NULL; ++i)
+        delete[] _arguments[i];
     delete[] _arguments;
 }
 
@@ -50,7 +45,7 @@ char** CGI::headers_to_env(const Request& request, const ServerConfig& config)
     envStrings.push_back("SERVER_NAME=" + config.serverName);
     envStrings.push_back("SERVER_SOFTWARE=" + config.serverName + "/1.0");
     envStrings.push_back("SERVER_PORT=" + ws_itoa(config.port));
-    envStrings.push_back("REQUEST_URI=" + string(_filePath));
+    envStrings.push_back("REQUEST_URI=" + _filePath);
     envStrings.push_back("PATH_INFO=" + config.locations.at("/cgi-bin").root);
 
     // envStrings.push_back("REQUEST_METHOD=" + request.get_method()); //! returns an ENUM
@@ -104,7 +99,7 @@ string CGI::execute(void)
         close(fd[0]);
         close(fd[1]);
 
-        if (execve(_filePath, _arguments, _environment) == -1) {
+        if (execve(_arguments[0], _arguments, _environment) == -1) {
             cerr << "Error executing execve: " << strerror(errno) << endl;
             _exit(EXIT_FAILURE);
         }
@@ -152,7 +147,6 @@ string CGI::execute(void)
         }
         usleep(100000);
     }
-
 
     close(fd[0]);
     return res_body;
