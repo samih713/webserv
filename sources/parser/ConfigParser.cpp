@@ -206,8 +206,8 @@ void ConfigParser::parse_server_name(string& serverName)
 
 void ConfigParser::parse_root(string& root)
 {
-    ++_itr; // move to root path
-    root = *_itr; //! root should not have a trailing slash
+    ++_itr;                         // move to root path
+    root = *_itr;                   //! root should not have a trailing slash
     if (get_file_type(root) != DIR) //!
         THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
     check_semicolon();

@@ -36,7 +36,8 @@ bool endsWith(const string& str, const string& suffix)
 const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    string resource = request.get_resource();
+    string       resource = request.get_resource();
+    vector<char> body;
 
     add_header(make_pair("Server", config.serverName.c_str()));
 
@@ -110,6 +111,6 @@ Response DeleteRequestHandler::handle_request(const Request& request,
 {
     DEBUG_MSG("Handling Delete request ... ", B);
 
-    body                      = get_resource(request, cachedPages, config);
+    vector<char> body = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

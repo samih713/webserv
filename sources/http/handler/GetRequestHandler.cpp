@@ -31,9 +31,9 @@ inline const string find_resource_type(const string& resource)
 const vector<char> GetRequestHandler::get_resource(const Request& r,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    string       resource       = r.get_resource();
-    string       defaultPage    = config.root + "/";
-    vector<char> body; //? data member body exists so why make it again?
+    string       resource    = r.get_resource();
+    string       defaultPage = config.root + "/";
+    vector<char> body;
 
     if (resource.find('?') != string::npos)
         resource = resource.substr(0, resource.find('?')); // removing query string
@@ -106,6 +106,6 @@ Response GetRequestHandler::handle_request(const Request& r,
     DEBUG_MSG("Handling GET request ... ", B);
 
     // ! reply to invalid requests
-    body = get_resource(r, cachedPages, config);
+    vector<char> body = get_resource(r, cachedPages, config);
     return Response(status, response_headers, body);
 }
