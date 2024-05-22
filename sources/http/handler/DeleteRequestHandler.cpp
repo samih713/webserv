@@ -23,17 +23,7 @@ inline const string find_resource_type(const string& resource)
         file_extension = resource.substr(extension_index + 1);
     else
         file_extension = "";
-    return (fileTypes.find(file_extension)->second);
-}
-
-bool restrict_path(const string& resourcePath)
-{
-    size_t pos = resourcePath.find("..");
-
-    if (pos != string::npos)
-        return (true);
-    else
-        return (false);
+    return fileTypes.find(file_extension)->second;
 }
 
 bool endsWith(const string& str, const string& suffix)
@@ -49,10 +39,9 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     HeaderMap requestHeaders = request.get_headers();
     string    resource       = request.get_resource();
 
-
     add_header(make_pair("Server", config.serverName.c_str()));
 
-    if (restrict_path(resource)) {
+    if (resource.find("..") != string::npos) {
         status = FORBIDDEN;
         add_header(make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
         add_header(
@@ -78,38 +67,36 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
                 body = cachedPages->notFound.data;
             }
         }
-        else
-
-            if (!endsWith(resource, "/"))
-        {
-            // If resource URI does not end with "/", set status code to 409 (Conflict)
-            status = CONFLICT;
-        }
         else {
-            // Check write permissions
-            if (access(resource.c_str(), W_OK) == 0) {
-                // Write permission granted, attempt to delete resource
-                if (remove(resource.c_str()) != 0) {
-                    // Error deleting resource
-                    DEBUG_MSG("Resource '" + resource + "' : [ Error deleting resource ]",
-                        R);
-                    status = INTERNAL_SERVER_ERROR; // Internal Server Error
+            // If resource URI does not end with "/", set status code to 409 (Conflict)
+            if (!endsWith(resource, "/"))
+                status = CONFLICT;
+            else {
+                // Check write permissions
+                if (access(resource.c_str(), W_OK) == 0) {
+                    // Write permission granted, attempt to delete resource
+                    if (remove(resource.c_str()) != 0) {
+                        DEBUG_MSG("Resource '" + resource +
+                                      "' : [ Error deleting resource ]",
+                            R);
+                        status = INTERNAL_SERVER_ERROR; // Internal Server Error
+                    }
+                    else {
+                        // Deletion successful
+                        DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
+                        status = NO_CONTENT;
+                        add_header(make_pair("Content-Type",
+                            cachedPages->notFound.contentType.c_str())); //? why
+                        add_header(make_pair("Content-Length",
+                            ws_itoa(cachedPages->notFound.contentLength))); //? why
+                        body = cachedPages->notFound.data;                  //? why
+                    }
                 }
                 else {
-                    // Deletion successful
-                    DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
-                    status = NO_CONTENT;
-                    add_header(make_pair("Content-Type",
-                        cachedPages->notFound.contentType.c_str()));
-                    add_header(make_pair("Content-Length",
-                        ws_itoa(cachedPages->notFound.contentLength)));
-                    body = cachedPages->notFound.data;
+                    // No write permission
+                    cerr << "Write permission is not granted for " << resource << endl;
+                    status = FORBIDDEN; // Forbidden
                 }
-            }
-            else {
-                // No write permission
-                cerr << "Write permission is not granted for " << resource << endl;
-                status = FORBIDDEN; // Forbidden
             }
         }
     }
@@ -124,7 +111,7 @@ Response DeleteRequestHandler::handle_request(const Request& request,
 {
     DEBUG_MSG("Handling Delete request ... ", B);
 
-    HeaderMap request_headers = request.get_headers();
+    HeaderMap request_headers = request.get_headers(); //? not being used
     body                      = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

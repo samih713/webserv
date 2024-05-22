@@ -76,7 +76,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             return;
         DEBUG_MSG(r, Y);
 
-        if (r.get_resource().find("/cgi-bin") != string::npos) {
+        if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
             DEBUG_MSG("Handling CGI", M);
             id = fork();
             if (id == -1)
