@@ -16,11 +16,11 @@ PostRequestHandler::~PostRequestHandler()
  *
  * if the resource is a directory we create an index.html file in it
  * if the resource is a file we append to it
- * 
+ *
  * Example of POST request:
  * POST /cgi-bin/process.cgi HTTP/1.1
  * POST /path/to/resource HTTP/1.1
-*/
+ */
 void PostRequestHandler::create_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
@@ -32,13 +32,12 @@ void PostRequestHandler::create_resource(const Request& request,
      * - a directory
      * - a cgi script
      * - a non existent resource
-     * 
-     * 
-    */
-   (void) cachedPages;
+     *
+     *
+     */
+    (void) cachedPages;
     (void) config;
     (void) resource;
-    
 }
 
 Response PostRequestHandler::handle_request(const Request& request,

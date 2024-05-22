@@ -14,9 +14,8 @@ public:
     }
 
 protected:
-    STATUS_CODE  status;
-    vector<char> body;
-    vsp          response_headers;
+    STATUS_CODE status;
+    vsp         response_headers;
 };
 
 #endif // REQUESTHANDLERBASE_HPP
