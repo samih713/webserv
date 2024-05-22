@@ -4,7 +4,7 @@ Header::Header() : bodySize(NOT_SPECIFIED), state(NOT_READY), chunked(false) {}
 
 Header::Header(const Header& other)
     : method(other.method), resource(other.resource), version(other.version),
-      cgiResource(other.cgiResource), bodySize(other.bodySize), fields(other.fields),
+      bodySize(other.bodySize), fields(other.fields),
       state(other.state), chunked(other.chunked)
 {}
 

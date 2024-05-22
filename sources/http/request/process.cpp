@@ -2,7 +2,6 @@
 #include "Request.hpp"
 #include <ios>
 
-
 /**
  * @brief Process the HTTP request by parsing the request
  * header and body. It applies the provided server configuration to the request header and
@@ -43,7 +42,23 @@ bool Request::process(const ServerConfig& config)
  */
 void Request::apply_config(const ServerConfig& config)
 {
-    header.resource    = config.root + header.resource;
-    header.cgiResource = config.root + header.resource; // change to cgi root
+    // check if the resource path matches a location
+    string match;
+    for (map<string, Location>::const_iterator location = config.locations.begin();
+         location != config.locations.end(); ++location)
+    {
+        if (header.resource.find(location->first) == 0) {
+            if (location->first.size() > match.size())
+                match = location->first;
+        }
+    }
+
+    // update resource path and body size
+    if (match.empty())
+        header.resource = config.root + header.resource;
+    else {
+        const Location& location = config.locations.at(match);
+        header.resource = location.root + header.resource.substr(match.size());
+    }
     header.bodySize    = std::min(header.bodySize, config.maxBodySize);
 }

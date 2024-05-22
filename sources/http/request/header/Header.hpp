@@ -28,7 +28,6 @@ struct Header {
     string    method;
     string    resource;
     string    version;
-    string    cgiResource;
     size_t    bodySize;
     HeaderMap fields;
 
