@@ -113,7 +113,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 activeSockets); // after completing remove
             delete handler;
         }
-    } catch (std::exception& e) {
+    } catch (std::exception& error) {
         ConnectionManager::remove_connection(incoming, activeSockets);
         DEBUG_MSG(error.what(), R);
     }
