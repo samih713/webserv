@@ -28,10 +28,10 @@ inline const string find_resource_type(const string& resource)
 }
 
 // TODO resource handling for get-requests, is broken
-const vector<char> GetRequestHandler::get_resource(const Request& r,
+const vector<char> GetRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
-    string       resource    = r.get_resource();
+    string       resource    = request.get_resource();
     string       defaultPage = config.root + "/";
     vector<char> body;
 
@@ -41,10 +41,9 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
     // add_general_headers()
     add_header(make_pair("Server", config.serverName.c_str()));
 
-    ifstream resource_file;
-    size_t   resource_size = 0;
-    status                 = r.get_status();
+    size_t resource_size = 0;
 
+    status = request.get_status();
     // if (status != OK) handle other bad cases
     //     return body;
     // a non implemented method is 501
@@ -69,7 +68,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
             if (resource_type.length() != 0)
                 add_header(make_pair("Content-Type", resource_type.c_str()));
             if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
-                CGI    cgi(r, config);
+                CGI    cgi(request, config);
                 string result = cgi.execute();
                 body          = vector<char>(result.begin(), result.end());
                 add_header(make_pair("Content-Length", ws_itoa(body.size())));
@@ -100,12 +99,12 @@ const vector<char> GetRequestHandler::get_resource(const Request& r,
 }
 
 
-Response GetRequestHandler::handle_request(const Request& r,
+Response GetRequestHandler::handle_request(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {
     DEBUG_MSG("Handling GET request ... ", B);
 
     // ! reply to invalid requests
-    vector<char> body = get_resource(r, cachedPages, config);
+    vector<char> body = get_resource(request, cachedPages, config);
     return Response(status, response_headers, body);
 }

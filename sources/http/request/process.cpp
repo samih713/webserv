@@ -43,22 +43,22 @@ bool Request::process(const ServerConfig& config)
 void Request::apply_config(const ServerConfig& config)
 {
     // check if the resource path matches a location
-    string match;
+    string locationMatch;
     for (map<string, Location>::const_iterator location = config.locations.begin();
          location != config.locations.end(); ++location)
     {
         if (header.resource.find(location->first) == 0) {
-            if (location->first.size() > match.size())
-                match = location->first;
+            if (location->first.size() > locationMatch.size())
+                locationMatch = location->first;
         }
     }
 
     // update resource path and body size
-    if (match.empty())
-        header.resource = config.root + header.resource;
+    if (locationMatch.empty())
+        header.resource = config.root + "/" + header.resource;
     else {
-        const Location& location = config.locations.at(match);
-        header.resource          = location.root + header.resource.substr(match.size());
+        const Location& location = config.locations.at(locationMatch);
+        header.resource = location.root + header.resource.substr(locationMatch.size());
     }
     header.bodySize = std::min(header.bodySize, config.maxBodySize);
 }

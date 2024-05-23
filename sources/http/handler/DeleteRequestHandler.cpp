@@ -105,7 +105,6 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     return body;
 }
 
-
 Response DeleteRequestHandler::handle_request(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
 {

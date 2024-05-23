@@ -133,10 +133,7 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
     if (is_keyword(*_itr))
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
-    if (*(root.end() - 1) == '/')
-        indexFile = root + *_itr;
-    else
-        indexFile = root + "/" + *_itr;
+    indexFile = root + "/" + *_itr;
     //! removed index file checking
 
     check_semicolon();
@@ -206,8 +203,10 @@ void ConfigParser::parse_server_name(string& serverName)
 
 void ConfigParser::parse_root(string& root)
 {
-    ++_itr;                         // move to root path
-    root = *_itr;                   //! root should not have a trailing slash
+    ++_itr; // move to root path
+    root = *_itr;
+    if (root[root.size() - 1] == '/') // remove trailing slash
+        root.erase(root.size() - 1);
     if (get_file_type(root) != DIR) //!
         THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
     check_semicolon();
