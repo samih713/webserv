@@ -103,20 +103,26 @@ static string ERR_ACCP("Socket: accept failed");
 static string ERR_MEMORY_ALLOC("Memory: allocation failed");
 
 /* --------------------------- UTILITY FUNCTIONS ---------------------------- */
-#define FILE 2
-#define DIR  1
-#define NO_EXIST 0
-#define NO_PERM -1
-#define UNEXPECTED -2
+enum FileType {
+    REG_FILE = 0,
+    DIR,
+    NO_EXIST,
+    NO_PERM,
+    UNEXPECTED
+};
 
 /**
- * @brief
+ * @brief Determine the type of a given file.
  * 
- * @param file
+ * This function checks the type of a file specified by its path.
+ * It can determine if the file is a regular file, a directory,
+ * if it does not exist, if there is no permission to read/write,
+ * or if it is an unexpected file type.
  * 
- * @return integer indicating type of file or error
-*/
-inline int get_file_type(const string& file)
+ * @param file The path to the file.
+ * @return FileType indicating the type of the file or an error.
+ */
+inline FileType get_file_type(const string& file)
 {
     struct stat fileInfo;
     if (stat(file.c_str(), &fileInfo) == -1)
@@ -128,7 +134,7 @@ inline int get_file_type(const string& file)
     if (S_ISDIR(fileInfo.st_mode))
         return DIR;
     else if (S_ISREG(fileInfo.st_mode))
-        return FILE;
+        return REG_FILE;
 
     return UNEXPECTED;
 }

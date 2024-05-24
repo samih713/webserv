@@ -23,10 +23,10 @@ void Request::recv(fd socket)
     bytesReceived = ::recv(socket, buffer, BUFFER_SIZE, 0);
 
     if (bytesReceived == 0)
-        THROW_EXCEPTION_WITH_INFO(R "no data recieved - closing connection" RE);
+        THROW_EXCEPTION_WITH_INFO(R "no data received - closing connection" RE);
 
     if (bytesReceived == -1)
-        THROW_EXCEPTION_WITH_INFO(R "Recieve failed:" + string(strerror(errno)) + RE);
+        THROW_EXCEPTION_WITH_INFO(R "Receive failed: " + string(strerror(errno)) + RE);
 
     message << string(buffer, bytesReceived);
 

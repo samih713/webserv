@@ -8,7 +8,7 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_EXTENSION);
 
     // check if file exists and is a regular file
-    if (get_file_type(configFile) != FILE)
+    if (get_file_type(configFile) != REG_FILE)
         THROW_EXCEPTION_WITH_INFO(ERR_FILE + configFile);
 
     // open file
