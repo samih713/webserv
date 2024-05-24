@@ -2,16 +2,11 @@
 #include "webserv.hpp"
 #include <limits>
 #include <set>
-#include <stack>
-#include <sys/stat.h>
 
 #ifndef CONFIG_PARSER_HPP
 #define CONFIG_PARSER_HPP
 
 using std::set;
-
-#define DIR  1
-#define FILE 2
 
 // file related error messages
 static const string ERR_FILE_EXTENSION("Config: invalid file extension");
@@ -122,21 +117,6 @@ private:
     bool   parse_autoindex(void);
     void   parse_allow_methods(vector<string>& methods);
 
-    int get_file_type(const string& file)
-    {
-        struct stat fileInfo;
-        if (stat(file.c_str(), &fileInfo) == -1)
-            THROW_EXCEPTION_WITH_INFO(file + ": " + strerror(errno));
-
-        if (access(file.c_str(), R_OK | W_OK) == -1)
-            THROW_EXCEPTION_WITH_INFO(file + ": " + strerror(errno));
-
-        if (S_ISDIR(fileInfo.st_mode))
-            return DIR;
-        else if (S_ISREG(fileInfo.st_mode))
-            return FILE;
-        return -1;
-    }
     bool is_number(const string& str)
     {
         if (str.find_first_not_of("0123456789") != string::npos)

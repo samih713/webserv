@@ -49,6 +49,7 @@
 #include <string>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -100,5 +101,36 @@ static string ERR_NLIST("Socket: not listening");
 static string ERR_ACCP("Socket: accept failed");
 
 static string ERR_MEMORY_ALLOC("Memory: allocation failed");
+
+/* --------------------------- UTILITY FUNCTIONS ---------------------------- */
+#define FILE 2
+#define DIR  1
+#define NO_EXIST 0
+#define NO_PERM -1
+#define UNEXPECTED -2
+
+/**
+ * @brief
+ * 
+ * @param file
+ * 
+ * @return integer indicating type of file or error
+*/
+inline int get_file_type(const string& file)
+{
+    struct stat fileInfo;
+    if (stat(file.c_str(), &fileInfo) == -1)
+        return NO_EXIST;
+
+    if (access(file.c_str(), R_OK | W_OK) == -1)
+        return NO_PERM;
+
+    if (S_ISDIR(fileInfo.st_mode))
+        return DIR;
+    else if (S_ISREG(fileInfo.st_mode))
+        return FILE;
+
+    return UNEXPECTED;
+}
 
 #endif // WEBSERV_HPP
