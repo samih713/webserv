@@ -83,8 +83,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
                 cerr << "Error forking process: " << strerror(errno) << endl; //!
             else if (id == 0) {
                 // Child process
-                IRequestHandler* handler =
-                    RequestHandlerFactory::MakeRequestHandler(r.get_method());
+                IRequestHandler* handler = MakeRequestHandler(r.get_method());
                 Response response = handler->handle_request(r, _cachedPages, _config);
                 response.send_response(incoming);
                 ConnectionManager::remove_connection(incoming,
@@ -94,8 +93,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             }
         }
         else {
-            IRequestHandler* handler =
-                RequestHandlerFactory::MakeRequestHandler(r.get_method());
+            IRequestHandler* handler = MakeRequestHandler(r.get_method());
             Response response = handler->handle_request(r, _cachedPages, _config);
             response.send_response(incoming);
             ConnectionManager::remove_connection(incoming,
@@ -231,8 +229,7 @@ void Server::kqueue_strat()
                     if (!req.process(_config))
                         continue;
 
-                    IRequestHandler* handler =
-                        RequestHandlerFactory::MakeRequestHandler(req.get_method());
+                    IRequestHandler* handler = MakeRequestHandler(req.get_method());
                     Response response =
                         handler->handle_request(req, _cachedPages, _config);
                     response.send_response(eventList[i].ident);

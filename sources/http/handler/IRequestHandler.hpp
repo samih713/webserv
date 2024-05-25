@@ -1,8 +1,8 @@
 #include "Response.hpp"
 #include "Server.hpp"
 
-#ifndef IRequestHandler_HPP
-#define IRequestHandler_HPP
+#ifndef IREQUESTHANDLER_HPP
+#define IREQUESTHANDLER_HPP
 
 // interface for request handlers
 class IRequestHandler {
@@ -12,4 +12,4 @@ public:
         const CachedPages* cachedPages, const ServerConfig& config) = 0;
 };
 
-#endif // IRequestHandler_HPP
+#endif // IREQUESTHANDLER_HPP

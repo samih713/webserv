@@ -1,4 +1,5 @@
 #include "IRequestHandler.hpp"
+#include "FileType.hpp"
 
 #ifndef REQUESTHANDLERBASE_HPP
 #define REQUESTHANDLERBASE_HPP
