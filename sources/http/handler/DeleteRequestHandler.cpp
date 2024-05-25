@@ -15,7 +15,8 @@ DeleteRequestHandler::~DeleteRequestHandler()
 };
 
 // parse accepted formats
-inline const string find_resource_type(const string& resource)
+// ! cause hashim copied the whole file
+static inline const string find_resource_type(const string& resource)
 {
     size_t extension_index = resource.find_last_of('.');
     string file_extension;
