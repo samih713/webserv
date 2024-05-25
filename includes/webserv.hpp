@@ -113,12 +113,12 @@ enum FileType {
 
 /**
  * @brief Determine the type of a given file.
- * 
+ *
  * This function checks the type of a file specified by its path.
  * It can determine if the file is a regular file, a directory,
  * if it does not exist, if there is no permission to read/write,
  * or if it is an unexpected file type.
- * 
+ *
  * @param file The path to the file.
  * @return FileType indicating the type of the file or an error.
  */

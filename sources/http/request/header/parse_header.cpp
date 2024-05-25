@@ -19,12 +19,11 @@ void Header::parse_header(stringstream& message)
 
 void Header::parse_request_line(stringstream& message)
 {
-    static const string acceptedVersion("HTTP/1.1");
-    char                singleSpace[3] = { 0 };
+    char singleSpace[3] = { 0 };
 
     std::noskipws(message);
     message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> version;
-    if (strcmp(singleSpace, "  ") || acceptedVersion != version)
+    if (strcmp(singleSpace, "  ") || version != "HTTP/1.1") //! return 505
         state = BAD;
     validate_terminator(message, CRLF);
     replace_spaces(resource);

@@ -54,7 +54,8 @@ void Request::apply_config(const ServerConfig& config)
         header.resource = config.root + "/" + header.resource;
     else {
         const Location& location = config.locations.at(locationMatch);
-        header.resource = location.root + "/" + header.resource.substr(locationMatch.size());
+        header.resource =
+            location.root + "/" + header.resource.substr(locationMatch.size());
     }
     header.bodySize = std::min(header.bodySize, config.maxBodySize);
 }

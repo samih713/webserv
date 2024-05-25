@@ -3,9 +3,6 @@
 #ifndef FILETYPE_HPP
 #define FILETYPE_HPP
 
-// typedef char supported file extensions
-typedef map<string, string> types_map_t;
-
 static const pair<string, string> init_filetypes[] = {
     make_pair("html", "text/html"),
     make_pair("css", "text/css"),
@@ -28,7 +25,7 @@ static const pair<string, string> init_filetypes[] = {
     make_pair("py", "python"),
 };
 
-static const map<string, string> fileTypes(init_filetypes,
+static const HeaderMap fileTypes(init_filetypes,
     init_filetypes + sizeof(init_filetypes) / sizeof(init_filetypes[0]));
 
 #endif // FILETYPE_HPP
