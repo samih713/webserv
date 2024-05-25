@@ -25,10 +25,7 @@ void Request::recv(fd socket)
     if (bytesReceived == 0)
         THROW_EXCEPTION_WITH_INFO(R "no data recieved - closing connection" RE);
 
-    if (bytesReceived == -1)
-        THROW_EXCEPTION_WITH_INFO(R "Recieve failed:" + string(strerror(errno)) + RE);
-
-    message << string(buffer, bytesReceived);
+    message << string(buffer, bytesReceived > 0 ? bytesReceived : 0);
 
     if (header(NOT_READY) && find_header_end(message))
         header.state = READY_TO_PARSE;

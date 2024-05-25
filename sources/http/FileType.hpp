@@ -26,7 +26,6 @@ static const pair<string, string> init_filetypes[] = {
     make_pair("ico", "image/x-icon"),
     make_pair("sh", "bash"),
     make_pair("py", "python"),
-
 };
 
 static const map<string, string> fileTypes(init_filetypes,
