@@ -1,7 +1,6 @@
 #include "DeleteRequestHandler.hpp"
 #include "CachedPages.hpp"
 #include "Cgi.hpp"
-#include "FileType.hpp"
 #include "debug.hpp"
 
 DeleteRequestHandler::DeleteRequestHandler()
@@ -14,25 +13,11 @@ DeleteRequestHandler::~DeleteRequestHandler()
     DEBUG_MSG("DeleteRequestHandler destructor called", B);
 };
 
-// parse accepted formats
-// ! cause hashim copied the whole file
-static inline const string find_resource_type(const string& resource)
-{
-    size_t extension_index = resource.find_last_of('.');
-    string file_extension;
-    if (extension_index != string::npos)
-        file_extension = resource.substr(extension_index + 1);
-    else
-        file_extension = "";
-    return fileTypes.find(file_extension)->second;
-}
-
 bool endsWith(const string& str, const string& suffix)
 {
     return str.size() >= suffix.size() &&
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
-
 
 const vector<char> DeleteRequestHandler::get_resource(const Request& request,
     const CachedPages* cachedPages, const ServerConfig& config)
