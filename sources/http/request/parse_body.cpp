@@ -17,7 +17,6 @@ static int get_chunk_size(stringstream& message)
     return chunkLength;
 }
 
-
 bool Request::parse_chunked_body()
 {
     static int chunkLength(-1);

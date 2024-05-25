@@ -20,7 +20,7 @@ void Header::parse_header(stringstream& message)
 void Header::parse_request_line(stringstream& message)
 {
     static const string acceptedVersion("HTTP/1.1");
-    char                singleSpace[2] = { 0 };
+    char                singleSpace[3] = { 0 };
 
     std::noskipws(message);
     message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> version;
