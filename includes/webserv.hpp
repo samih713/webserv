@@ -54,6 +54,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
+#if defined(__MAC__)
+#include <sys/event.h>
+#endif
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
 using std::cout;

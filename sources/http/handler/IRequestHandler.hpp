@@ -1,5 +1,6 @@
+#include "CachedPages.hpp"
 #include "Response.hpp"
-#include "Server.hpp"
+#include "ServerConfig.hpp"
 
 #ifndef IREQUEST_HANDLER_HPP
 #define IREQUEST_HANDLER_HPP

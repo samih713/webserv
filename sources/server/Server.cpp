@@ -1,17 +1,5 @@
-/* -------------------------------- INCLUDES -------------------------------- */
 #include "Server.hpp"
-#include "GetRequestHandler.hpp"
-#include "IRequestHandler.hpp"
-#include "Request.hpp"
-#include "RequestHandlerFactory.hpp"
-#include "webserv.hpp"
-#include <algorithm>
-#include <sys/select.h>
-#include <utility>
-#if defined(__MAC__)
-#include <sys/event.h>
-#endif
-/* -------------------------------- INCLUDES -------------------------------- */
+
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
 
@@ -93,8 +81,8 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             }
         }
         else {
-            IRequestHandler* handler = MakeRequestHandler(r.get_method());
-            Response response = handler->handle_request(r, _cachedPages, _config);
+            IRequestHandler* handler  = MakeRequestHandler(r.get_method());
+            Response         response = handler->handle_request(r, _cachedPages, _config);
             response.send_response(incoming);
             ConnectionManager::remove_connection(incoming,
                 activeSockets); // after completing remove
@@ -230,7 +218,7 @@ void Server::kqueue_strat()
                         continue;
 
                     IRequestHandler* handler = MakeRequestHandler(req.get_method());
-                    Response response =
+                    Response         response =
                         handler->handle_request(req, _cachedPages, _config);
                     response.send_response(eventList[i].ident);
                     delete handler;

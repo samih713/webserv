@@ -1,7 +1,5 @@
 #include "Request.hpp"
 #include "RequestHandlerBase.hpp"
-#include "Response.hpp"
-#include "Server.hpp"
 #include "webserv.hpp"
 
 #ifndef GET_REQUEST_HANDLER_HPP
