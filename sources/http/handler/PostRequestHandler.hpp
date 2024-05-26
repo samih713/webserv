@@ -4,8 +4,8 @@
 #include "Server.hpp"
 #include "webserv.hpp"
 
-#ifndef POSTREQUESTHANDLER_HPP
-#define POSTREQUESTHANDLER_HPP
+#ifndef POST_REQUEST_HANDLER_HPP
+#define POST_REQUEST_HANDLER_HPP
 
 class PostRequestHandler: public RequestHandlerBase {
 public:
@@ -13,10 +13,6 @@ public:
     ~PostRequestHandler();
     Response handle_request(const Request& request, const CachedPages* cachedPages,
         const ServerConfig& config);
-
-private:
-    void create_resource(const Request& request, const CachedPages* cachedPages,
-        const ServerConfig& config);
 };
 
-#endif // POSTREQUESTHANDLER_HPP
+#endif // POST_REQUEST_HANDLER_HPP

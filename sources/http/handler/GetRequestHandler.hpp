@@ -4,8 +4,8 @@
 #include "Server.hpp"
 #include "webserv.hpp"
 
-#ifndef GETREQUESTHANDLER_HPP
-#define GETREQUESTHANDLER_HPP
+#ifndef GET_REQUEST_HANDLER_HPP
+#define GET_REQUEST_HANDLER_HPP
 
 class GetRequestHandler: public RequestHandlerBase {
 public:
@@ -19,4 +19,4 @@ private:
         const CachedPages* cachedPages, const ServerConfig& config);
 };
 
-#endif // GETREQUESTHANDLER_HPP
+#endif // GET_REQUEST_HANDLER_HPP

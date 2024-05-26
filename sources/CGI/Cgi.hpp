@@ -1,10 +1,10 @@
-#ifndef CGI_HPP
-#define CGI_HPP
-
 #include "Request.hpp"
 #include "Server.hpp"
 #include "TimeOut.hpp"
 #include "webserv.hpp"
+
+#ifndef CGI_HPP
+#define CGI_HPP
 
 class CGI {
 public:

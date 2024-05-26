@@ -1,5 +1,5 @@
-#ifndef ERROR_HPP
-#define ERROR_HPP
+#ifndef DEBUG_HPP
+#define DEBUG_HPP
 
 /* --------------------------------- COLORS --------------------------------- */
 #define SET_COLOR(color) (std::cout << (color))
@@ -38,4 +38,4 @@
 #define DEBUGASSERT(x)
 #endif // __DEBUG__
 
-#endif // ERROR_HPP
+#endif // DEBUG_HPP

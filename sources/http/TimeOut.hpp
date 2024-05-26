@@ -1,6 +1,7 @@
 #include <ctime>
-#ifndef TIMOUT_HPP
-#define TIMOUT_HPP
+
+#ifndef TIMEOUT_HPP
+#define TIMEOUT_HPP
 
 // default connection time out, this needs to come from the config
 static const time_t DEFAULT_TIMEOUT(10);
@@ -16,4 +17,4 @@ private:
     time_t              lastEvent;
 };
 
-#endif //  TIMOUT_HPP
+#endif //  TIMEOUT_HPP

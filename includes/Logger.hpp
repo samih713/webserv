@@ -1,7 +1,7 @@
+#include "webserv.hpp"
+
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
-
-#include "webserv.hpp"
 
 enum LogLevel {
     INFO = 0,

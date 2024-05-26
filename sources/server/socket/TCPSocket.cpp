@@ -1,9 +1,5 @@
 #include "TCPSocket.hpp"
 
-#ifdef __DEBUG__
-#include <iostream>
-#endif // __DEBUG__
-
 /**
  * @brief Constructor for creating a TCP socket with the specified port and backlog.
  *

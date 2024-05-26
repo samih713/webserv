@@ -1,8 +1,8 @@
-#include "IRequestHandler.hpp"
 #include "FileType.hpp"
+#include "IRequestHandler.hpp"
 
-#ifndef REQUESTHANDLERBASE_HPP
-#define REQUESTHANDLERBASE_HPP
+#ifndef REQUEST_HANDLER_BASE_HPP
+#define REQUEST_HANDLER_BASE_HPP
 
 // Base class for request handlers
 class RequestHandlerBase: public IRequestHandler {
@@ -22,7 +22,7 @@ public:
             file_extension = resource.substr(extension_index + 1);
         else
             file_extension = "";
-         //! need to protect against fail case
+        //! need to protect against fail case
         return fileTypes.find(file_extension)->second;
     }
 
@@ -31,4 +31,4 @@ protected:
     vsp         response_headers;
 };
 
-#endif // REQUESTHANDLERBASE_HPP
+#endif // REQUEST_HANDLER_BASE_HPP
