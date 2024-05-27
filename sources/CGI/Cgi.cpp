@@ -5,11 +5,8 @@ CGI::CGI(const Request& request, const ServerConfig& config)
 {
     string resource = request.get_resource();
     _filePath       = resource;
-    size_t queryPos = resource.find('?');
-    if (queryPos != string::npos) {
-        _filePath    = const_cast<char*>(resource.substr(0, queryPos).c_str());
-        _queryString = resource.substr(queryPos + 1);
-    }
+    if (!request.get_query_string().empty())
+        _queryString = request.get_query_string();
     _environment = headers_to_env(request, config);
 
     _arguments    = new char*[2];

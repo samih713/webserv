@@ -23,6 +23,7 @@ public:
     const string&    get_resource() const;
     const string&    get_body() const;
     const HeaderMap& get_headers() const;
+    const string&    get_query_string() const;
 
     void set_status(STATUS_CODE);
 
@@ -31,15 +32,15 @@ public:
     friend ostream& operator<<(ostream& os, const Request& r);
 
 private:
-    bool        parse_body();
-    bool        parse_chunked_body();
-    void        apply_config(const ServerConfig& config);
-    STATUS_CODE status;
-    Header      header;
+    bool parse_body();
+    bool parse_chunked_body();
+    void apply_config(const ServerConfig& config);
 
+    STATUS_CODE  status;
+    Header       header;
     stringstream message;
-
-    string body;
+    string       body;
+    string       queryString;
 
     // deleted copy assigment
     void operator=(const Request&);

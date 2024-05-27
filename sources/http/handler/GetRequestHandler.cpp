@@ -22,9 +22,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
     string       defaultPage = config.root + "/";
     vector<char> body;
 
-    if (resource.find('?') != string::npos)
-        resource = resource.substr(0, resource.find('?')); // removing query string
-
     // add_general_headers()
     add_header(make_pair("Server", config.serverName.c_str()));
 
