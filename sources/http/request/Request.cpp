@@ -36,6 +36,11 @@ STATUS_CODE Request::get_status() const
     return status;
 }
 
+const string& Request::get_query_string() const
+{
+    return queryString;
+}
+
 void Request::set_status(STATUS_CODE s)
 {
     status = s;
@@ -43,14 +48,15 @@ void Request::set_status(STATUS_CODE s)
 
 ostream& operator<<(ostream& os, const Request& r)
 {
-    os << "Method: " << r.header.method << std::endl;
-    os << "Request-Target: " << r.header.resource << std::endl;
-    os << "HTTP-Version: " << r.header.version << std::endl;
+    os << "Method: " << r.header.method << endl;
+    os << "Request-Target: " << r.header.resource << endl;
+    if (!r.get_query_string().empty())
+        os << "Query: " << r.get_query_string() << endl;
+    os << "HTTP-Version: " << r.header.version << endl;
     os << "************ fields *************\n";
     for (HeaderMap::const_iterator it = r.header.fields.begin();
          it != r.header.fields.end(); ++it)
-        os << "[" << it->first << "]"
-           << ": " << it->second << std::endl;
+        os << "[" << it->first << "]" << ": " << it->second << endl;
     os << "************ body *************\n";
     os << r.body << endl;
     return os;

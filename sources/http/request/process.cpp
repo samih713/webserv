@@ -2,7 +2,6 @@
 #include "Request.hpp"
 #include <ios>
 
-
 /**
  * @brief Process the HTTP request by parsing the request
  * header and body. It applies the provided server configuration to the request header and
@@ -20,6 +19,13 @@ bool Request::process(const ServerConfig& config)
             header.parse_header(message);
             header.state = PARSED;
             apply_config(config);
+
+            // separating resource and query string
+            size_t queryPos = header.resource.find('?');
+            if (queryPos != string::npos) {
+                queryString = header.resource.substr(queryPos + 1);
+                header.resource = header.resource.substr(0, queryPos);
+            }
         }
         if (header(PARSED) && parse_body())
             return true;
@@ -39,7 +45,24 @@ bool Request::process(const ServerConfig& config)
  */
 void Request::apply_config(const ServerConfig& config)
 {
-    header.resource    = config.root + header.resource;
-    header.cgiResource = config.root + header.resource; // change to cgi root
-    header.bodySize    = std::min(header.bodySize, config.maxBodySize);
+    // check if the resource path matches a location
+    string locationMatch;
+    for (map<string, Location>::const_iterator location = config.locations.begin();
+         location != config.locations.end(); ++location)
+    {
+        if (header.resource.find(location->first) == 0) {
+            if (location->first.size() > locationMatch.size())
+                locationMatch = location->first;
+        }
+    }
+
+    // update resource path and body size
+    if (locationMatch.empty())
+        header.resource = config.root + "/" + header.resource;
+    else {
+        const Location& location = config.locations.at(locationMatch);
+        header.resource =
+            location.root + "/" + header.resource.substr(locationMatch.size());
+    }
+    header.bodySize = std::min(header.bodySize, config.maxBodySize);
 }

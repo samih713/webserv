@@ -1,8 +1,14 @@
 #include "CachedPages.hpp"
 #include "ConnectionManager.hpp"
+#include "DeleteRequestHandler.hpp"
+#include "GetRequestHandler.hpp"
+#include "IRequestHandler.hpp"
 #include "Logger.hpp"
+#include "PostRequestHandler.hpp"
+#include "Request.hpp"
 #include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
+#include "webserv.hpp"
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
@@ -30,7 +36,6 @@ public:
         int                                         backLog = DEFAULT_BACKLOG);
     ~Server();
     void start(enum polling_strat);
-    bool check_cgi_request(string res);
 
 protected:
     Server(const ServerConfig& config, int backLog);
@@ -39,6 +44,19 @@ private:
     TCPSocket           _listener;
     const ServerConfig& _config;
     CachedPages*        _cachedPages;
+
+
+    IRequestHandler* MakeRequestHandler(const string& method)
+    {
+        if (method == "GET")
+            return new GetRequestHandler;
+        else if (method == "POST")
+            return new PostRequestHandler;
+        else if (method == "DELETE")
+            return new DeleteRequestHandler;
+        else //! return 501 Not implemented
+            THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
+    }
 
     void handle_connection(fd incoming, fd_set& activeSockets);
 

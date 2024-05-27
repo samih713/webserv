@@ -1,17 +1,5 @@
-/* -------------------------------- INCLUDES -------------------------------- */
 #include "Server.hpp"
-#include "GetRequestHandler.hpp"
-#include "IRequestHandler.hpp"
-#include "Request.hpp"
-#include "RequestHandlerFactory.hpp"
-#include "webserv.hpp"
-#include <algorithm>
-#include <sys/select.h>
-#include <utility>
-#if defined(__MAC__)
-#include <sys/event.h>
-#endif
-/* -------------------------------- INCLUDES -------------------------------- */
+
 
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
 
@@ -32,17 +20,6 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
                             ws_itoa(config.port) + "]",
         INFO);
     return instance;
-}
-
-bool Server::check_cgi_request(string res)
-{
-    // Find the position of the word in the string
-    size_t pos = res.find("cgi-bin");
-
-    if (pos != std::string::npos)
-        return (true);
-    else
-        return (false);
 }
 
 /**
@@ -77,25 +54,24 @@ Server::~Server()
 
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
-    ConnectionManager::check_connection(incoming);
-    Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-	int id;
-
     try {
+        ConnectionManager::check_connection(incoming);
+        Request& r = ConnectionManager::add_connection(incoming, activeSockets);
+        int      id;
+
         r.recv(incoming);
         if (!r.process(_config))
             return;
         DEBUG_MSG(r, Y);
 
-        if (check_cgi_request(r.get_resource())) {
+        if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
+            DEBUG_MSG("Handling CGI", M);
             id = fork();
-            if (id == -1) {
-                std::cerr << "Error forking process: " << strerror(errno) << std::endl;
-            }
+            if (id == -1)
+                cerr << "Error forking process: " << strerror(errno) << endl; //!
             else if (id == 0) {
                 // Child process
-                IRequestHandler* handler =
-                    RequestHandlerFactory::MakeRequestHandler(r.get_method());
+                IRequestHandler* handler = MakeRequestHandler(r.get_method());
                 Response response = handler->handle_request(r, _cachedPages, _config);
                 response.send_response(incoming);
                 ConnectionManager::remove_connection(incoming,
@@ -105,9 +81,8 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             }
         }
         else {
-            IRequestHandler* handler =
-                RequestHandlerFactory::MakeRequestHandler(r.get_method());
-            Response response = handler->handle_request(r, _cachedPages, _config);
+            IRequestHandler* handler  = MakeRequestHandler(r.get_method());
+            Response         response = handler->handle_request(r, _cachedPages, _config);
             response.send_response(incoming);
             ConnectionManager::remove_connection(incoming,
                 activeSockets); // after completing remove
@@ -150,6 +125,7 @@ void Server::select_strat()
         ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
+        //TODO need to implement writeFds
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
@@ -242,9 +218,8 @@ void Server::kqueue_strat()
                     if (!req.process(_config))
                         continue;
 
-                    IRequestHandler* handler =
-                        RequestHandlerFactory::MakeRequestHandler(req.get_method());
-                    Response response =
+                    IRequestHandler* handler = MakeRequestHandler(req.get_method());
+                    Response         response =
                         handler->handle_request(req, _cachedPages, _config);
                     response.send_response(eventList[i].ident);
                     delete handler;

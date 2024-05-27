@@ -1,9 +1,5 @@
 #include "TCPSocket.hpp"
 
-#ifdef __DEBUG__
-#include <iostream>
-#endif // __DEBUG__
-
 /**
  * @brief Constructor for creating a TCP socket with the specified port and backlog.
  *
@@ -17,7 +13,8 @@
  *
  * @throws Socket::Exception if there is an error in creating or setting up the socket.
  */
-TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP) : Socket(family, type, 0, SOCK_FLAG)
+TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP)
+    : Socket(family, type, 0, SOCK_FLAG)
 {
     struct sockaddr_in addr;
     // prep up the struct

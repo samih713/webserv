@@ -87,17 +87,15 @@ int main()
 int main()
 {
 #define X(test_case)                                                                     \
-    do                                                                                   \
-    {                                                                                    \
-        cout << "---- Case[" << test_case << "] -----\n";                           \
+    do {                                                                                 \
+        cout << "---- Case[" << test_case << "] -----\n";                                \
         TCPSocket socket;                                                                \
-		try { \
-			socket.set_port(test_case);                                                      \
-			socket.bind();                                                                   \
-		} \
-		catch (Socket::Exception &se) { \
-			cerr << "Error in port number\n"; \
-		} \
+        try {                                                                            \
+            socket.set_port(test_case);                                                  \
+            socket.bind();                                                               \
+        } catch (Socket::Exception & se) {                                               \
+            cerr << "Error in port number\n";                                            \
+        }                                                                                \
     } while (false);
     TEST_CASES
 #undef X // Clean up the macro definition

@@ -14,7 +14,8 @@ class CachedPages {
 public:
     CachedPages(const ServerConfig& config)
     {
-        // load the error page
+        // TODO: load pages in a more dynamic way since rn this is hardcoded
+        //  load the error page
         ifstream notFoundDefault(config.errorPages.at(NOT_FOUND).c_str(),
             std::ios_base::binary);
         if (notFoundDefault.fail()) {

@@ -1,29 +1,27 @@
-#ifndef CGI_HPP
-#define CGI_HPP
-
 #include "Request.hpp"
 #include "Server.hpp"
 #include "TimeOut.hpp"
-#include "signal.h"
 #include "webserv.hpp"
 
-class Cgi {
+#ifndef CGI_HPP
+#define CGI_HPP
+
+class CGI {
 public:
-    Cgi(const Request& request, const ServerConfig& config);
-    ~Cgi();
-    void    execute(const string& outputFile);
-    char**  headersToEnv(const Request& request, const string res,
-         const ServerConfig& config);
-    TimeOut timer;
-    string  execute(void);
+    CGI(const Request& request, const ServerConfig& config);
+    ~CGI();
+
+    string execute(void);
+    char** headers_to_env(const Request& request, const ServerConfig& config);
+
 
 private:
-    HeaderMap headers;
-    string    queryString;
-    string    filePath;
-    string    body;
-    char**    arguments;
-    char**    environment;
+    string  _queryString;
+    string  _filePath;
+    string  _body;
+    char**  _arguments;
+    char**  _environment;
+    TimeOut _timer;
 };
 
 #endif

@@ -5,7 +5,6 @@
 #define CONFIG_HPP
 
 struct Location {
-    string         uri;
     string         root;
     string         indexFile;
     bool           autoindex;
@@ -24,7 +23,7 @@ struct ServerConfig {
     bool                     autoindex;
     size_t                   maxBodySize;
     map<STATUS_CODE, string> errorPages; //! maybe need default values
-    vector<Location>         locations;
+    map<string, Location>    locations;
 
     ServerConfig()
         : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
@@ -43,21 +42,22 @@ struct ServerConfig {
         cout << "  autoindex: " << (autoindex == true ? "yes" : "no") << endl;
         cout << "  maxBodySize: " << maxBodySize << endl;
         cout << "  locations: [" << endl;
-        for (vector<Location>::const_iterator itr = locations.begin();
+        for (map<string, Location>::const_iterator itr = locations.begin();
              itr != locations.end(); ++itr)
         {
             cout << "    Location {" << endl;
-            cout << "      uri: " << itr->uri << endl;
-            cout << "      root: " << itr->root << endl;
-            cout << "      indexFile: " << indexFile << endl;
-            cout << "      autoindex: " << (autoindex == true ? "yes" : "no") << endl;
-            cout << "      maxBodySize: " << itr->maxBodySize << endl;
+            cout << "      uri: " << itr->first << endl;
+            cout << "      root: " << itr->second.root << endl;
+            cout << "      indexFile: " << itr->second.indexFile << endl;
+            cout << "      autoindex: " << (itr->second.autoindex == true ? "yes" : "no")
+                 << endl;
+            cout << "      maxBodySize: " << itr->second.maxBodySize << endl;
             cout << "      methods: [";
-            for (vector<string>::const_iterator itr2 = itr->methods.begin();
-                 itr2 != itr->methods.end(); ++itr2)
+            for (vector<string>::const_iterator itr2 = itr->second.methods.begin();
+                 itr2 != itr->second.methods.end(); ++itr2)
             {
                 cout << *itr2;
-                if (itr2 + 1 != itr->methods.end())
+                if (itr2 + 1 != itr->second.methods.end())
                     cout << ", ";
             }
             cout << "]" << endl;

@@ -10,7 +10,7 @@
 #include "Cgi.hpp"
 
 
-//using namespace webserv::http;
+// using namespace webserv::http;
 
 
 // int	main(int ac, char **av, char **env)
@@ -37,29 +37,27 @@
 // }
 
 
-
 int main(int argc, char** argv, char** envp)
 {
-	(void)argc;
-	(void)argv;
-	(void)envp;
-	vsp headers;
+    (void) argc;
+    (void) argv;
+    (void) envp;
+    vsp headers;
 
-	// for (int i = 0; envp[i] != NULL; ++i)
+    // for (int i = 0; envp[i] != NULL; ++i)
     // {
     //     cout << envp[i] << endl;
     // }
-	// cout<< endl<<endl;
+    // cout<< endl<<endl;
 
-	//const string outputFile;
+    // const string outputFile;
 
-	string res;
+    string res;
 
-    try
-    {
+    try {
         Request request(sample_request_cgi);
         // headers = request.get_headers();
-		// cout<< endl << request.get_resource()<< endl;
+        // cout<< endl << request.get_resource()<< endl;
 
         // // Print headers
         // cout << "Headers:" << endl;
@@ -69,31 +67,31 @@ int main(int argc, char** argv, char** envp)
         //     cout << it->first << ": " << it->second << endl;
         // }
 
-        Cgi     cgi(request);
+        CGI cgi(request);
 
-		res = cgi.execute();
-		cout << "this return exce CGI : " <<res << endl;
+        res = cgi.execute();
+        cout << "this return exce CGI : " << res << endl;
 
-       //cgi.execute("stds");
-    }
-    catch (runtime_error &e)
-    {
+        // cgi.execute("stds");
+    } catch (runtime_error& e) {
         cerr << e.what() << endl;
     }
 
-    // const char *pythonScriptPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
-    // const char *pythonInterpreterPath = "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
+    // const char *pythonScriptPath =
+    // "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh"; const char
+    // *pythonInterpreterPath =
+    // "/Users/hashim/Desktop/42curses/webserv/CGI/tester/file.sh";
 
     // // Check if the Python script exists
     // if (access(pythonScriptPath, X_OK) == -1)
     // {
-    //     cerr << "Error: Python script not found or does not have execution permission." << endl;
-    //     return 1;
+    //     cerr << "Error: Python script not found or does not have execution permission."
+    //     << endl; return 1;
     // }
 
     // // Create an instance of the CGI class
     // char* scriptArguments[] = { const_cast<char*>(pythonScriptPath), nullptr };
-    // Cgi cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
+    // CGI cgi(const_cast<char*>(pythonInterpreterPath), scriptArguments, envp);
 
     // // Execute the Python script
     // cgi.execute("std");

@@ -1,11 +1,9 @@
 #include "Request.hpp"
 #include "RequestHandlerBase.hpp"
-#include "Response.hpp"
-#include "Server.hpp"
 #include "webserv.hpp"
 
-#ifndef DELETEREQUESTHANDLER_HPP
-#define DELETEREQUESTHANDLER_HPP
+#ifndef DELETE_REQUEST_HANDLER_HPP
+#define DELETE_REQUEST_HANDLER_HPP
 
 class DeleteRequestHandler: public RequestHandlerBase {
 public:
@@ -19,4 +17,4 @@ private:
         const CachedPages* cachedPages, const ServerConfig& config);
 };
 
-#endif // DELETEREQUESTHANDLER_HPP
+#endif // DELETE_REQUEST_HANDLER_HPP

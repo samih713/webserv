@@ -6,8 +6,8 @@
 
 const string crlf("\r\n");
 const string version("HTTP/1.1");
-// const std::string request("GET /index.html " + version + crlf + crlf);
-#define BUFFER_SIZE 1000
+const string request("GET /index.html " + version + crlf + crlf);
+#define BUFFER_SIZE 4096
 
 int main()
 {
@@ -53,7 +53,7 @@ int main()
 
     while (true) {
         bytesReceived = recv(sockfd, buffer, BUFFER_SIZE, 0);
-        if (bytesReceived <= 0) 
+        if (bytesReceived <= 0)
             break;
         response.append(buffer, bytesReceived);
     }
