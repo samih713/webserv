@@ -12,7 +12,7 @@
  * @param backLog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server& Server::get_instance(const ServerConfig& config, int backLog)
+Server& Server::get_instance(ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
     string        host = inet_ntoa(*(struct in_addr*) &config.host);
@@ -33,7 +33,7 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
-Server::Server(const ServerConfig& config, int backLog)
+Server::Server(ServerConfig& config, int backLog)
     : _listener(config.port, backLog, config.host), _config(config),
       _cachedPages(new CachedPages(config))
 {
@@ -125,7 +125,7 @@ void Server::select_strat()
         ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
-        //TODO need to implement writeFds
+        // TODO need to implement writeFds
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;

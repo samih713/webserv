@@ -1,6 +1,6 @@
 # server makefile
 
-SERVER_SRCS:= $(addprefix $(SERVER_DIR)/, socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp Server.cpp)
+SERVER_SRCS:= $(addprefix $(SERVER_DIR)/, socket/Socket.cpp socket/TCPSocket.cpp connection_manager/ConnectionManager.cpp error_pages/error_pages.cpp Server.cpp)
 
 SRCS += $(SERVER_SRCS)
 

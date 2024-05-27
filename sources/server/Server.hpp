@@ -8,6 +8,7 @@
 #include "Request.hpp"
 #include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
+#include "error_pages.hpp"
 #include "webserv.hpp"
 
 #ifndef SERVER_HPP
@@ -32,19 +33,17 @@ static const int MAX_EVENTS(16);
 
 class Server {
 public:
-    static Server& get_instance(const ServerConfig& config,
-        int                                         backLog = DEFAULT_BACKLOG);
+    static Server& get_instance(ServerConfig& config, int backLog = DEFAULT_BACKLOG);
     ~Server();
     void start(enum polling_strat);
 
 protected:
-    Server(const ServerConfig& config, int backLog);
+    Server(ServerConfig& config, int backLog);
 
 private:
-    TCPSocket           _listener;
-    const ServerConfig& _config;
-    CachedPages*        _cachedPages;
-
+    TCPSocket     _listener;
+    ServerConfig& _config;
+    CachedPages*  _cachedPages;
 
     IRequestHandler* MakeRequestHandler(const string& method)
     {
