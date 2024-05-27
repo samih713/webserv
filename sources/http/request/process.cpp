@@ -23,7 +23,7 @@ bool Request::process(const ServerConfig& config)
             // separating resource and query string
             size_t queryPos = header.resource.find('?');
             if (queryPos != string::npos) {
-                queryString = header.resource.substr(queryPos + 1);
+                queryString     = header.resource.substr(queryPos + 1);
                 header.resource = header.resource.substr(0, queryPos);
             }
         }

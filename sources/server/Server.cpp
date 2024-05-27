@@ -125,7 +125,7 @@ void Server::select_strat()
         ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
-        //TODO need to implement writeFds
+        // TODO need to implement writeFds
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;

@@ -17,23 +17,27 @@ Response PostRequestHandler::handle_request(const Request& request,
 
     vector<char>  body;
     const string& resource = request.get_resource();
-    string fileToWrite;
+    string        fileToWrite;
 
     add_header(make_pair("Server", config.serverName.c_str()));
 
     FileType fileType = get_file_type(resource);
     if (fileType == NO_EXIST) {
         // resource does not exist so create it
-    } else if (fileType == NO_PERM) {
+    }
+    else if (fileType == NO_PERM) {
         // resource exists but no permission to write
         // return 403 Forbidden
-    } else if (fileType == REG_FILE) {
+    }
+    else if (fileType == REG_FILE) {
         // resource exists and is a regular file
         // append to file
-    } else if (fileType == DIR) {
+    }
+    else if (fileType == DIR) {
         // resource exists and is a directory
-        // 
-    } else {
+        //
+    }
+    else {
         // unexpected error
     }
     (void) fileType;
