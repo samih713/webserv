@@ -65,19 +65,17 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
                 add_header(make_pair("Content-Length", ws_itoa(resource_size)));
                 resource_file.seekg(0, std::ios_base::beg);
             }
-            // content type
-
-            // content length
         }
     }
     /* authentication function goes here for the requested resource */
     DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
-    /* caching control */
 
-    /* compression/encoding
+    /* // TODO caching control */
+
+    /* // TODO compression/encoding
      * */
 
-    /* support range requests, usefull for large files
+    /* // TODO support range requests, usefull for large files
      * */
     return body;
 }
