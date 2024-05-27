@@ -97,5 +97,5 @@ Response DeleteRequestHandler::handle_request(const Request& request,
     DEBUG_MSG("Handling Delete request ... ", B);
 
     vector<char> body = get_resource(request, cachedPages, config);
-    return Response(status, response_headers, body);
+    return Response(status, responseHeaders, body);
 }

@@ -32,7 +32,7 @@ Response PostRequestHandler::handle_request(const Request& request,
         // append to file
     } else if (fileType == DIR) {
         // resource exists and is a directory
-        // 
+        //
     } else {
         // unexpected error
     }
@@ -40,5 +40,5 @@ Response PostRequestHandler::handle_request(const Request& request,
 
     (void) cachedPages;
 
-    return Response(status, response_headers, body);
+    return Response(status, responseHeaders, body);
 }

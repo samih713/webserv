@@ -11,7 +11,7 @@ public:
     ~RequestHandlerBase() {};
     void add_header(pair<string, string> header_field)
     {
-        response_headers.push_back(header_field);
+        responseHeaders.insert(header_field);
     }
     //! ideally this should be done in Request itself
     const string find_resource_type(const string& resource)
@@ -28,7 +28,7 @@ public:
 
 protected:
     STATUS_CODE status;
-    vsp         response_headers;
+    HeaderMap   responseHeaders;
 };
 
 #endif // REQUEST_HANDLER_BASE_HPP

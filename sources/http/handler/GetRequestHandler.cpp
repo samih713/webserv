@@ -88,5 +88,5 @@ Response GetRequestHandler::handle_request(const Request& request,
 
     // ! reply to invalid requests
     vector<char> body = get_resource(request, cachedPages, config);
-    return Response(status, response_headers, body);
+    return Response(status, responseHeaders, body);
 }
