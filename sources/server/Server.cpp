@@ -15,7 +15,7 @@ Server& Server::get_instance(ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
     string        host = inet_ntoa(*(struct in_addr*) &config.host);
-    LOG_INFO("Server created successfully on port [" + host + ":" + ws_itoa(config.port) + "]");
+    LOG_INFO("Server created on port [" + host + ":" + ws_itoa(config.port) + "]");
     return instance;
 }
 
@@ -55,7 +55,6 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
     try {
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-        // int      id;
 
         r.recv(incoming);
         if (!r.process(_config))
@@ -63,7 +62,7 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
 
         // if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
         //     DEBUG_MSG("Handling CGI", M);
-        //     id = fork();
+        //     int id = fork();
         //     if (id == -1)
         //         cerr << "Error forking process: " << strerror(errno) << endl; //!
         //     else if (id == 0) {
@@ -83,9 +82,8 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
         response.send_response(incoming);
         delete handler;
     } catch (std::exception& error) {
-		LOG_ERROR(error.what());
-        DEBUG_MSG(__FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE
-                           << error.what(), R);
+        LOG_ERROR(error.what()); //! need to think through error cases
+        DEBUG_MSG(__FILE__ << ":" << __LINE__ << ": " << "error: " << error.what(), R);
     }
     ConnectionManager::remove_connection(incoming, activeSockets);
 }

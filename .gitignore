@@ -19,3 +19,4 @@ test_http
 ubuntu_tester
 *.dSYM
 stds
+server_log.txt

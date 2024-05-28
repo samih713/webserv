@@ -61,6 +61,11 @@ $(OBJS_DIR):
 run: re
 	./$(NAME) configs/webserv.conf
 
+log: export CXXFLAGS += -D__LOG_TO_FILE__
+log: fclean
+	@$(MAKE) -se all
+	@echo "$(MAGENTA)$(BOLD)[ LOGGING ]$(RESET) $(NAME) is logging to file."
+
 debug: export CXXFLAGS += $(DEBUGFLAGS)
 debug: fclean
 	@$(MAKE) -se all
