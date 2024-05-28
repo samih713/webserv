@@ -11,7 +11,7 @@ PostRequestHandler::~PostRequestHandler()
 }
 
 Response PostRequestHandler::handle_request(const Request& request, CachedPages& cached,
-    ServerConfig& config)
+    const ServerConfig& config)
 {
     DEBUG_MSG("Handling POST request", W);
 

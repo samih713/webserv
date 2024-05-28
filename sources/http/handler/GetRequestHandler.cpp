@@ -17,7 +17,7 @@ GetRequestHandler::~GetRequestHandler()
 
 // TODO resource handling for get-requests, is broken
 const vector<char> GetRequestHandler::get_resource(const Request& request,
-    CachedPages& cached, ServerConfig& config)
+    CachedPages& cached, const ServerConfig& config)
 {
     // status                = request.get_status();
     status                = INTERNAL_SERVER_ERROR;
@@ -100,7 +100,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& request,
 
 
 Response GetRequestHandler::handle_request(const Request& request, CachedPages& cached,
-    ServerConfig& config)
+    const ServerConfig& config)
 {
     DEBUG_MSG("Handling GET request ... ", B);
 

@@ -9,7 +9,7 @@ class PostRequestHandler: public RequestHandlerBase {
 public:
     PostRequestHandler();
     ~PostRequestHandler();
-    Response handle_request(const Request& request, const CachedPages& cached,
+    Response handle_request(const Request& request, CachedPages& cached,
         const ServerConfig& config);
 };
 

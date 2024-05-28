@@ -9,7 +9,7 @@
 class IRequestHandler {
 public:
     virtual ~IRequestHandler() { DEBUG_MSG("IRequestHandler destructor called", M); };
-    virtual Response handle_request(const Request& request, const CachedPages& cached,
+    virtual Response handle_request(const Request& request, CachedPages& cached,
         const ServerConfig& config) = 0;
 };
 
