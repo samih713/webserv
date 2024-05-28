@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
 
 /**
@@ -56,43 +55,39 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
     try {
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-        int      id;
+        // int      id;
 
         r.recv(incoming);
         if (!r.process(_config))
             return;
-        DEBUG_MSG(r, Y);
 
-        if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
-            DEBUG_MSG("Handling CGI", M);
-            id = fork();
-            if (id == -1)
-                cerr << "Error forking process: " << strerror(errno) << endl; //!
-            else if (id == 0) {
-                // Child process
-                IRequestHandler* handler = MakeRequestHandler(r.get_method());
-                Response response = handler->handle_request(r, _cachedPages, _config);
-                response.send_response(incoming);
-                ConnectionManager::remove_connection(incoming,
-                    activeSockets); // after completing remove
-                delete handler;
-                exit(0);
-            }
-        }
-        else {
-            IRequestHandler* handler  = MakeRequestHandler(r.get_method());
-            Response         response = handler->handle_request(r, _cachedPages, _config);
-            response.send_response(incoming);
-            ConnectionManager::remove_connection(incoming,
-                activeSockets); // after completing remove
-            delete handler;
-        }
+        // if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
+        //     DEBUG_MSG("Handling CGI", M);
+        //     id = fork();
+        //     if (id == -1)
+        //         cerr << "Error forking process: " << strerror(errno) << endl; //!
+        //     else if (id == 0) {
+        //         // Child process
+        //         IRequestHandler* handler = MakeRequestHandler(r.get_method());
+        //         Response response = handler->handle_request(r, *_cachedPages, _config);
+        //         response.send_response(incoming);
+        //         ConnectionManager::remove_connection(incoming,
+        //             activeSockets); // after completing remove
+        //         delete handler;
+        //         exit(0);
+        //     }
+        // }
+        // else {
+        IRequestHandler* handler  = MakeRequestHandler(r.get_method());
+        Response         response = handler->handle_request(r, *_cachedPages, _config);
+        response.send_response(incoming);
+        delete handler;
     } catch (std::exception& error) {
 		LOG_ERROR(error.what());
         DEBUG_MSG(__FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE
                            << error.what(), R);
     }
-        ConnectionManager::remove_connection(incoming, activeSockets);
+    ConnectionManager::remove_connection(incoming, activeSockets);
 }
 
 /* -------------------------------------------------------------------------- */

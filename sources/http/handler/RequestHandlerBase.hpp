@@ -9,10 +9,12 @@ class RequestHandlerBase: public IRequestHandler {
 public:
     RequestHandlerBase() {};
     ~RequestHandlerBase() {};
-    void add_header(pair<string, string> header_field)
+
+    void add_header(const string& headerName, const string& value)
     {
-        responseHeaders.insert(header_field);
+        responseHeaders.insert(make_pair(headerName, value));
     }
+
     //! ideally this should be done in Request itself
     const string find_resource_type(const string& resource)
     {

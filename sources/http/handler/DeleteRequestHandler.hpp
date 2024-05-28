@@ -9,12 +9,12 @@ class DeleteRequestHandler: public RequestHandlerBase {
 public:
     DeleteRequestHandler();
     ~DeleteRequestHandler();
-    Response handle_request(const Request& request, const CachedPages* cachedPages,
+    Response handle_request(const Request& request, const CachedPages& cached,
         const ServerConfig& config);
 
 private:
-    const vector<char> get_resource(const Request& request,
-        const CachedPages* cachedPages, const ServerConfig& config);
+    const vector<char> get_resource(const Request& request, const CachedPages& cached,
+        const ServerConfig& config);
 };
 
 #endif // DELETE_REQUEST_HANDLER_HPP

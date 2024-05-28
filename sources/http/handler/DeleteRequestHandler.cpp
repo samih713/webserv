@@ -20,19 +20,19 @@ bool endsWith(const string& str, const string& suffix)
 }
 
 const vector<char> DeleteRequestHandler::get_resource(const Request& request,
-    const CachedPages* cachedPages, const ServerConfig& config)
+    const CachedPages& cached, const ServerConfig& config)
 {
+    (void) cached;
     string       resource = request.get_resource();
     vector<char> body;
 
-    add_header(make_pair("Server", config.serverName.c_str()));
+    add_header("Server", config.serverName);
 
     if (resource.find("..") != string::npos) {
         status = FORBIDDEN;
-        add_header(make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
-        add_header(
-            make_pair("Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
-        body = cachedPages->notFound.data;
+        // add_header("Content-Type", cached.notFound.contentType);
+        // add_header("Content-Length", ws_itoa(cached.notFound.contentLength));
+        // body = cached.notFound.data;
         DEBUG_MSG("Restricted", W);
     }
     else {
@@ -46,11 +46,9 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
             else {
                 DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
                 status = NOT_FOUND;
-                add_header(
-                    make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
-                add_header(make_pair("Content-Length",
-                    ws_itoa(cachedPages->notFound.contentLength)));
-                body = cachedPages->notFound.data;
+                // add_header("Content-Type", cached.notFound.contentType);
+                // add_header("Content-Length", ws_itoa(cached.notFound.contentLength));
+                // body = cached.notFound.data;
             }
         }
         else {
@@ -71,11 +69,11 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
                         // Deletion successful
                         DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
                         status = NO_CONTENT;
-                        add_header(make_pair("Content-Type",
-                            cachedPages->notFound.contentType.c_str())); //? why
-                        add_header(make_pair("Content-Length",
-                            ws_itoa(cachedPages->notFound.contentLength))); //? why
-                        body = cachedPages->notFound.data;                  //? why
+                        // add_header("Content-Type",
+                        //     cached.notFound.contentType); //? why
+                        // add_header("Content-Length",
+                        //     ws_itoa(cached.notFound.contentLength)); //? why
+                        // body = cached.notFound.data;                 //? why
                     }
                 }
                 else {
@@ -92,10 +90,10 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& request,
 }
 
 Response DeleteRequestHandler::handle_request(const Request& request,
-    const CachedPages* cachedPages, const ServerConfig& config)
+    const CachedPages& cached, const ServerConfig& config)
 {
     DEBUG_MSG("Handling Delete request ... ", B);
 
-    vector<char> body = get_resource(request, cachedPages, config);
+    vector<char> body = get_resource(request, cached, config);
     return Response(status, responseHeaders, body);
 }

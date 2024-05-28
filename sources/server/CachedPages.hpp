@@ -1,55 +1,38 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
 
+
 #ifndef CACHED_PAGES_HPP
 #define CACHED_PAGES_HPP
 
 struct Page {
+    Page() : contentType("text/html"), contentLength(0) {}
+
     vector<char> data;
     string       contentType;
     size_t       contentLength;
 };
 
+/**
+ * pages is a map of page names and their corresponding struct page.
+ * ideally, pages should contain:
+ // cfg
+ *  [index]      = index file data
+ *  [error code] = error page
+*/
 class CachedPages {
 public:
-    CachedPages(const ServerConfig& config)
-    {
-        // TODO: load pages in a more dynamic way since rn this is hardcoded
-        //  load the error page
-        ifstream notFoundDefault(config.errorPages.at(NOT_FOUND).c_str(),
-            std::ios_base::binary);
-        if (notFoundDefault.fail()) {
-            DEBUG_MSG("404 page failed to load", B);
-        }
-        else {
-            /* determine content length */
-            notFoundDefault.seekg(0, std::ios_base::end);
-            notFound.contentLength = notFoundDefault.tellg();
-            notFound.contentType   = "text/html";
-            notFoundDefault.seekg(0, std::ios_base::beg);
-            notFound.data =
-                vector<char>((std::istreambuf_iterator<char>(notFoundDefault)),
-                    std::istreambuf_iterator<char>());
-        }
-        // load the indexDefault page
-        ifstream indexDefault(config.indexFile.c_str(), std::ios_base::binary);
-        if (indexDefault.fail()) {
-            DEBUG_MSG("Index page failed to load", B);
-        }
-        else {
-            /* determine content length */
-            indexDefault.seekg(0, std::ios_base::end);
-            home.contentLength = indexDefault.tellg();
-            indexDefault.seekg(0, std::ios_base::beg);
-            home.contentType = "text/html";
-            home.data = vector<char>((std::istreambuf_iterator<char>(indexDefault)),
-                std::istreambuf_iterator<char>());
-        }
-    }
+    CachedPages(const ServerConfig& config);
     ~CachedPages() { DEBUG_MSG("Cached Pages destructor called", R); }
-    vector<Page> pages;
-    Page         notFound;
-    Page         home;
+
+    Page& get_error_page(STATUS_CODE status);
+    Page& get_page(const string& pageName);
+
+private:
+    //* name, struct Page
+    map<string, Page> pages;
+    bool load_page(const string& path, const string& name);
+    void generate_error_page(STATUS_CODE status);
 };
 
 #endif // CACHED_PAGES_HPP
