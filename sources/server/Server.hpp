@@ -8,7 +8,6 @@
 #include "Request.hpp"
 #include "ServerConfig.hpp"
 #include "TCPSocket.hpp"
-#include "error_pages.hpp"
 #include "webserv.hpp"
 
 #ifndef SERVER_HPP
@@ -29,6 +28,7 @@ static const int DEFAULT_BACKLOG(16);
 static const int SELECTWAITTIME(5);
 // default kqueue wait
 static const int KQUEUEWAITTIME(5);
+// default max events to wait on
 static const int MAX_EVENTS(16);
 
 class Server {
@@ -37,13 +37,12 @@ public:
     ~Server();
     void start(enum polling_strat);
 
-protected:
-    Server(ServerConfig& config, int backLog);
-
 private:
     TCPSocket     _listener;
     ServerConfig& _config;
     CachedPages*  _cachedPages;
+
+    Server(ServerConfig& config, int backLog);
 
     IRequestHandler* MakeRequestHandler(const string& method)
     {

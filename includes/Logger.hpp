@@ -11,6 +11,10 @@ enum LogLevel {
 
 #define LOG_FILE "logfile.txt"
 
+#define LOG_INFO(message) Logger::log_message(message, INFO)
+#define LOG_DEBUG(message) Logger::log_message(message, DEBUG)
+#define LOG_ERROR(message) Logger::log_message(message, ERROR)
+
 class Logger {
 public:
     static void log_message(const string& message, LogLevel level, bool toFile = false)
@@ -18,8 +22,7 @@ public:
         string logMessage = "[" + _get_current_time() + "]\t[" + _level_to_string(level) +
                             "]\t" + message;
         if (toFile) {
-            ofstream _logFile;
-            _logFile.open(LOG_FILE, std::ios_base::app);
+            ofstream _logFile(LOG_FILE, std::ios_base::app);
             if (!_logFile.is_open())
                 THROW_EXCEPTION_WITH_INFO("Log: could not open log file");
 

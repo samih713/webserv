@@ -16,9 +16,7 @@ Server& Server::get_instance(ServerConfig& config, int backLog)
 {
     static Server instance(config, backLog);
     string        host = inet_ntoa(*(struct in_addr*) &config.host);
-    Logger::log_message("Server created successfully on port [" + host + ":" +
-                            ws_itoa(config.port) + "]",
-        INFO);
+    LOG_INFO("Server created successfully on port [" + host + ":" + ws_itoa(config.port) + "]");
     return instance;
 }
 
@@ -52,6 +50,7 @@ Server::~Server()
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
+// TODO this function does not work with kqueue, only select
 void Server::handle_connection(fd incoming, fd_set& activeSockets)
 {
     try {
@@ -89,9 +88,11 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets)
             delete handler;
         }
     } catch (std::exception& error) {
-        ConnectionManager::remove_connection(incoming, activeSockets);
-        DEBUG_MSG(error.what(), R);
+		LOG_ERROR(error.what());
+        DEBUG_MSG(__FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE
+                           << error.what(), R);
     }
+        ConnectionManager::remove_connection(incoming, activeSockets);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -220,7 +221,7 @@ void Server::kqueue_strat()
 
                     IRequestHandler* handler = MakeRequestHandler(req.get_method());
                     Response         response =
-                        handler->handle_request(req, _cachedPages, _config);
+                        handler->handle_request(req, *_cachedPages, _config);
                     response.send_response(eventList[i].ident);
                     delete handler;
                 } catch (std::ios_base::failure& f) {
