@@ -23,13 +23,13 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     vector<char> body;
 
-    add_header("Server", cfg.serverName);
+    _add_header("Server", cfg.serverName);
 
     // default path
     if (resource == (cfg.root + "/")) {
         Page& p = cp.get_page("index");
-        add_header("Content-Type", p.contentType);
-        add_header("Content-Length", ws_itoa(p.contentLength));
+        _add_header("Content-Type", p.contentType);
+        _add_header("Content-Length", ws_itoa(p.contentLength));
         return p.data;
     }
 
@@ -39,21 +39,21 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     // errors
     if (status >= 400)
-        return (get_error_body(status, cp));
+        return (make_error_body(status, cp));
 
-    string resource_type = find_resource_type(resource);
+    string resource_type = find_resource_type(resource); //! doesn't make sense
     if (resource_type.length() != 0)
-        add_header("Content-Type", resource_type);
+        _add_header("Content-Type", resource_type);
     if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
         CGI    cgi(r, cfg);
         string result = cgi.execute();
         body          = vector<char>(result.begin(), result.end());
-        add_header("Content-Length", ws_itoa(body.size()));
+        _add_header("Content-Length", ws_itoa(body.size()));
     }
     else {
         body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
             std::istreambuf_iterator<char>());
-        add_header("Content-Length", ws_itoa(body.size()));
+        _add_header("Content-Length", ws_itoa(body.size()));
     }
 
     /* authentication function goes here for the requested resource */
@@ -67,20 +67,3 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     return body;
 }
-
-/* ------------------------------------------------------------------------- */
-/*                                Constructor                                */
-/* ------------------------------------------------------------------------- */
-GetRequestHandler::GetRequestHandler(ServerConfig& cfg, CachedPages& cp)
-    : RequestHandlerBase(cfg, cp)
-{
-    DEBUG_MSG("GetRequestHandler constructor called", B);
-}
-
-/* ------------------------------------------------------------------------- */
-/*                                 Destructor                                */
-/* ------------------------------------------------------------------------- */
-GetRequestHandler::~GetRequestHandler()
-{
-    DEBUG_MSG("GetRequestHandler destructor called", B);
-};

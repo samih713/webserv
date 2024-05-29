@@ -7,7 +7,7 @@ Response DeleteRequestHandler::handle_request(const Request& r)
 {
     DEBUG_MSG("Handling Delete request ... ", B);
 
-    add_header("Server", cfg.serverName);
+    _add_header("Server", cfg.serverName);
 
     vector<char> body = get_resource(r);
     return Response(status, responseHeaders, body);
@@ -28,45 +28,28 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
     if (resource.find("..") != string::npos || access(resource.c_str(), W_OK) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Forbidden ]");
         status = FORBIDDEN;
-        return (get_error_body(status, cp));
+        return (make_error_body(status, cp));
     }
 
     //? why is this needed for DELETE
     // string resource_type = find_resource_type(resource);
     // if (resource_type.length() != 0)
-    //     add_header("Content-Type", resource_type);
+    //     _add_header("Content-Type", resource_type);
 
     // If resource URI does not end with "/", set status code to 409 (Conflict)
     if (!endsWith(resource, "/")) {
         LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
         status = CONFLICT;
-        return (get_error_body(status, cp));
+        return (make_error_body(status, cp));
     }
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Error deleting resource ]");
         status = INTERNAL_SERVER_ERROR;
-        return (get_error_body(status, cp));
+        return (make_error_body(status, cp));
     }
     LOG_INFO("DELETE: Resource '" + resource + "' : [ Deleted ]");
     status = OK;
-    return get_error_body(status, cp); // Return 200 OK
+    return make_error_body(status, cp); // Return 200 OK
 }
-
-/* ------------------------------------------------------------------------- */
-/*                                Constructor                                */
-/* ------------------------------------------------------------------------- */
-DeleteRequestHandler::DeleteRequestHandler(const ServerConfig& cfg, CachedPages& cp)
-    : RequestHandlerBase(cfg, cp)
-{
-    DEBUG_MSG("DeleteRequestHandler constructor called", B);
-}
-
-/* ------------------------------------------------------------------------- */
-/*                                 Destructor                                */
-/* ------------------------------------------------------------------------- */
-DeleteRequestHandler::~DeleteRequestHandler()
-{
-    DEBUG_MSG("DeleteRequestHandler destructor called", B);
-};

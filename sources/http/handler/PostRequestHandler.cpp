@@ -1,15 +1,5 @@
 #include "PostRequestHandler.hpp"
 
-PostRequestHandler::PostRequestHandler(ServerConfig &cfg, CachedPages &cp) : RequestHandlerBase(cfg, cp)
-{
-    DEBUG_MSG("PostRequestHandler constructor called", B);
-}
-
-PostRequestHandler::~PostRequestHandler()
-{
-    DEBUG_MSG("PostRequestHandler destructor called", B);
-}
-
 Response PostRequestHandler::handle_request(const Request& r)
 {
     DEBUG_MSG("Handling POST request", W);
@@ -18,7 +8,7 @@ Response PostRequestHandler::handle_request(const Request& r)
     const string& resource = r.get_resource();
     string        fileToWrite;
 
-    add_header("Server", cfg.serverName);
+    _add_header("Server", cfg.serverName);
 
     FileType fileType = get_file_type(resource);
     if (fileType == NO_EXIST) {

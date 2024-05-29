@@ -7,8 +7,12 @@
 
 class GetRequestHandler: public RequestHandlerBase {
 public:
-    GetRequestHandler(ServerConfig &cfg, CachedPages &cp);
-    ~GetRequestHandler();
+    GetRequestHandler(ServerConfig& cfg, CachedPages& cp) : RequestHandlerBase(cfg, cp)
+    {
+        DEBUG_MSG("GetRequestHandler constructor called", B);
+    }
+    ~GetRequestHandler() { DEBUG_MSG("GetRequestHandler destructor called", B); }
+
     Response handle_request(const Request& r);
 
 private:

@@ -10,7 +10,7 @@ public:
     RequestHandlerBase(const ServerConfig& cfg, CachedPages& cp) : cfg(cfg), cp(cp) {};
     ~RequestHandlerBase() {};
 
-    void add_header(const string& headerName, const string& headerValue)
+    void _add_header(const string& headerName, const string& headerValue)
     {
         responseHeaders.insert(make_pair(headerName, headerValue));
     }
@@ -26,17 +26,17 @@ public:
         return fileTypes.find(file_extension)->second; //!
     }
 
-    const vector<char>& get_error_body(STATUS_CODE status, CachedPages& cp)
+    const vector<char>& make_error_body(STATUS_CODE status, CachedPages& cp)
     {
         Page& p = cp.get_error_page(status);
-        add_header("Content-Type", p.contentType);
-        add_header("Content-Length", ws_itoa(p.contentLength));
+        _add_header("Content-Type", p.contentType);
+        _add_header("Content-Length", ws_itoa(p.contentLength));
         return p.data;
     }
 
 protected:
-    STATUS_CODE         status;
-    HeaderMap           responseHeaders;
+    STATUS_CODE status;
+    HeaderMap   responseHeaders;
 
     const ServerConfig& cfg;
     CachedPages&        cp;
