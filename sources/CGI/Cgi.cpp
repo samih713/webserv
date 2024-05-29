@@ -1,14 +1,13 @@
 #include "Cgi.hpp"
 
-CGI::CGI(const Request& request, const ServerConfig& config)
+CGI::CGI(const Request& request, const ServerConfig& cfg)
     : _body(request.get_body()), _timer(request.timer)
 {
     string resource = request.get_resource();
     _filePath       = resource;
     if (!request.get_query_string().empty())
         _queryString = request.get_query_string();
-    _environment = headers_to_env(request, config);
-
+    _environment = headers_to_env(request, cfg);
     _arguments    = new char*[2];
     _arguments[0] = strdup(_filePath.c_str());
     _arguments[1] = NULL;
@@ -24,9 +23,8 @@ CGI::~CGI()
     delete[] _arguments;
 }
 
-char** CGI::headers_to_env(const Request& request, const ServerConfig& config)
+char** CGI::headers_to_env(const Request& request, const ServerConfig& cfg)
 {
-    (void) request; //! used in REQUEST_METHOD but for now its voided for compiler
     vector<string> envStrings;
     HeaderMap      headers = request.get_headers();
 
@@ -39,19 +37,19 @@ char** CGI::headers_to_env(const Request& request, const ServerConfig& config)
 
     envStrings.push_back("GATEWAY_INTERFACE=CGI/1.1");
     envStrings.push_back("SERVER_PROTOCOL=HTTP/1.1");
-    envStrings.push_back("SERVER_NAME=" + config.serverName);
-    envStrings.push_back("SERVER_SOFTWARE=" + config.serverName + "/1.0");
-    envStrings.push_back("SERVER_PORT=" + ws_itoa(config.port));
+    envStrings.push_back("SERVER_NAME=" + cfg.serverName);
+    envStrings.push_back("SERVER_SOFTWARE=" + cfg.serverName + "/1.0");
+    envStrings.push_back("SERVER_PORT=" + ws_itoa(cfg.port));
     envStrings.push_back("REQUEST_URI=" + _filePath);
-    envStrings.push_back("PATH_INFO=" + config.locations.at("/cgi-bin").root);
-
-    // envStrings.push_back("REQUEST_METHOD=" + request.get_method()); //! returns an ENUM
+    envStrings.push_back("PATH_INFO=" + cfg.locations.at("/cgi-bin").root);
+    envStrings.push_back("REQUEST_METHOD=" + request.get_method());
 
     // "PATH_TRANSLATED" "REMOTEaddr" "REMOTE_IDENT" "REMOTE_USER"
 
     // https://example.com/path/to/page?name=ferret&color=purple
     // QUERY_STRING=name=ferret color=purple
 
+	// ! Query string is stored already in request
     string envQueryString = "QUERY_STRING=";
     char*  token          = strtok(const_cast<char*>(_queryString.c_str()), "&");
     // Iterate through the tokens and push integers onto the stack

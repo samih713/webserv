@@ -7,12 +7,12 @@
 // Base class for request handlers
 class RequestHandlerBase: public IRequestHandler {
 public:
-    RequestHandlerBase() {};
+    RequestHandlerBase(const ServerConfig& cfg, CachedPages& cp) : cfg(cfg), cp(cp) {};
     ~RequestHandlerBase() {};
 
-    void add_header(const string& headerName, const string& value)
+    void add_header(const string& headerName, const string& headerValue)
     {
-        responseHeaders.insert(make_pair(headerName, value));
+        responseHeaders.insert(make_pair(headerName, headerValue));
     }
 
     //! ideally this should be done in Request itself
@@ -29,8 +29,11 @@ public:
     }
 
 protected:
-    STATUS_CODE status;
-    HeaderMap   responseHeaders;
+    STATUS_CODE         status;
+    HeaderMap           responseHeaders;
+
+    const ServerConfig& cfg;
+    CachedPages&        cp;
 };
 
 #endif // REQUEST_HANDLER_BASE_HPP

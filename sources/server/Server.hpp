@@ -33,25 +33,25 @@ static const int MAX_EVENTS(16);
 
 class Server {
 public:
-    static Server& get_instance(ServerConfig& config, int backLog = DEFAULT_BACKLOG);
+    static Server& get_instance(ServerConfig& cfg, int backLog = DEFAULT_BACKLOG);
     ~Server();
     void start(enum polling_strat);
 
 private:
-    TCPSocket     _listener;
-    ServerConfig& _config;
-    CachedPages*  _cachedPages;
+    TCPSocket     listener;
+    ServerConfig& cfg;
+    CachedPages*  cp;
 
-    Server(ServerConfig& config, int backLog);
+    Server(ServerConfig& cfg, int backLog);
 
-    IRequestHandler* MakeRequestHandler(const string& method)
+    IRequestHandler* make_request_handler(const string& method)
     {
         if (method == "GET")
-            return new GetRequestHandler;
+            return new GetRequestHandler(cfg, *cp);
         else if (method == "POST")
-            return new PostRequestHandler;
+            return new PostRequestHandler(cfg, *cp);
         else if (method == "DELETE")
-            return new DeleteRequestHandler;
+            return new DeleteRequestHandler(cfg, *cp);
         else //! return 501 Not implemented
             THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
     }

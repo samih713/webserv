@@ -22,7 +22,7 @@ struct Page {
 */
 class CachedPages {
 public:
-    CachedPages(const ServerConfig& config);
+    CachedPages(const ServerConfig& cfg);
     ~CachedPages() { DEBUG_MSG("Cached Pages destructor called", R); }
 
     Page& get_error_page(STATUS_CODE status);
@@ -31,8 +31,8 @@ public:
 private:
     //* name, struct Page
     map<string, Page> pages;
-    bool load_page(const string& path, const string& name);
-    void generate_error_page(STATUS_CODE status);
+    bool              load_page(const string& path, const string& name);
+    void              generate_error_page(STATUS_CODE status);
 };
 
 #endif // CACHED_PAGES_HPP

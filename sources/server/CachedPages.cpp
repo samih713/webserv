@@ -26,11 +26,11 @@ const StatusCodeMap status_codes_map = createStatusCodeMap();
 
 // loads all the error pages found in the config,
 // if the loading fails then generate the error page and add it to the map
-CachedPages::CachedPages(const ServerConfig& config)
+CachedPages::CachedPages(const ServerConfig& cfg)
 {
     //  load the error pages in config
-    for (map<STATUS_CODE, string>::const_iterator it = config.errorPages.begin();
-         it != config.errorPages.end(); it++)
+    for (map<STATUS_CODE, string>::const_iterator it = cfg.errorPages.begin();
+         it != cfg.errorPages.end(); it++)
     {
         if (!load_page(it->second, ws_itoa(it->first))) {
             LOG_INFO("Generating error page " + ws_itoa(it->first));
@@ -38,8 +38,8 @@ CachedPages::CachedPages(const ServerConfig& config)
         }
     }
     // load the indexDefault page
-    if (!load_page(config.indexFile, "index"))
-        LOG_ERROR("Failed to load index page " + config.indexFile);
+    if (!load_page(cfg.indexFile, "index"))
+        LOG_ERROR("Failed to load index page " + cfg.indexFile);
 }
 
 bool CachedPages::load_page(const string& path, const string& name)

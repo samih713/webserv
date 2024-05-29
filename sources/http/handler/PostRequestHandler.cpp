@@ -1,6 +1,6 @@
 #include "PostRequestHandler.hpp"
 
-PostRequestHandler::PostRequestHandler()
+PostRequestHandler::PostRequestHandler(ServerConfig &cfg, CachedPages &cp) : RequestHandlerBase(cfg, cp)
 {
     DEBUG_MSG("PostRequestHandler constructor called", B);
 }
@@ -10,16 +10,15 @@ PostRequestHandler::~PostRequestHandler()
     DEBUG_MSG("PostRequestHandler destructor called", B);
 }
 
-Response PostRequestHandler::handle_request(const Request& request, CachedPages& cached,
-    const ServerConfig& config)
+Response PostRequestHandler::handle_request(const Request& r)
 {
     DEBUG_MSG("Handling POST request", W);
 
     vector<char>  body;
-    const string& resource = request.get_resource();
+    const string& resource = r.get_resource();
     string        fileToWrite;
 
-    add_header("Server", config.serverName);
+    add_header("Server", cfg.serverName);
 
     FileType fileType = get_file_type(resource);
     if (fileType == NO_EXIST) {
@@ -42,7 +41,7 @@ Response PostRequestHandler::handle_request(const Request& request, CachedPages&
     }
     (void) fileType;
 
-    (void) cached;
+    (void) cp;
 
     return Response(status, responseHeaders, body);
 }

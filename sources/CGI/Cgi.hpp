@@ -8,12 +8,11 @@
 
 class CGI {
 public:
-    CGI(const Request& request, const ServerConfig& config);
+    CGI(const Request& request, const ServerConfig& cfg);
     ~CGI();
 
     string execute(void);
-    char** headers_to_env(const Request& request, const ServerConfig& config);
-
+    char** headers_to_env(const Request& request, const ServerConfig& cfg);
 
 private:
     string  _queryString;

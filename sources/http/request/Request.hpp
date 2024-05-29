@@ -16,7 +16,7 @@ public:
     Request(const Request& other);
 
     void recv(fd socket);
-    bool process(const ServerConfig& config);
+    bool process(const ServerConfig& cfg);
 
     STATUS_CODE      get_status() const;
     const string&    get_method() const;
@@ -34,7 +34,7 @@ public:
 private:
     bool parse_body();
     bool parse_chunked_body();
-    void apply_config(const ServerConfig& config);
+    void apply_config(const ServerConfig& cfg);
 
     STATUS_CODE  status;
     Header       header;
