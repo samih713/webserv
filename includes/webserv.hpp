@@ -105,41 +105,4 @@ static string ERR_ACCP("Socket: accept failed");
 
 static string ERR_MEMORY_ALLOC("Memory: allocation failed");
 
-/* --------------------------- UTILITY FUNCTIONS ---------------------------- */
-enum FileType {
-    REG_FILE = 0,
-    DIR,
-    NO_EXIST,
-    NO_PERM,
-    UNEXPECTED
-};
-
-/**
- * @brief Determine the type of a given file.
- *
- * This function checks the type of a file specified by its path.
- * It can determine if the file is a regular file, a directory,
- * if it does not exist, if there is no permission to read/write,
- * or if it is an unexpected file type.
- *
- * @param file The path to the file.
- * @return FileType indicating the type of the file or an error.
- */
-inline FileType get_file_type(const string& file)
-{
-    struct stat fileInfo;
-    if (stat(file.c_str(), &fileInfo) == -1)
-        return NO_EXIST;
-
-    if (access(file.c_str(), R_OK | W_OK) == -1)
-        return NO_PERM;
-
-    if (S_ISDIR(fileInfo.st_mode))
-        return DIR;
-    else if (S_ISREG(fileInfo.st_mode))
-        return REG_FILE;
-
-    return UNEXPECTED;
-}
-
 #endif // WEBSERV_HPP

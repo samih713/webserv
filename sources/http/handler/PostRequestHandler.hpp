@@ -11,6 +11,9 @@ public:
     ~PostRequestHandler();
     Response handle_request(const Request& request, const CachedPages* cachedPages,
         const ServerConfig& config);
+
+private:
+    vector<char> process_data(const Request& r);
 };
 
 #endif // POST_REQUEST_HANDLER_HPP

@@ -8,8 +8,16 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_EXTENSION);
 
     // check if file exists and is a regular file
-    if (get_file_type(configFile) != REG_FILE)
+    struct stat fileInfo;
+    if (stat(configFile.c_str(), &fileInfo) == -1)
         THROW_EXCEPTION_WITH_INFO(ERR_FILE + configFile);
+
+    if (S_ISDIR(fileInfo.st_mode))
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE_TYPE);
+
+    // check file permissions
+    if (access(configFile.c_str(), R_OK | W_OK) == -1)
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE_PERM);
 
     // open file
     ifstream file(configFile.c_str());
@@ -207,8 +215,6 @@ void ConfigParser::parse_root(string& root)
     root = *_itr;
     if (root[root.size() - 1] == '/') // remove trailing slash
         root.erase(root.size() - 1);
-    if (get_file_type(root) != DIR) //!
-        THROW_EXCEPTION_WITH_INFO(ERR_ROOT);
     check_semicolon();
 }
 
@@ -316,11 +322,8 @@ void ConfigParser::parse_location_context(ServerConfig& server)
             location.maxBodySize = parse_client_max_body_size();
         else if (*_itr == "allow_methods")
             parse_allow_methods(location.methods);
-        else if (*_itr == "index") {
-            if (get_file_type(location.root + uri) != DIR) //!
-                THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_INDEX);
+        else if (*_itr == "index")
             parse_index(location.indexFile, location.root + uri);
-        }
         else if (*_itr == "autoindex") {
             if (uri == "/cgi-bin") //?
                 THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX_CGI);

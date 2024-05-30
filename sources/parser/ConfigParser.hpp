@@ -11,6 +11,8 @@ using std::set;
 // file related error messages
 static const string ERR_FILE_EXTENSION("Config: invalid file extension");
 static const string ERR_FILE("Config: invalid file ");
+static const string ERR_FILE_TYPE("Config: file is a directory");
+static const string ERR_FILE_PERM("Config: invalid file permissions");
 static const string ERR_OPEN("Config: cannot open file");
 static const string ERR_EMPTY("Config: file is empty");
 

@@ -15,58 +15,46 @@ Response PostRequestHandler::handle_request(const Request& request,
 {
     DEBUG_MSG("Handling POST request", W);
 
-    vector<char>  responseBody;
-    const string& resource = request.get_resource();
-    string        fileToWrite;
-
     // TODO need to check if the body is exceeding max body size
     // TODO need to check type of content
 
+    (void) cachedPages;
+    status = request.get_status();
     add_header(make_pair("Server", config.serverName.c_str()));
 
-    cout << "Resource: " << resource << endl;
+    vector<char> body = process_data(request);
+    return Response(status, response_headers, body);
+}
 
-    FileType fileType = get_file_type(resource);
-    // if (fileType == NO_EXIST) {
-    //     cout << "Resource does not exist" << endl;
-    //     // resource does not exist so create it
-    // }
-    // else 
-    if (fileType == NO_PERM) {
-        cout << "No permission to write" << endl;
-        // resource exists but no permission to write
-        // return 403 Forbidden
-    }
-    else if (fileType == REG_FILE || fileType == NO_EXIST) {
-        cout << "Resource exists and is a regular file" << endl;
-        // resource exists and is a regular file
-        // append to file
-        ofstream outputFile(resource.c_str(), std::ios_base::app);
-        if (!outputFile.is_open()) {
-            // cant open output file
-            //! http code 500 = INTERNAL_SERVER_ERROR
-            THROW_EXCEPTION_WITH_INFO("POST: cannot open file"); //!
-        }
-        outputFile << request.get_body();
-        outputFile.close();
+vector<char> PostRequestHandler::process_data(const Request& r)
+{
+    const string& resource    = r.get_resource();
+    const string& requestBody = r.get_body();
+    vector<char>  responseBody;
 
-        status = OK;
-        //! build request body
-        string successMsg = "POST request was successful.";
-        responseBody.assign(successMsg.begin(), successMsg.end());
-        add_header(make_pair("Content-Length", ws_itoa(responseBody.size())));
-        add_header(make_pair("Content-Type", "text/html;"));
-    }
-    else if (fileType == DIR) {
-        cout << "Resource exists and is a directory" << endl;
-        // resource exists and is a directory
-    }
-    else {
-        cout << "Unexpected error" << endl;
-        // unexpected error
+    if (requestBody.empty()) {
+        status = BAD_REQUEST;
+        responseBody.push_back('b'); //! placeholder
+        return responseBody;
     }
 
-    (void) cachedPages;
+    // append to file
+    ofstream outputFile(resource.c_str(), std::ios_base::app);
+    if (!outputFile.is_open()) {
+        // cant open output file
+        status = INTERNAL_SERVER_ERROR;
+        responseBody.push_back('i'); //! placeholder
+        return responseBody;
+    }
+    outputFile << requestBody;
+    outputFile.close();
 
-    return Response(status, response_headers, responseBody);
+    status = OK;
+    //! build response body
+    string successMsg = "POST request was successful.";
+    responseBody.assign(successMsg.begin(), successMsg.end());
+    add_header(make_pair("Content-Length", ws_itoa(responseBody.size())));
+    add_header(make_pair("Content-Type", "text/html;"));
+
+    return responseBody;
 }
