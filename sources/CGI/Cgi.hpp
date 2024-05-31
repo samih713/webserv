@@ -8,11 +8,10 @@
 
 class CGI {
 public:
-    CGI(const Request& request, const ServerConfig& cfg);
+    CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp);
     ~CGI();
 
-    string execute(void);
-    char** headers_to_env(const Request& request, const ServerConfig& cfg);
+    vector<char> execute(void);
 
 private:
     string  _queryString;
@@ -21,6 +20,10 @@ private:
     char**  _arguments;
     char**  _environment;
     TimeOut _timer;
+
+    CachedPages& _cp;
+
+    char** set_environment(const Request& request, const ServerConfig& cfg);
 };
 
 #endif

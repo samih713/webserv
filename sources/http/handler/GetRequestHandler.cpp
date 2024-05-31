@@ -45,9 +45,8 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
     if (resource_type.length() != 0)
         _add_header("Content-Type", resource_type);
     if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
-        CGI    cgi(r, cfg);
-        string result = cgi.execute();
-        body          = vector<char>(result.begin(), result.end());
+        CGI cgi(r, cfg, cp);
+        body = cgi.execute();
         _add_header("Content-Length", ws_itoa(body.size()));
     }
     else {

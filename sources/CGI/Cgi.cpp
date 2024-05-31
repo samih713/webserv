@@ -1,13 +1,13 @@
 #include "Cgi.hpp"
 
-CGI::CGI(const Request& request, const ServerConfig& cfg)
-    : _body(request.get_body()), _timer(request.timer)
+CGI::CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp)
+    : _body(request.get_body()), _timer(request.timer), _cp(cp)
 {
     string resource = request.get_resource();
     _filePath       = resource;
     if (!request.get_query_string().empty())
         _queryString = request.get_query_string();
-    _environment = headers_to_env(request, cfg);
+    _environment  = set_environment(request, cfg);
     _arguments    = new char*[2];
     _arguments[0] = strdup(_filePath.c_str());
     _arguments[1] = NULL;
@@ -23,7 +23,7 @@ CGI::~CGI()
     delete[] _arguments;
 }
 
-char** CGI::headers_to_env(const Request& request, const ServerConfig& cfg)
+char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
 {
     vector<string> envStrings;
     HeaderMap      headers = request.get_headers();
@@ -49,14 +49,14 @@ char** CGI::headers_to_env(const Request& request, const ServerConfig& cfg)
     // https://example.com/path/to/page?name=ferret&color=purple
     // QUERY_STRING=name=ferret color=purple
 
-	// ! Query string is stored already in request
-    string envQueryString = "QUERY_STRING=";
-    char*  token          = strtok(const_cast<char*>(_queryString.c_str()), "&");
-    // Iterate through the tokens and push integers onto the stack
-    while (token != NULL) {
-        envStrings.push_back(token);
-        token = strtok(NULL, "&");
-    }
+    //! this needs to be looked at
+    // string envQueryString = "QUERY_STRING=";
+    // char*  token          = strtok(const_cast<char*>(_queryString.c_str()), "&");
+    // // Iterate through the tokens and push
+    // while (token != NULL) {
+    //     envQueryString.push_back(token);
+    //     token = strtok(NULL, "&");
+    // }
 
     // Allocate memory for char* array
     char** envp = new char*[envStrings.size() + 1];
@@ -69,24 +69,24 @@ char** CGI::headers_to_env(const Request& request, const ServerConfig& cfg)
     return envp;
 }
 
-string CGI::execute(void)
+vector<char> CGI::execute(void)
 {
-    int    fd[2];
-    int    id;
-    string res_body;
+    int          fd[2];
+    int          id;
+    vector<char> body;
 
     // Create a pipe for communication
     if (pipe(fd) == -1) {
-        cerr << "Error creating pipe: " << strerror(errno) << endl;
-        return NULL;
+        LOG_ERROR("CGI: Error creating pipe: " + string(strerror(errno)));
+        return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
     }
 
     // Fork the process
     // TODO fix forking here for sleep
     id = fork();
     if (id == -1) {
-        cerr << "Error forking process: " << strerror(errno) << endl;
-        return NULL;
+        LOG_ERROR("CGI: Error forking process: " + string(strerror(errno)));
+        return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
     }
     else if (id == 0) {
         // Child process
@@ -95,7 +95,7 @@ string CGI::execute(void)
         close(fd[1]);
 
         if (execve(_arguments[0], _arguments, _environment) == -1) {
-            cerr << "Error executing execve: " << strerror(errno) << endl;
+            LOG_ERROR("CGI: Error executing execve: " + string(strerror(errno)));
             _exit(EXIT_FAILURE);
         }
     }
@@ -108,8 +108,7 @@ string CGI::execute(void)
     while (true) {
         // Check if the timeout duration has been reached
         if (_timer.is_timeout()) {
-            cerr << "Timeout reached. Exiting." << endl;
-            // Terminate the child process
+            LOG_INFO("Timeout reached. Exiting." + string(strerror(errno)));
             kill(id, SIGTERM);
             break;
         }
@@ -121,20 +120,20 @@ string CGI::execute(void)
             char    buffer[1024]; //!
             ssize_t bytesRead = read(fd[0], buffer, sizeof(buffer));
             if (bytesRead > 0) {
-                res_body.append(buffer, bytesRead);
+                body.insert(body.end(), buffer, buffer + bytesRead);
             }
             else if (bytesRead == 0) {
                 break;
             }
             else {
-                // Error while reading from the pipe
+                //! Error while reading from the pipe
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
                     // No data available yet, continue waiting
                     usleep(100000);
                     continue;
                 }
                 else {
-                    cerr << "Error reading from pipe: " << strerror(errno) << endl;
+					LOG_ERROR("CGI: Error reading from pipe: " + string(strerror(errno)));
                     break;
                 }
             }
@@ -144,5 +143,5 @@ string CGI::execute(void)
     }
 
     close(fd[0]);
-    return res_body;
+    return body;
 }
