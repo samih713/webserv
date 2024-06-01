@@ -68,7 +68,7 @@ Response::Response(const Response& other)
 // TODO move to its own file
 inline void Response::load_status_line(ostringstream& os) const
 {
-	DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
+    DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
     os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
 }
 
