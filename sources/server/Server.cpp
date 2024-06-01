@@ -1,24 +1,21 @@
 #include "Server.hpp"
 
-
 /* ------------------------------- CONSTRUCTOR ------------------------------ */
 
 /**
  * @brief Returns the singleton instance of the Server class,
  * creating it if necessary.
  *
- * @param config reference to config object, containing root,
+ * @param cfg reference to ServerConfig object, containing root,
  * default, error pages ... etc
  * @param backLog The maximum length of the queue of pending connections
  * @return A reference to the singleton instance of the Server class
  */
-Server& Server::get_instance(const ServerConfig& config, int backLog)
+Server& Server::get_instance(ServerConfig& cfg, int backLog)
 {
-    static Server instance(config, backLog);
-    string        host = inet_ntoa(*(struct in_addr*) &config.host);
-    Logger::log_message("Server created successfully on port [" + host + ":" +
-                            ws_itoa(config.port) + "]",
-        INFO);
+    static Server instance(cfg, backLog);
+    string        host = inet_ntoa(*(struct in_addr*) &cfg.host);
+    LOG_INFO("Server created on port [" + host + ":" + ws_itoa(cfg.port) + "]");
     return instance;
 }
 
@@ -28,14 +25,13 @@ Server& Server::get_instance(const ServerConfig& config, int backLog)
  * This constructor initializes a Server object with the provided configuration and
  * backlog.
  *
- * @param config The configuration settings for the server.
+ * @param cfg The configuration settings for the server.
  * @param backLog The maximum length of the queue of pending connections.
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
-Server::Server(const ServerConfig& config, int backLog)
-    : _listener(config.port, backLog, config.host), _config(config),
-      _cachedPages(new CachedPages(config))
+Server::Server(ServerConfig& cfg, int backLog)
+    : listener(cfg.port, backLog, cfg.host), cfg(cfg), cp(new CachedPages(cfg))
 {
     DEBUG_MSG("Server was created successfully", B);
 }
@@ -47,50 +43,48 @@ Server::Server(const ServerConfig& config, int backLog)
  */
 Server::~Server()
 {
-    delete _cachedPages;
+    delete cp;
 }
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
-void Server::handle_connection(fd incoming, fd_set& activeSockets)
+// TODO this function does not work with kqueue, only select
+void Server::handle_connection(fd incoming, fd_set& activeSockets,
+    fd& maxSocketDescriptor)
 {
     try {
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
-        int      id;
 
         r.recv(incoming);
-        if (!r.process(_config))
+        if (!r.process(cfg)) //? should each request be paired with location?
             return;
-        DEBUG_MSG(r, Y);
 
-        if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
-            DEBUG_MSG("Handling CGI", M);
-            id = fork();
-            if (id == -1)
-                cerr << "Error forking process: " << strerror(errno) << endl; //!
-            else if (id == 0) {
-                // Child process
-                IRequestHandler* handler = MakeRequestHandler(r.get_method());
-                Response response = handler->handle_request(r, _cachedPages, _config);
-                response.send_response(incoming);
-                ConnectionManager::remove_connection(incoming,
-                    activeSockets); // after completing remove
-                delete handler;
-                exit(0);
-            }
+        IRequestHandler* handler = make_request_handler(r.get_method());
+        // ! need to check if request is allowed for specific resource
+        Response response = handler->handle_request(r);
+
+        if (r.cgiStatus == IN_PROCESS) {
+            r.cgiStatus = TEMP; // set to temp to avoid double processing
+            r.cgiClient = incoming;
+            ConnectionManager::add_cgi_connection(r, activeSockets, maxSocketDescriptor);
+            return; //* to not send response and not close connection
         }
-        else {
-            IRequestHandler* handler  = MakeRequestHandler(r.get_method());
-            Response         response = handler->handle_request(r, _cachedPages, _config);
+        else if (r.cgiStatus == COMPLETED) {
+            LOG_DEBUG("CGI is completed, sending response");
+            response.send_response(r.cgiClient);
+            ConnectionManager::remove_connection(r.cgiClient, activeSockets);
+            ConnectionManager::remove_connection(r.cgiReadFd, activeSockets);
+        }
+        else if (r.cgiStatus == NOT_SET) {
             response.send_response(incoming);
-            ConnectionManager::remove_connection(incoming,
-                activeSockets); // after completing remove
-            delete handler;
+            ConnectionManager::remove_connection(incoming, activeSockets);
         }
+        delete handler;
     } catch (std::exception& error) {
+        //! need to think through error cases
+        LOG_ERROR("Server: " + string(error.what()));
         ConnectionManager::remove_connection(incoming, activeSockets);
-        DEBUG_MSG(error.what(), R);
     }
 }
 
@@ -108,7 +102,7 @@ void Server::select_strat()
     struct timeval selectTimeOut = { .tv_sec = SELECTWAITTIME, .tv_usec = 0 };
 
     fd       incoming;
-    const fd listenerFd = _listener.get_fd();
+    const fd listenerFd = listener.get_fd();
 
     fd_set activeSockets;
     fd_set readytoRead;
@@ -125,7 +119,7 @@ void Server::select_strat()
         ConnectionManager::remove_expired(activeSockets);
         readytoRead = activeSockets;
 
-        //TODO need to implement writeFds
+        // TODO need to implement writeFds
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
         selectTimeOut.tv_sec = SELECTWAITTIME;
@@ -134,13 +128,13 @@ void Server::select_strat()
         {
             if (FD_ISSET(currentSocket, &readytoRead)) {
                 if (currentSocket == listenerFd) {
-                    incoming            = _listener.accept();
+                    incoming            = listener.accept();
                     maxSocketDescriptor = std::max(maxSocketDescriptor, incoming);
                 }
                 else
                     incoming = currentSocket;
                 DEBUG_MSG("reading from connection", M);
-                handle_connection(incoming, activeSockets);
+                handle_connection(incoming, activeSockets, maxSocketDescriptor);
             }
         }
     }
@@ -156,7 +150,7 @@ void Server::kqueue_strat()
 #elif defined(__MAC__)
 void Server::kqueue_strat()
 {
-    const fd              socketFD      = _listener.get_fd();
+    const fd              listenerFD    = listener.get_fd();
     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0 };
 
     struct kevent changeList;            // list of events to monitor
@@ -167,10 +161,10 @@ void Server::kqueue_strat()
     if (kq == -1)
         THROW_EXCEPTION_WITH_INFO(strerror(errno));
 
-    // adding socketFD to changeList to monitor for read events
-    EV_SET(&changeList, socketFD, EVFILT_READ, EV_ADD, 0, 0, 0);
+    // adding listenerFD to changeList to monitor for read events
+    EV_SET(&changeList, listenerFD, EVFILT_READ, EV_ADD, 0, 0, 0);
 
-    // adding changeList containing only socketFD to kqueue
+    // adding changeList containing only listenerFD to kqueue
     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
         close(kq);
         THROW_EXCEPTION_WITH_INFO(strerror(errno));
@@ -190,9 +184,9 @@ void Server::kqueue_strat()
             continue;
 
         for (int i = 0; i < numEvents; i++) {
-            if (eventList[i].ident == static_cast<uintptr_t>(socketFD)) {
+            if (eventList[i].ident == static_cast<uintptr_t>(listenerFD)) {
                 // add new connection to kqueue
-                fd newConnection = _listener.accept();
+                fd newConnection = listener.accept();
                 EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);
                 if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
                     close(kq);
@@ -215,12 +209,11 @@ void Server::kqueue_strat()
                 try {
                     Request req;
                     req.recv(eventList[i].ident);
-                    if (!req.process(_config))
+                    if (!req.process(cfg))
                         continue;
 
-                    IRequestHandler* handler = MakeRequestHandler(req.get_method());
-                    Response         response =
-                        handler->handle_request(req, _cachedPages, _config);
+                    IRequestHandler* handler  = make_request_handler(req.get_method());
+                    Response         response = handler->handle_request(req);
                     response.send_response(eventList[i].ident);
                     delete handler;
                 } catch (std::ios_base::failure& f) {

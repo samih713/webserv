@@ -1,13 +1,19 @@
 #include "Request.hpp"
 #include "debug.hpp"
 
-Request::Request() : status(OK) {}
+
+// ! CGI
+Request::Request()
+    : cgiStatus(NOT_SET), cgiReadFd(NOT_SET), cgiClient(NOT_SET), cgiChild(9999999),
+      status(OK)
+{}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : status(other.status), header(other.header), message(other.message.str()),
-      body(other.body)
+    : cgiStatus(other.cgiStatus), cgiReadFd(other.cgiReadFd), cgiClient(other.cgiClient),
+      cgiChild(other.cgiChild), status(other.status), header(other.header),
+      message(other.message.str()), body(other.body)
 {}
 
 

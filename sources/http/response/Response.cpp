@@ -28,7 +28,6 @@ static StatusCodeMap createStatusCodeMap()
 
 const StatusCodeMap status_codes_map = createStatusCodeMap();
 
-
 /**
  * @brief Constructor for Response class
  *
@@ -39,7 +38,7 @@ const StatusCodeMap status_codes_map = createStatusCodeMap();
  * @param headers The headers of the response
  * @param body The body of the response
  */
-Response::Response(STATUS_CODE status, const vsp& headers, const vector<char>& body)
+Response::Response(STATUS_CODE status, const HeaderMap& headers, const vector<char>& body)
     : status(status), headers(headers), body(body)
 {
     DEBUG_MSG("Response called\n", Y);
@@ -66,18 +65,18 @@ Response::Response(const Response& other)
     DEBUG_MSG("Copy constructor called\n", Y);
 }
 
-
 // TODO move to its own file
 inline void Response::load_status_line(ostringstream& os) const
 {
+	DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
     os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
 }
 
 inline void Response::load_headers(ostringstream& os) const
 {
-    vsp::const_iterator begin = headers.begin();
-    vsp::const_iterator end   = headers.end();
-    for (vsp::const_iterator it = begin; it != end; it++)
+    HeaderMap::const_iterator begin = headers.begin();
+    HeaderMap::const_iterator end   = headers.end();
+    for (HeaderMap::const_iterator it = begin; it != end; it++)
         os << it->first << ": " << it->second << CRLF;
     os << CRLF;
 }

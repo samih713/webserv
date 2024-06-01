@@ -28,37 +28,35 @@ static const int DEFAULT_BACKLOG(16);
 static const int SELECTWAITTIME(5);
 // default kqueue wait
 static const int KQUEUEWAITTIME(5);
+// default max events to wait on
 static const int MAX_EVENTS(16);
 
 class Server {
 public:
-    static Server& get_instance(const ServerConfig& config,
-        int                                         backLog = DEFAULT_BACKLOG);
+    static Server& get_instance(ServerConfig& cfg, int backLog = DEFAULT_BACKLOG);
     ~Server();
     void start(enum polling_strat);
 
-protected:
-    Server(const ServerConfig& config, int backLog);
-
 private:
-    TCPSocket           _listener;
-    const ServerConfig& _config;
-    CachedPages*        _cachedPages;
+    TCPSocket     listener;
+    ServerConfig& cfg;
+    CachedPages*  cp;
 
+    Server(ServerConfig& cfg, int backLog);
 
-    IRequestHandler* MakeRequestHandler(const string& method)
+    IRequestHandler* make_request_handler(const string& method)
     {
         if (method == "GET")
-            return new GetRequestHandler;
+            return new GetRequestHandler(cfg, *cp);
         else if (method == "POST")
-            return new PostRequestHandler;
+            return new PostRequestHandler(cfg, *cp);
         else if (method == "DELETE")
-            return new DeleteRequestHandler;
+            return new DeleteRequestHandler(cfg, *cp);
         else //! return 501 Not implemented
             THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
     }
 
-    void handle_connection(fd incoming, fd_set& activeSockets);
+    void handle_connection(fd incoming, fd_set& activeSockets, fd& maxSocketDescriptor);
 
     /* polling strats */
     void select_strat();

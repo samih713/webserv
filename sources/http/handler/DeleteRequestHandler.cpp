@@ -3,15 +3,15 @@
 #include "Cgi.hpp"
 #include "debug.hpp"
 
-DeleteRequestHandler::DeleteRequestHandler()
+Response DeleteRequestHandler::handle_request(const Request& r)
 {
-    DEBUG_MSG("DeleteRequestHandler constructor called", B);
-}
+    DEBUG_MSG("Handling Delete request ... ", B);
 
-DeleteRequestHandler::~DeleteRequestHandler()
-{
-    DEBUG_MSG("DeleteRequestHandler destructor called", B);
-};
+    _add_header("Server", cfg.serverName);
+
+    vector<char> body = get_resource(r);
+    return Response(status, responseHeaders, body);
+}
 
 bool endsWith(const string& str, const string& suffix)
 {
@@ -19,83 +19,37 @@ bool endsWith(const string& str, const string& suffix)
            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-const vector<char> DeleteRequestHandler::get_resource(const Request& request,
-    const CachedPages* cachedPages, const ServerConfig& config)
+const vector<char> DeleteRequestHandler::get_resource(const Request& r)
 {
-    string       resource = request.get_resource();
+    string       resource = r.get_resource();
     vector<char> body;
 
-    add_header(make_pair("Server", config.serverName.c_str()));
-
-    if (resource.find("..") != string::npos) {
+    // Check if resource URI contains ".." and write permissions
+    if (resource.find("..") != string::npos || access(resource.c_str(), W_OK) == -1) {
+        LOG_INFO("DELETE: Resource '" + resource + "' : [ Forbidden ]");
         status = FORBIDDEN;
-        add_header(make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
-        add_header(
-            make_pair("Content-Length", ws_itoa(cachedPages->notFound.contentLength)));
-        body = cachedPages->notFound.data;
-        DEBUG_MSG("Restricted", W);
+        return (make_error_body(status, cp));
     }
-    else {
-        string resource_type = find_resource_type(resource);
-        if (resource_type.length() != 0) {
-            if (remove(resource.c_str()) != 0) {
-                cerr << "Error deleting resource: " << resource << endl;
-                DEBUG_MSG("Resource '" + resource + "' : [ Error deleting resource ]", R);
-                status = OK;
-            }
-            else {
-                DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
-                status = NOT_FOUND;
-                add_header(
-                    make_pair("Content-Type", cachedPages->notFound.contentType.c_str()));
-                add_header(make_pair("Content-Length",
-                    ws_itoa(cachedPages->notFound.contentLength)));
-                body = cachedPages->notFound.data;
-            }
-        }
-        else {
-            // If resource URI does not end with "/", set status code to 409 (Conflict)
-            if (!endsWith(resource, "/"))
-                status = CONFLICT;
-            else {
-                // Check write permissions
-                if (access(resource.c_str(), W_OK) == 0) {
-                    // Write permission granted, attempt to delete resource
-                    if (remove(resource.c_str()) != 0) {
-                        DEBUG_MSG("Resource '" + resource +
-                                      "' : [ Error deleting resource ]",
-                            R);
-                        status = INTERNAL_SERVER_ERROR; // Internal Server Error
-                    }
-                    else {
-                        // Deletion successful
-                        DEBUG_MSG("Resource '" + resource + "' : [ Deleted ]", W);
-                        status = NO_CONTENT;
-                        add_header(make_pair("Content-Type",
-                            cachedPages->notFound.contentType.c_str())); //? why
-                        add_header(make_pair("Content-Length",
-                            ws_itoa(cachedPages->notFound.contentLength))); //? why
-                        body = cachedPages->notFound.data;                  //? why
-                    }
-                }
-                else {
-                    // No write permission
-                    cerr << "Write permission is not granted for " << resource << endl;
-                    status = FORBIDDEN; // Forbidden
-                }
-            }
-        }
+
+    //? why is this needed for DELETE
+    // string resource_type = find_resource_type(resource);
+    // if (resource_type.length() != 0)
+    //     _add_header("Content-Type", resource_type);
+
+    // If resource URI does not end with "/", set status code to 409 (Conflict)
+    if (!endsWith(resource, "/")) {
+        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
+        status = CONFLICT;
+        return (make_error_body(status, cp));
     }
-    /* authentication function goes here for the requested resource */
-    DEBUG_MSG("Resource '" + resource, W);
-    return body;
-}
 
-Response DeleteRequestHandler::handle_request(const Request& request,
-    const CachedPages* cachedPages, const ServerConfig& config)
-{
-    DEBUG_MSG("Handling Delete request ... ", B);
-
-    vector<char> body = get_resource(request, cachedPages, config);
-    return Response(status, response_headers, body);
+    // all checks passed, delete the resource
+    if (remove(resource.c_str()) == -1) {
+        LOG_INFO("DELETE: Resource '" + resource + "' : [ Error deleting resource ]");
+        status = INTERNAL_SERVER_ERROR;
+        return (make_error_body(status, cp));
+    }
+    LOG_INFO("DELETE: Resource '" + resource + "' : [ Deleted ]");
+    status = OK;
+    return make_error_body(status, cp); // Return 200 OK
 }
