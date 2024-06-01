@@ -56,7 +56,7 @@ private:
             THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
     }
 
-    void handle_connection(fd incoming, fd_set& activeSockets);
+    void handle_connection(fd incoming, fd_set& activeSockets, fd& maxSocketDescriptor);
 
     /* polling strats */
     void select_strat();

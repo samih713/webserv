@@ -1,3 +1,4 @@
+#include "Logger.hpp"
 #include "Request.hpp"
 #include "TimeOut.hpp"
 #include "webserv.hpp"
@@ -15,6 +16,8 @@ public:
     static void            check_connection(fd currentSocket);
     static inline void     remove_connection(fd currentSocket, fd_set& activeSockets);
     static inline Request& add_connection(fd newConnection, fd_set& activeSockets);
+    static inline void     add_cgi_connection(Request& r, fd_set& activeSockets,
+            fd& maxSocketDescriptor);
 
 private:
     static ConnectionMap connectionMap;
@@ -51,10 +54,10 @@ inline void ConnectionManager::update_connection(fd currentSocket)
  */
 inline void ConnectionManager::remove_connection(fd currentSocket, fd_set& activeSockets)
 {
-    FD_CLR(currentSocket, &activeSockets);
     close(currentSocket);
     connectionMap.erase(connectionMap.find(currentSocket));
-    DEBUG_MSG("Connection closed", L);
+    FD_CLR(currentSocket, &activeSockets);
+    LOG_INFO("Connection closed");
 }
 
 
@@ -74,6 +77,15 @@ inline Request& ConnectionManager::add_connection(fd newConnection, fd_set& acti
     Request& r = connectionMap.insert(make_pair(newConnection, Request())).first->second;
     r.timer.update_time();
     return (r);
+}
+
+inline void ConnectionManager::add_cgi_connection(Request& r, fd_set& activeSockets,
+    fd& maxSocketDescriptor)
+{
+    FD_SET(r.cgiReadFd, &activeSockets);
+    connectionMap.insert(make_pair(r.cgiReadFd, r));
+    //* ideally we should be updating maxSocketDescriptor in select loop, not here
+    maxSocketDescriptor = std::max(maxSocketDescriptor, r.cgiReadFd);
 }
 
 #endif // CONNECTION_MANAGER_HPP

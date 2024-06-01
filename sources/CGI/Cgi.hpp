@@ -11,7 +11,7 @@ public:
     CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp);
     ~CGI();
 
-    vector<char> execute(void);
+    vector<char> execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild);
 
 private:
     string  _queryString;
@@ -19,10 +19,11 @@ private:
     string  _body;
     char**  _arguments;
     char**  _environment;
-    TimeOut _timer;
+    TimeOut _timer; //! need more testing
 
     CachedPages& _cp;
 
+    pid_t  execute_child(fd& cgiReadFd);
     char** set_environment(const Request& request, const ServerConfig& cfg);
 };
 

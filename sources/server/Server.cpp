@@ -49,41 +49,43 @@ Server::~Server()
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
 
 // TODO this function does not work with kqueue, only select
-void Server::handle_connection(fd incoming, fd_set& activeSockets)
+void Server::handle_connection(fd incoming, fd_set& activeSockets,
+    fd& maxSocketDescriptor)
 {
     try {
         ConnectionManager::check_connection(incoming);
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
 
         r.recv(incoming);
-        if (!r.process(cfg))
+        if (!r.process(cfg)) //? should each request be paired with location?
             return;
-        // if (r.get_resource().find("/cgi-bin") != string::npos) { //! cgi check
-        //     DEBUG_MSG("Handling CGI", M);
-        //     int id = fork();
-        //     if (id == -1)
-        //         cerr << "Error forking process: " << strerror(errno) << endl; //!
-        //     else if (id == 0) {
-        //         // Child process
-        //         IRequestHandler* handler = make_request_handler(r.get_method());
-        //         Response response = handler->handle_request(r);
-        //         response.send_response(incoming);
-        //         ConnectionManager::remove_connection(incoming,
-        //             activeSockets); // after completing remove
-        //         delete handler;
-        //         exit(0);
-        //     }
-        // }
-        IRequestHandler* handler  = make_request_handler(r.get_method());
-		//! need to check if request is allowed for specific resource
-        Response         response = handler->handle_request(r);
-        response.send_response(incoming);
+
+        IRequestHandler* handler = make_request_handler(r.get_method());
+        // ! need to check if request is allowed for specific resource
+        Response response = handler->handle_request(r);
+
+        if (r.cgiStatus == IN_PROCESS) {
+            r.cgiStatus = TEMP; // set to temp to avoid double processing
+            r.cgiClient = incoming;
+            ConnectionManager::add_cgi_connection(r, activeSockets, maxSocketDescriptor);
+            return; //* to not send response and not close connection
+        }
+        else if (r.cgiStatus == COMPLETED) {
+            LOG_DEBUG("CGI is completed, sending response");
+            response.send_response(r.cgiClient);
+            ConnectionManager::remove_connection(r.cgiClient, activeSockets);
+            ConnectionManager::remove_connection(r.cgiReadFd, activeSockets);
+        }
+        else if (r.cgiStatus == NOT_SET) {
+            response.send_response(incoming);
+            ConnectionManager::remove_connection(incoming, activeSockets);
+        }
         delete handler;
     } catch (std::exception& error) {
-        LOG_ERROR(error.what()); //! need to think through error cases
-        DEBUG_MSG(__FILE__ << ":" << __LINE__ << ": " << "error: " << error.what(), R);
+        //! need to think through error cases
+        LOG_ERROR("Server: " + string(error.what()));
+        ConnectionManager::remove_connection(incoming, activeSockets);
     }
-    ConnectionManager::remove_connection(incoming, activeSockets);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -132,7 +134,7 @@ void Server::select_strat()
                 else
                     incoming = currentSocket;
                 DEBUG_MSG("reading from connection", M);
-                handle_connection(incoming, activeSockets);
+                handle_connection(incoming, activeSockets, maxSocketDescriptor);
             }
         }
     }
@@ -148,7 +150,7 @@ void Server::kqueue_strat()
 #elif defined(__MAC__)
 void Server::kqueue_strat()
 {
-    const fd              socketFD      = listener.get_fd();
+    const fd              listenerFD    = listener.get_fd();
     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0 };
 
     struct kevent changeList;            // list of events to monitor
@@ -159,10 +161,10 @@ void Server::kqueue_strat()
     if (kq == -1)
         THROW_EXCEPTION_WITH_INFO(strerror(errno));
 
-    // adding socketFD to changeList to monitor for read events
-    EV_SET(&changeList, socketFD, EVFILT_READ, EV_ADD, 0, 0, 0);
+    // adding listenerFD to changeList to monitor for read events
+    EV_SET(&changeList, listenerFD, EVFILT_READ, EV_ADD, 0, 0, 0);
 
-    // adding changeList containing only socketFD to kqueue
+    // adding changeList containing only listenerFD to kqueue
     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
         close(kq);
         THROW_EXCEPTION_WITH_INFO(strerror(errno));
@@ -182,7 +184,7 @@ void Server::kqueue_strat()
             continue;
 
         for (int i = 0; i < numEvents; i++) {
-            if (eventList[i].ident == static_cast<uintptr_t>(socketFD)) {
+            if (eventList[i].ident == static_cast<uintptr_t>(listenerFD)) {
                 // add new connection to kqueue
                 fd newConnection = listener.accept();
                 EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);

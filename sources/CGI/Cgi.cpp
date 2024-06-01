@@ -69,79 +69,65 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
     return envp;
 }
 
-vector<char> CGI::execute(void)
+pid_t CGI::execute_child(fd& cgiReadFd)
 {
-    int          fd[2];
-    int          id;
-    vector<char> body;
+    int pipe_fd[2];
 
-    // Create a pipe for communication
-    if (pipe(fd) == -1) {
+    if (pipe(pipe_fd)) {
         LOG_ERROR("CGI: Error creating pipe: " + string(strerror(errno)));
-        return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
+        return -1;
     }
 
-    // Fork the process
-    // TODO fix forking here for sleep
-    id = fork();
-    if (id == -1) {
-        LOG_ERROR("CGI: Error forking process: " + string(strerror(errno)));
-        return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
+    pid_t cgiChild = fork();
+    if (cgiChild == -1) {
+        LOG_ERROR("CGI: Error forking: " + string(strerror(errno)));
+        return -1;
     }
-    else if (id == 0) {
-        // Child process
-        dup2(fd[1], STDOUT_FILENO);
-        close(fd[0]);
-        close(fd[1]);
+
+    if (cgiChild == 0) {
+        dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
 
         if (execve(_arguments[0], _arguments, _environment) == -1) {
             LOG_ERROR("CGI: Error executing execve: " + string(strerror(errno)));
             _exit(EXIT_FAILURE);
         }
     }
+    cgiReadFd = pipe_fd[0];
+    close(pipe_fd[1]);
+    return cgiChild;
+}
 
-    close(fd[1]); // Close the write end of the pipe
-
-    // Parent process
-    int childStatus;
-    // Wait for the child process to finish or until timeout
-    while (true) {
-        // Check if the timeout duration has been reached
-        if (_timer.is_timeout()) {
-            LOG_INFO("Timeout reached. Exiting." + string(strerror(errno)));
-            kill(id, SIGTERM);
-            break;
+vector<char> CGI::execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild)
+{
+    if (cgiStatus == NOT_SET) {
+        cgiStatus = IN_PROCESS;
+        cgiChild  = execute_child(cgiReadFd);
+        if (cgiChild == -1) {
+            cgiStatus = COMPLETED;
+            return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
         }
-
-        // Check if the child process has finished
-        if (waitpid(id, &childStatus, WNOHANG) == id) {
-            // Child process has finished
-            // Read from the pipe
-            char    buffer[1024]; //!
-            ssize_t bytesRead = read(fd[0], buffer, sizeof(buffer));
-            if (bytesRead > 0) {
-                body.insert(body.end(), buffer, buffer + bytesRead);
-            }
-            else if (bytesRead == 0) {
-                break;
-            }
-            else {
-                //! Error while reading from the pipe
-                if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    // No data available yet, continue waiting
-                    usleep(100000);
-                    continue;
-                }
-                else {
-					LOG_ERROR("CGI: Error reading from pipe: " + string(strerror(errno)));
-                    break;
-                }
-            }
-            break;
-        }
-        usleep(100000);
     }
 
-    close(fd[0]);
+    vector<char> body;
+
+    if (waitpid(cgiChild, NULL, WNOHANG) == cgiChild) {
+        char buffer[1024];
+        while (true) {
+            ssize_t bytesRead = read(cgiReadFd, buffer, sizeof(buffer));
+            DEBUGASSERT(bytesRead < 0);
+            if (bytesRead > 0)
+                body.insert(body.end(), buffer, buffer + bytesRead);
+            if (bytesRead == -1) {
+                LOG_ERROR("CGI: Error reading from pipe: " + string(strerror(errno)));
+                return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
+            }
+            if (bytesRead == 0)
+                break;
+        }
+        cgiStatus = COMPLETED;
+    }
+
     return body;
 }

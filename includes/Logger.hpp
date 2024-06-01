@@ -3,6 +3,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+// LOG_DEBUG should only be used if __DEBUG__ is defined
 #if defined(__LOG_TO_FILE__)
 #define LOG_FILE "server_log.txt"
 #define LOG_INFO(message)  Logger::log_message(message, "INFO", true)
