@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 
         ConfigParser&        parser  = ConfigParser::get_instance(configFile);
         vector<ServerConfig> servers = parser.parse();
-        Logger::log_message("Parsing " + configFile, INFO);
+		LOG_INFO("Parsing " + configFile);
 
         // for (size_t i = 0; i < servers.size(); i++)
         //     servers[i].print();
@@ -24,9 +24,9 @@ int main(int argc, char** argv)
 #if defined(__LINUX__)
         webserv.start(SELECT);
 #elif defined(__MAC__)
-        webserv.start(KQUEUE);
+        webserv.start(SELECT);
 #endif
     } catch (std::exception& error) {
-        Logger::log_message(error.what(), ERROR);
+		LOG_ERROR(error.what());
     }
 }

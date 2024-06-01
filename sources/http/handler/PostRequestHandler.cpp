@@ -1,26 +1,14 @@
 #include "PostRequestHandler.hpp"
 
-PostRequestHandler::PostRequestHandler()
-{
-    DEBUG_MSG("PostRequestHandler constructor called", B);
-}
-
-PostRequestHandler::~PostRequestHandler()
-{
-    DEBUG_MSG("PostRequestHandler destructor called", B);
-}
-
-Response PostRequestHandler::handle_request(const Request& request,
-    const CachedPages* cachedPages, const ServerConfig& config)
+Response PostRequestHandler::handle_request(const Request& r)
 {
     DEBUG_MSG("Handling POST request", W);
 
     // TODO need to check if the body is exceeding max body size
     // TODO need to check type of content
 
-    (void) cachedPages;
     status = request.get_status();
-    add_header(make_pair("Server", config.serverName.c_str()));
+    _add_header("Server", cfg.serverName);
 
     vector<char> body = process_data(request);
     return Response(status, response_headers, body);

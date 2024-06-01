@@ -7,14 +7,16 @@
 
 class GetRequestHandler: public RequestHandlerBase {
 public:
-    GetRequestHandler();
-    ~GetRequestHandler();
-    Response handle_request(const Request& request, const CachedPages* cachedPages,
-        const ServerConfig& config);
+    GetRequestHandler(ServerConfig& cfg, CachedPages& cp) : RequestHandlerBase(cfg, cp)
+    {
+        DEBUG_MSG("GetRequestHandler constructor called", B);
+    }
+    ~GetRequestHandler() { DEBUG_MSG("GetRequestHandler destructor called", B); }
+
+    Response handle_request(const Request& r);
 
 private:
-    const vector<char> get_resource(const Request& request,
-        const CachedPages* cachedPages, const ServerConfig& config);
+    const vector<char> get_resource(const Request& r);
 };
 
 #endif // GET_REQUEST_HANDLER_HPP

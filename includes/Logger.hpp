@@ -3,37 +3,53 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-enum LogLevel {
-    INFO = 0,
-    DEBUG,
-    ERROR
-};
+// LOG_DEBUG should only be used if __DEBUG__ is defined
+#if defined(__LOG_TO_FILE__)
+#define LOG_FILE "server_log.txt"
+#define LOG_INFO(message)  Logger::log_message(message, "INFO", true)
+#define LOG_DEBUG(message) Logger::log_message(message, "DEBUG", true)
+#define LOG_ERROR(message) Logger::log_message(message, "ERROR", true)
+static void writeLog(const string& logMessage)
+{
+    ofstream _logFile(LOG_FILE, std::ios_base::app);
+    if (!_logFile.is_open())
+        THROW_EXCEPTION_WITH_INFO("Log: could not open log file");
 
-#define LOG_FILE "logfile.txt"
+    _logFile << logMessage << endl;
+    _logFile.close();
+}
+#else
+#define LOG_INFO(message)  Logger::log_message(message, "INFO")
+#define LOG_DEBUG(message) Logger::log_message(message, "DEBUG")
+#define LOG_ERROR(message) Logger::log_message(message, "ERROR")
+
+static void writeLog(const string& logMessage)
+{
+    cout << logMessage << endl;
+}
+#endif
 
 class Logger {
 public:
-    static void log_message(const string& message, LogLevel level, bool toFile = false)
+    static void log_message(const string& message, const string& level, bool toFile = false)
     {
-        string logMessage = "[" + _get_current_time() + "]\t[" + _level_to_string(level) +
-                            "]\t" + message;
-        if (toFile) {
-            ofstream _logFile;
-            _logFile.open(LOG_FILE, std::ios_base::app);
-            if (!_logFile.is_open())
-                THROW_EXCEPTION_WITH_INFO("Log: could not open log file");
+        string logMessage = "[" + get_current_time() + "]\t[";
 
-            _logFile << logMessage << endl;
-            _logFile.close();
-        }
-        else
-            cout << logMessage << endl;
+        if (level == "INFO" && !toFile)
+            logMessage += B + level + RE;
+        else if (level == "DEBUG" && !toFile)
+            logMessage += M + level + RE;
+        else if (level == "ERROR" && !toFile)
+            logMessage += R + level + RE;
+		else
+			logMessage += level;
+
+        logMessage += "]\t" + message;
+        writeLog(logMessage);
     }
 
 private:
-    static LogLevel _level;
-
-    static string _get_current_time()
+    static string get_current_time()
     {
         time_t     rawtime;
         struct tm* timeInfo;
@@ -44,15 +60,6 @@ private:
 
         strftime(buffer, sizeof(buffer), "%Y-%m-%d  %H:%M:%S", timeInfo);
         return string(buffer);
-    }
-    static string _level_to_string(LogLevel level)
-    {
-        switch (level) {
-            case INFO:  return string(B "INFO" RE);
-            case DEBUG: return string(M "DEBUG" RE);
-            case ERROR: return string(R "ERROR" RE);
-            default:    return string(W "NULL" RE);
-        }
     }
 
     Logger();

@@ -7,18 +7,17 @@
  * sockets.
  *
  * @return void
- *
- * @throws None
  */
 void ConnectionManager::remove_expired(fd_set& currentSockets)
 {
     ConnectionMap::iterator it = connectionMap.begin();
     while (it != connectionMap.end())
         if (it->second.timer.is_timeout()) {
-            DEBUG_MSG("Connection closed after select", L);
             FD_CLR(it->first, &currentSockets);
             close(it->first);
             connectionMap.erase(it++);
+            // it = connectionMap.erase(it++);
+            LOG_INFO("Select: Connection closed due to timeout");
         }
         else
             it++;
