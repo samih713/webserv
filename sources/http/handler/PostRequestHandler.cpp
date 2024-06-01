@@ -32,7 +32,9 @@ vector<char> PostRequestHandler::process_data(const Request& r)
     const string& requestBody = r.get_body();
     vector<char>  responseBody;
 
-    if (requestBody.empty()) {
+    // for uploads, check if the location block allows uploads
+
+    if (requestBody.empty()) { // no data to write
         status = BAD_REQUEST;
         responseBody.push_back('b'); //! placeholder
         return responseBody;
@@ -46,6 +48,9 @@ vector<char> PostRequestHandler::process_data(const Request& r)
         responseBody.push_back('i'); //! placeholder
         return responseBody;
     }
+    // need to check if file is too big (return 413 if so)
+    // need to check if the file type is allowed (return 415 if not)
+    // need to handle CGI POST requests
     outputFile << requestBody;
     outputFile.close();
 
