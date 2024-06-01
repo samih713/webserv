@@ -1,5 +1,6 @@
 #include "Message.hpp"
 #include "Request.hpp"
+#include "Logger.hpp"
 #include <ios>
 
 /**
@@ -31,7 +32,7 @@ bool Request::process(const ServerConfig& cfg)
             return true;
     } catch (std::ios_base::failure& f) {
         set_status(BAD_REQUEST);
-        DEBUG_MSG(ERR_PARSE + ": " + string(f.what()), R);
+		LOG_ERROR(ERR_PARSE + ": " + string(f.what()));
         return true;
     }
     return false;
@@ -60,9 +61,12 @@ void Request::apply_config(const ServerConfig& cfg)
     if (locationMatch.empty())
         header.resource = cfg.root + "/" + header.resource;
     else {
-        const Location& location = cfg.locations.at(locationMatch);
-        header.resource =
-            location.root + "/" + header.resource.substr(locationMatch.size());
+        const string& locationRoot = cfg.locations.at(locationMatch).root;
+		const string& uri = header.resource.substr(locationMatch.size());
+		if (uri[0] == '/')
+			header.resource = locationRoot + uri;
+		else
+			header.resource = locationRoot + "/" + uri;
     }
     header.bodySize = std::min(header.bodySize, cfg.maxBodySize);
 }
