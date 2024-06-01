@@ -81,8 +81,10 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets,
             ConnectionManager::remove_connection(incoming, activeSockets);
         }
         delete handler;
+    } catch (TimeOut::Exception& to) {
+        LOG_INFO("Server: connection timed out [" + ws_itoa(incoming) + "]");
+        ConnectionManager::remove_connection(incoming, activeSockets);
     } catch (std::exception& error) {
-        //! need to think through error cases
         LOG_ERROR("Server: " + string(error.what()));
         ConnectionManager::remove_connection(incoming, activeSockets);
     }

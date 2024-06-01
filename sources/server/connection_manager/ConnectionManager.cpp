@@ -16,8 +16,7 @@ void ConnectionManager::remove_expired(fd_set& currentSockets)
             FD_CLR(it->first, &currentSockets);
             close(it->first);
             connectionMap.erase(it++);
-            // it = connectionMap.erase(it++);
-            LOG_INFO("Select: Connection closed due to timeout");
+            LOG_INFO("Server: connection timed out [" + ws_itoa(incoming) + "]");
         }
         else
             it++;
@@ -35,5 +34,5 @@ void ConnectionManager::check_connection(fd currentSocket)
 {
     ConnectionMap::iterator it = connectionMap.find(currentSocket);
     if (it != connectionMap.end() && it->second.timer.is_timeout())
-        THROW_EXCEPTION_WITH_INFO(L "Connection Timed out" RE);
+        throw TimeOut::Exception();
 }
