@@ -64,14 +64,25 @@ static string generate_error_page_template(STATUS_CODE status)
     stringstream ss;
 
     // clang-format off
-    // TODO css file should be inlined
     ss << "<!DOCTYPE html>"
        << "<html lang=\"en\">"
        << "<head>"
        << "    <meta charset=\"UTF-8\">"
        << "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
        << "    <title>" << status << " " << status_codes_map.at(status) << "</title>"
-       << "    <link rel=\"stylesheet\" href=\"style.css\">"
+       << "    <style>"
+       << "        body, html { height: 100%; margin: 0; font-family: Arial, sans-serif; "
+       << "            background-color: #f0f0f0; display: flex; justify-content: center; "
+       << "            align-items: center; text-align: center; }"
+       << "        .container { max-width: 600px; padding: 20px; background-color: #fff; "
+       << "            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); word-wrap: break-word; }"
+       << "        h1 { font-size: 48px; color: #ff6347; margin: 0; padding: 0; }"
+       << "        p { font-size: 18px; }"
+       << "        a { display: inline-block; margin-top: 20px; padding: 10px 20px; "
+       << "            background-color: #ff6347; color: #fff; text-decoration: none; "
+       << "            border-radius: 5px; }"
+       << "        a:hover { background-color: #e55347; }"
+       << "    </style>"
        << "</head>"
        << "<body>"
        << "    <div class=\"container\">"
