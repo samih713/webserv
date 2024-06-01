@@ -16,7 +16,8 @@ void ConnectionManager::remove_expired(fd_set& currentSockets)
             FD_CLR(it->first, &currentSockets);
             close(it->first);
             connectionMap.erase(it++);
-            LOG_INFO("Server: connection timed out [" + ws_itoa(incoming) + "]");
+			//! this is -1 for regular client
+            LOG_INFO("Server: connection timed out [" + ws_itoa(it->second.cgiClient) + "]");
         }
         else
             it++;
