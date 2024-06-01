@@ -6,9 +6,9 @@ include .colors.mk
 ### COMPILER SETTINGS ###
 CXX:= c++
 DEPFLAGS:= -MMD -MP
-CXXFLAGS:= -Wall -Wextra -Werror -std=c++98
 DEBUGFLAGS:= -ggdb3 -D__DEBUG__
 SANITIZE:= -fsanitize=address
+CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 #$(SANITIZE) $(DEBUGFLAGS)
 
 ### OS DETECTION ###
 ifeq ($(shell uname), Linux)

@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 #if defined(__LINUX__)
         webserv.start(SELECT);
 #elif defined(__MAC__)
-        webserv.start(KQUEUE);
+        webserv.start(SELECT);
 #endif
     } catch (std::exception& error) {
 		LOG_ERROR(error.what());
