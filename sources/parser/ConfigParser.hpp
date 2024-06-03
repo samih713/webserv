@@ -111,7 +111,7 @@ private:
 
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);
-    void   parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
+    void   parse_error_page(StatusCodeMap& errorPages, const string& root);
     fd     parse_listen(in_addr_t& host, bool& defaultServer);
     void   parse_server_name(string& serverName);
     void   parse_root(string& root);

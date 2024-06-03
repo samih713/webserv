@@ -5,7 +5,6 @@
 
 /* ------------------------------ const strings ----------------------------- */
 static const string CRLF     = "\r\n";
-static const string NEWLINE  = "\n";
 static const string SP       = " ";
 static const string HTTP_VER = "HTTP/1.1";
 
@@ -136,6 +135,32 @@ enum STATUS_CODE {
     LOOP_DETECTED                   = 508,
     NOT_EXTENDED
 };
+
+/* ---------------------------- STATUS CODE MAP ----------------------------- */
+
+typedef map<STATUS_CODE, string> StatusCodeMap;
+
+/**
+ * @brief Creates a map of status codes and their corresponding string representations.
+ *
+ * This function creates a map where the keys are status codes and the values are their
+ * string representations. The status codes are defined in the STATUS_CODE_LIST macro.
+ *
+ * @return A StatusCodeMap object containing the status codes and their string
+ * representations.
+ */
+static StatusCodeMap createStatusCodeMap()
+{
+    StatusCodeMap map;
+#define X(a) map.insert(make_pair(a, #a));
+    STATUS_CODE_LIST
+#undef X
+    return map;
+}
+
+const StatusCodeMap status_codes_map = createStatusCodeMap();
+
+/* ------------------------------ HTTP SAMPLES ------------------------------ */
 
 static const string sample_response =
     "HTTP/1.1 200 OK\r\n"                        // status line

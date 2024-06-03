@@ -14,16 +14,16 @@ struct Location {
 };
 
 struct ServerConfig {
-    fd                       port;
-    in_addr_t                host;
-    bool                     defaultServer;
-    string                   serverName;
-    string                   root;
-    string                   indexFile;
-    bool                     autoindex;
-    size_t                   maxBodySize;
-    map<STATUS_CODE, string> errorPages; //! maybe need default values
-    map<string, Location>    locations;
+    fd                    port;
+    in_addr_t             host;
+    bool                  defaultServer;
+    string                serverName;
+    string                root;
+    string                indexFile;
+    bool                  autoindex;
+    size_t                maxBodySize;
+    StatusCodeMap         errorPages;
+    map<string, Location> locations;
 
     ServerConfig()
         : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
@@ -65,7 +65,7 @@ struct ServerConfig {
         }
         cout << "  ]" << endl;
         cout << "  errorPages: [" << endl;
-        for (map<STATUS_CODE, string>::const_iterator itr = errorPages.begin();
+        for (StatusCodeMap::const_iterator itr = errorPages.begin();
              itr != errorPages.end(); ++itr)
         {
             cout << "    " << itr->first << ": " << itr->second << endl;

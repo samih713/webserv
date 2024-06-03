@@ -89,8 +89,7 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_CLOSING_BRACE);
 }
 
-void ConfigParser::parse_error_page(map<STATUS_CODE, string>& errorPages,
-    const string&                                             root)
+void ConfigParser::parse_error_page(StatusCodeMap& errorPages, const string& root)
 {
     if (root.empty()) // root can be empty if not set
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);

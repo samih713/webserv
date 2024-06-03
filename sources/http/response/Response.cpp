@@ -3,32 +3,6 @@
 #include "debug.hpp"
 
 /**
- * This constant string represents the HTTP version "HTTP/1.1" that is used in the
- * Response class. It is a static member of the Response class and cannot be modified.
- */
-const string& Response::version = "HTTP/1.1";
-
-/**
- * @brief Creates a map of status codes and their corresponding string representations.
- *
- * This function creates a map where the keys are status codes and the values are their
- * string representations. The status codes are defined in the STATUS_CODE_LIST macro.
- *
- * @return A StatusCodeMap object containing the status codes and their string
- * representations.
- */
-static StatusCodeMap createStatusCodeMap()
-{
-    StatusCodeMap map;
-#define X(a) map.insert(make_pair(a, #a));
-    STATUS_CODE_LIST
-#undef X
-    return map;
-}
-
-const StatusCodeMap status_codes_map = createStatusCodeMap();
-
-/**
  * @brief Constructor for Response class
  *
  * This constructor initializes a Response object with the provided status code, headers,
@@ -69,7 +43,7 @@ Response::Response(const Response& other)
 inline void Response::load_status_line(ostringstream& os) const
 {
     DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
-    os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
+    os << HTTP_VER << SP << status << SP << status_codes_map.find(status)->second << CRLF;
 }
 
 inline void Response::load_headers(ostringstream& os) const
