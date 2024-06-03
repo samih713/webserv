@@ -1,6 +1,5 @@
 #include "Response.hpp"
 #include "Server.hpp"
-#include "debug.hpp"
 
 /**
  * @brief Constructor for Response class

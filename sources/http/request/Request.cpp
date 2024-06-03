@@ -1,6 +1,4 @@
 #include "Request.hpp"
-#include "debug.hpp"
-
 
 // ! CGI
 Request::Request()
