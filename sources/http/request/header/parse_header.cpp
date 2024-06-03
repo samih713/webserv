@@ -23,10 +23,11 @@ void Header::parse_request_line(stringstream& message)
 
     std::noskipws(message);
     message >> method >> singleSpace[0] >> resource >> singleSpace[1] >> version;
-    if (strcmp(singleSpace, "  ") || version != "HTTP/1.1") //! return 505
+    if (strcmp(singleSpace, "  ") || version != HTTP_VER) //! return 505
         state = BAD;
     validate_terminator(message, CRLF);
     replace_spaces(resource);
+    parse_query_string(resource);
 }
 
 void Header::add_header(stringstream& message)
@@ -133,4 +134,14 @@ static void replace_spaces(string& resource)
     size_t pos;
     while ((pos = resource.find("%20")) != string::npos)
         resource.replace(pos, 3, " ");
+}
+
+void Header::parse_query_string(string& resource)
+{
+    // separating resource and query string
+    size_t queryPos = resource.find('?');
+    if (queryPos != string::npos) {
+        queryString = resource.substr(queryPos + 1);
+        resource    = resource.substr(0, queryPos);
+    }
 }
