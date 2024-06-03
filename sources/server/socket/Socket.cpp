@@ -139,7 +139,7 @@ fd Socket::accept()
     newSocket = ::accept(socketFD, &peerInfo, &peerLength);
     if (newSocket == invalidFD) {
         // if set to non_blocking it returns EAGAIN or EWOULDBLOCK if no connection
-        if (errno != EAGAIN && errno != EWOULDBLOCK)
+        if (errno != EAGAIN && errno != EWOULDBLOCK) //!!
             THROW_EXCEPTION_WITH_INFO(ERR_ACCP);
     }
     return newSocket;

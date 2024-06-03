@@ -1,3 +1,4 @@
+#include "Message.hpp"
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
 #include <limits>
@@ -10,7 +11,7 @@ using std::set;
 
 // file related error messages
 static const string ERR_FILE_EXTENSION("Config: invalid file extension");
-static const string ERR_FILE("Config: invalid file ");
+static const string ERR_FILE("Config: invalid file: ");
 static const string ERR_FILE_TYPE("Config: file is a directory");
 static const string ERR_FILE_PERM("Config: invalid file permissions");
 static const string ERR_OPEN("Config: cannot open file");
@@ -19,7 +20,7 @@ static const string ERR_EMPTY("Config: file is empty");
 // brace related error messages
 static const string ERR_CLOSING_BRACE("Config: } missing");
 static const string ERR_OPENING_BRACE("Config: { missing");
-static const string ERR_MISSING_SEMICOLON("Config: missing semicolon after ");
+static const string ERR_MISSING_SEMICOLON("Config: missing semicolon at ");
 static const string ERR_MISSING_CONTEXT("Config: missing context");
 
 // global context error messages
@@ -110,14 +111,15 @@ private:
     void         parse_location_context(ServerConfig& server);
 
     // parsing config directives
-    void   parse_index(string& indexFile, const string& root);
+    void   parse_allow_methods(vector<string>& methods);
+    bool   parse_autoindex(void);
+    size_t parse_client_max_body_size(void);
     void   parse_error_page(StatusCodeMap& errorPages, const string& root);
     fd     parse_listen(in_addr_t& host, bool& defaultServer);
-    void   parse_server_name(string& serverName);
+    void   parse_http_redirection();
+    void   parse_index(string& indexFile, const string& root);
     void   parse_root(string& root);
-    size_t parse_client_max_body_size(void);
-    bool   parse_autoindex(void);
-    void   parse_allow_methods(vector<string>& methods);
+    void   parse_server_name(string& serverName);
 
     bool is_number(const string& str)
     {

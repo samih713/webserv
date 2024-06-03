@@ -1,7 +1,6 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
 
-
 #ifndef CACHED_PAGES_HPP
 #define CACHED_PAGES_HPP
 
@@ -31,8 +30,9 @@ public:
 private:
     //* name, struct Page
     map<string, Page> pages;
-    bool              load_page(const string& path, const string& name);
-    void              generate_error_page(STATUS_CODE status);
+
+    bool load_page(const string& path, const string& name);
+    void generate_error_page(STATUS_CODE status);
 };
 
 #endif // CACHED_PAGES_HPP

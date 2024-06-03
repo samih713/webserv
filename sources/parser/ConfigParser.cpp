@@ -73,7 +73,7 @@ ConfigParser::ConfigParser(const string& configFile)
     {
         if (*vecItr == "{") {
             if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
-                vecItr - 2 >= _tokens.begin() && *(vecItr - 2) != "location") //!
+                vecItr - 2 >= _tokens.begin() && *(vecItr - 2) != "location")
             {
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
             }
@@ -100,10 +100,10 @@ void ConfigParser::parse_error_page(StatusCodeMap& errorPages, const string& roo
         codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
         ++_itr; // move to next error code
     }
-    if (*_itr == ";")
+    if (*_itr == ";") //? unnecessary should be handled in next check
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
 
-    string errorPath = *_itr;
+    string errorPath = *_itr; //!
     if (errorPath.find(".html") == string::npos &&
         errorPath.find(".htm") == string::npos && errorPath.find(".txt") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
@@ -137,11 +137,10 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
     ++_itr; // move to index file
-    if (is_keyword(*_itr))
+    if (is_keyword(*_itr) || _itr->find("/") != string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
     indexFile = root + "/" + *_itr;
-    //! removed index file checking
 
     check_semicolon();
 }
@@ -274,8 +273,7 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
     ++_itr; // move to methods
 
     while (*_itr != ";") {
-        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE" ||
-            *_itr == "PUT") // add more methods here
+        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE")
             methods.push_back(*_itr);
         else
             THROW_EXCEPTION_WITH_INFO(ERR_METHOD);
@@ -289,14 +287,19 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
     check_semicolon();
 }
 
+void ConfigParser::parse_http_redirection()
+{
+    // redirect [uri] [other uri]
+}
+
 void ConfigParser::parse_location_context(ServerConfig& server)
 {
     ++_itr; // move to location uri
 
     string uri;
     uri = *_itr;
-    if (uri[0] != '/') // uri should begin with /
-        THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH);
+    if (uri[0] != '/')                                    // uri should begin with /
+        THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH); //!
     else if (uri.find_first_of("/") != uri.find_last_of("/"))
         THROW_EXCEPTION_WITH_INFO(ERR_URI_DUPLICATE_SLASH);
 
@@ -310,6 +313,7 @@ void ConfigParser::parse_location_context(ServerConfig& server)
     location.indexFile   = server.indexFile;
     location.autoindex   = server.autoindex;
     location.maxBodySize = server.maxBodySize;
+    location.methods     = server.methods;
 
     set<string> parsedDirectives;
     while (*_itr != "}") {
@@ -323,11 +327,10 @@ void ConfigParser::parse_location_context(ServerConfig& server)
             parse_allow_methods(location.methods);
         else if (*_itr == "index")
             parse_index(location.indexFile, location.root + uri);
-        else if (*_itr == "autoindex") {
-            if (uri == "/cgi-bin") //?
-                THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX_CGI);
+        else if (*_itr == "autoindex")
             location.autoindex = parse_autoindex();
-        }
+        // else if (*itr == "redirect")
+        // location.
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else
@@ -365,6 +368,8 @@ ServerConfig ConfigParser::parse_server_context(void)
             parse_index(server.indexFile, server.root);
         else if (*_itr == "server_name")
             parse_server_name(server.serverName);
+        else if (*_itr == "allow_methods")
+            parse_allow_methods(server.methods);
         else if (*_itr == "error_page")
             parse_error_page(server.errorPages, server.root);
         else if (*_itr == "location")
@@ -375,8 +380,12 @@ ServerConfig ConfigParser::parse_server_context(void)
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
     }
 
-    if (server.locations.empty())
-        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_LOCATION);
+    if (server.locations.empty()) {
+        if (parsedDirectives.find("root") == parsedDirectives.end())
+            THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
+        else if (parsedDirectives.find("allow_methods") == parsedDirectives.end())
+            THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
+    }
 
     ++_itr; // move to next context
 

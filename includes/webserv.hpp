@@ -83,7 +83,6 @@ typedef map<string, string> HeaderMap;
 typedef int                 fd; // socket_descriptor type
 
 /* --------------------------------- MACROS --------------------------------- */
-#define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
     static_cast<const ostringstream&>((ostringstream() << std::dec << number)).str()
 

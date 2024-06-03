@@ -12,6 +12,7 @@ CachedPages::CachedPages(const ServerConfig& cfg)
          it != cfg.errorPages.end(); it++)
     {
         if (!load_page(it->second, ws_itoa(it->first))) {
+            LOG_ERROR("Failed to load error page: " + it->second);
             LOG_INFO("Generating error page " + ws_itoa(it->first));
             generate_error_page(it->first);
         }
@@ -24,17 +25,17 @@ CachedPages::CachedPages(const ServerConfig& cfg)
 bool CachedPages::load_page(const string& path, const string& name)
 {
     ifstream pFile(path.c_str(), std::ios_base::binary);
-    if (pFile.fail()) {
-        LOG_ERROR("Failed to load error page " + path);
+    if (pFile.fail())
         return false;
-    }
 
     Page page;
-    page.data          = vector<char>((std::istreambuf_iterator<char>(pFile)),
-                 std::istreambuf_iterator<char>());
+    page.data = vector<char>((std::istreambuf_iterator<char>(pFile)),
+        std::istreambuf_iterator<char>());
+
     page.contentLength = page.data.size();
     pages.insert(make_pair(name, page));
 
+    LOG_INFO("Loaded " + name + " page at: " + path);
     return true;
 }
 
@@ -98,7 +99,6 @@ Page& CachedPages::get_page(const string& pageName)
 {
     if (pages.find(pageName) == pages.end()) {
         LOG_ERROR("Page " + pageName + " not found");
-        // return 404 page
         return get_error_page(NOT_FOUND);
     }
     return pages.at(pageName);

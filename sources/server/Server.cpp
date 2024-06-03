@@ -121,7 +121,7 @@ void Server::select_strat()
 
         // TODO need to implement writeFds
         if (select(maxSocketDescriptor + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-            THROW_EXCEPTION_WITH_INFO(strerror(errno));
+            THROW_EXCEPTION_WITH_INFO(strerror(errno)); //! idk about using errno here
         selectTimeOut.tv_sec = SELECTWAITTIME;
 
         for (fd currentSocket = 0; currentSocket <= maxSocketDescriptor; currentSocket++)
