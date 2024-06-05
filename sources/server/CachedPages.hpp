@@ -1,6 +1,6 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
-
+#include "Logger.hpp"
 
 #ifndef CACHED_PAGES_HPP
 #define CACHED_PAGES_HPP
@@ -23,7 +23,7 @@ struct Page {
 class CachedPages {
 public:
     CachedPages(const ServerConfig& cfg);
-    ~CachedPages() { DEBUG_MSG("Cached Pages destructor called", R); }
+    ~CachedPages() { LOG_DEBUG("CachedPages: destructor called"); }
 
     Page& get_error_page(STATUS_CODE status);
     Page& get_page(const string& pageName);

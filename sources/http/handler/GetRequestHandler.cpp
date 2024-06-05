@@ -3,11 +3,6 @@
 #include "Cgi.hpp"
 #include "webserv.hpp"
 
-// #define LOG_INFO(message)  Logger::log_message(message, "INFO")
-// #define LOG_DEBUG(message) Logger::log_message(message, "DEBUG")
-// #define LOG_ERROR(message) Logger::log_message(message, "ERROR")
-/* -------------------------------- Helpers -------------------------------- */
-
 Response GetRequestHandler::handle_request(const Request& r)
 {
     // LOG_INFO("Handling GET request ... "); //? commented due to many prints
@@ -56,7 +51,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
     }
 
     /* authentication function goes here for the requested resource */
-    // DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
 
     // TODO caching control */
 

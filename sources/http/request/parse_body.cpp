@@ -1,6 +1,6 @@
+#include "Logger.hpp"
 #include "Message.hpp"
 #include "Request.hpp"
-#include "debug.hpp"
 #include "request_utils.hpp"
 #include "webserv.hpp"
 
@@ -38,7 +38,7 @@ bool Request::parse_chunked_body()
 
         // check if the chunk is the right size
         if (static_cast<int>(chunk.length()) != chunkLength) {
-            DEBUG_MSG("invalid chunk size", B);
+            LOG_ERROR("invalid chunk size");
             message.setstate(std::ios::failbit);
         }
 

@@ -41,7 +41,7 @@ const StatusCodeMap status_codes_map = createStatusCodeMap();
 Response::Response(STATUS_CODE status, const HeaderMap& headers, const vector<char>& body)
     : status(status), headers(headers), body(body)
 {
-    DEBUG_MSG("Response called\n", Y);
+    LOG_DEBUG("Response: called for status: " + ws_itoa(status));
 }
 
 /**
@@ -62,13 +62,13 @@ Response::~Response() {}
 Response::Response(const Response& other)
     : status(other.status), headers(other.headers), body(other.body)
 {
-    DEBUG_MSG("Copy constructor called\n", Y);
+    LOG_DEBUG("Response: Copy constructor called");
 }
 
 // TODO move to its own file
 inline void Response::load_status_line(ostringstream& os) const
 {
-	DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
+    DEBUGASSERT(status_codes_map.find(status) != status_codes_map.end());
     os << version << SP << status << SP << status_codes_map.find(status)->second << CRLF;
 }
 

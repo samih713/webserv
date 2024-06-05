@@ -103,10 +103,8 @@ void Header::find_content_length(const HeaderMap::const_iterator it)
     length.exceptions(std::ios::failbit | std::ios::badbit);
     length >> bodySize;
 
-    if (!length.eof()) {
+    if (!length.eof())
         length.setstate(std::ios::failbit);
-        // DEBUG_MSG("failed here", R);
-    }
 }
 
 // helper utils

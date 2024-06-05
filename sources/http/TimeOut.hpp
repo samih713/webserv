@@ -1,4 +1,5 @@
 #include <ctime>
+#include <exception>
 
 #ifndef TIMEOUT_HPP
 #define TIMEOUT_HPP

@@ -5,7 +5,7 @@
 
 Response DeleteRequestHandler::handle_request(const Request& r)
 {
-    DEBUG_MSG("Handling Delete request ... ", B);
+    LOG_DEBUG("Handling Delete request for resource: " + r.get_resource());
 
     _add_header("Server", cfg.serverName);
 
