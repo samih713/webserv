@@ -29,6 +29,8 @@ public:
     const string&    get_body() const;
     const HeaderMap& get_headers() const;
     const string&    get_query_string() const;
+    const string&    get_resource_path() const;
+    const string&    get_location_match() const;
 
     void set_status(STATUS_CODE);
 
@@ -51,6 +53,8 @@ private:
     Header       header;
     stringstream message;
     string       body;
+    string       resourcePath;
+    string       locationMatch;
 
     // deleted copy assigment
     void operator=(const Request&);
