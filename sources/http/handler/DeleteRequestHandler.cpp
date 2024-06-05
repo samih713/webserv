@@ -26,8 +26,7 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
     // Check if resource URI contains ".." and write permissions
     if (resource.find("..") != string::npos || access(resource.c_str(), W_OK) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Forbidden ]");
-        status = FORBIDDEN;
-        return (make_error_body(status, cp));
+        return (make_error_body(FORBIDDEN));
     }
 
     //? why is this needed for DELETE
@@ -38,17 +37,15 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
     // If resource URI does not end with "/", set status code to 409 (Conflict)
     if (!endsWith(resource, "/")) {
         LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
-        status = CONFLICT;
-        return (make_error_body(status, cp));
+        return (make_error_body(CONFLICT));
     }
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Error deleting resource ]");
-        status = INTERNAL_SERVER_ERROR;
-        return (make_error_body(status, cp));
+        return (make_error_body(INTERNAL_SERVER_ERROR));
     }
     LOG_INFO("DELETE: Resource '" + resource + "' : [ Deleted ]");
     status = OK;
-    return make_error_body(status, cp); // Return 200 OK
+    return vector<char>(); // Return 200 OK
 }

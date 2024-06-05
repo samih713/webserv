@@ -1,3 +1,4 @@
+#include "CachedPages.hpp"
 #include "FileType.hpp"
 #include "IRequestHandler.hpp"
 
@@ -29,7 +30,7 @@ public:
         return fileTypeItr->second;
     }
 
-    const vector<char>& make_error_body(STATUS_CODE status, CachedPages& cp)
+    const vector<char>& make_error_body(STATUS_CODE status)
     {
         Page& p = cp.get_error_page(status);
         _add_header("Content-Type", p.contentType);

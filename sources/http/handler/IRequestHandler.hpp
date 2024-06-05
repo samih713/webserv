@@ -1,4 +1,3 @@
-#include "CachedPages.hpp"
 #include "Response.hpp"
 #include "ServerConfig.hpp"
 

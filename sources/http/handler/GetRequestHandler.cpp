@@ -3,11 +3,6 @@
 #include "Cgi.hpp"
 #include "webserv.hpp"
 
-// #define LOG_INFO(message)  Logger::log_message(message, "INFO")
-// #define LOG_DEBUG(message) Logger::log_message(message, "DEBUG")
-// #define LOG_ERROR(message) Logger::log_message(message, "ERROR")
-/* -------------------------------- Helpers -------------------------------- */
-
 Response GetRequestHandler::handle_request(const Request& r)
 {
     // LOG_INFO("Handling GET request ... "); //? commented due to many prints
@@ -38,7 +33,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     // errors
     if (status >= 400)
-        return (make_error_body(status, cp));
+        return (make_error_body(status));
 
     string resource_type = find_resource_type(resource); //! doesn't make sense
     if (resource_type.length() != 0)

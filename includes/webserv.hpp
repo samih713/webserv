@@ -30,6 +30,7 @@
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
+#include <algorithm>
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
@@ -37,6 +38,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <netdb.h>

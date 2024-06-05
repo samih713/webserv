@@ -17,6 +17,7 @@ public:
 
 private:
     const vector<char> get_resource(const Request& r);
+    vector<char>       list_directory(const string& dirPath, const string& uri);
 };
 
 #endif // GET_REQUEST_HANDLER_HPP
