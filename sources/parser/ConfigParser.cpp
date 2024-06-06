@@ -100,26 +100,23 @@ void ConfigParser::parse_error_page(StatusCodeMap& errorPages, const string& roo
         codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
         ++_itr; // move to next error code
     }
-    if (*_itr == ";") //? unnecessary should be handled in next check
-        THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
 
-    string errorPath = *_itr; //!
-    if (errorPath.find(".html") == string::npos &&
-        errorPath.find(".htm") == string::npos && errorPath.find(".txt") == string::npos)
+    string errorFile = *_itr;
+    if (errorFile.find(".html") == string::npos && errorFile.find(".htm") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
-    if (errorPath.find("/") == string::npos)
+    if (errorFile.find("/") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
-    else if (errorPath.find_first_of("/") != errorPath.find_last_of("/"))
+    else if (errorFile.find_first_of("/") != errorFile.find_last_of("/"))
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
-    if (errorPath.find("x") == string::npos) {
-        if (errorPath.find_first_of("x") != errorPath.find_last_of("x"))
+    if (errorFile.find("x") == string::npos) {
+        if (errorFile.find_first_of("x") != errorFile.find_last_of("x"))
             THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     }
 
     for (vector<STATUS_CODE>::const_iterator itr = codes.begin(); itr != codes.end();
          ++itr)
     {
-        string page = root + errorPath;
+        string page = root + errorFile;
         size_t xPos = page.find("x");
         if (xPos != string::npos) {
             char lastDigit = *itr % 10 + '0';
@@ -268,10 +265,11 @@ bool ConfigParser::parse_autoindex(void)
     return autoindex == "on";
 }
 
-void ConfigParser::parse_allow_methods(vector<string>& methods)
+vector<string> ConfigParser::parse_allow_methods(void)
 {
     ++_itr; // move to methods
 
+    vector<string> methods;
     while (*_itr != ";") {
         if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE")
             methods.push_back(*_itr);
@@ -285,6 +283,8 @@ void ConfigParser::parse_allow_methods(vector<string>& methods)
 
     --_itr; // move back to last method
     check_semicolon();
+
+    return methods;
 }
 
 void ConfigParser::parse_http_redirection()
@@ -298,8 +298,8 @@ void ConfigParser::parse_location_context(ServerConfig& server)
 
     string uri;
     uri = *_itr;
-    if (uri[0] != '/')                                    // uri should begin with /
-        THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH); //!
+    if (uri[0] != '/') // uri should begin with /
+        THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH);
     else if (uri.find_first_of("/") != uri.find_last_of("/"))
         THROW_EXCEPTION_WITH_INFO(ERR_URI_DUPLICATE_SLASH);
 
@@ -324,7 +324,7 @@ void ConfigParser::parse_location_context(ServerConfig& server)
         else if (*_itr == "client_max_body_size")
             location.maxBodySize = parse_client_max_body_size();
         else if (*_itr == "allow_methods")
-            parse_allow_methods(location.methods);
+            location.methods = parse_allow_methods();
         else if (*_itr == "index")
             parse_index(location.indexFile, location.root + uri);
         else if (*_itr == "autoindex")
@@ -369,7 +369,7 @@ ServerConfig ConfigParser::parse_server_context(void)
         else if (*_itr == "server_name")
             parse_server_name(server.serverName);
         else if (*_itr == "allow_methods")
-            parse_allow_methods(server.methods);
+            server.methods = parse_allow_methods();
         else if (*_itr == "error_page")
             parse_error_page(server.errorPages, server.root);
         else if (*_itr == "location")

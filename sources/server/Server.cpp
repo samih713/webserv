@@ -60,8 +60,9 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets,
         if (!r.process(cfg))
             return;
 
-        IRequestHandler* handler = make_request_handler(r);
-        Response response = handler->handle_request(r);
+        //! need a way to handle http errors in server
+        IRequestHandler* handler  = make_request_handler(r);
+        Response         response = handler->handle_request(r);
 
         if (r.cgiStatus == IN_PROCESS) {
             r.cgiStatus = TEMP; // set to temp to avoid double processing
@@ -211,7 +212,7 @@ void Server::kqueue_strat()
                     if (!req.process(cfg))
                         continue;
 
-                    IRequestHandler* handler  = make_request_handler(req.get_method());
+                    IRequestHandler* handler  = make_request_handler(req);
                     Response         response = handler->handle_request(req);
                     response.send_response(eventList[i].ident);
                     delete handler;

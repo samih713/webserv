@@ -50,13 +50,19 @@ void Request::apply_config(const ServerConfig& cfg)
     }
 
     // update resource path and body size
-    string  root = cfg.root;
-    string& uri  = header.resource;
+    string& uri         = header.resource;
+    string  root        = cfg.root;
+    size_t  maxBodySize = cfg.maxBodySize;
     if (!locationMatch.empty()) {
-        root = cfg.locations.at(locationMatch).root;
-        uri  = header.resource.substr(locationMatch.size());
+        const Location& location = cfg.locations.at(locationMatch);
+        root                     = location.root;
+        uri                      = header.resource.substr(locationMatch.size());
+        maxBodySize              = location.maxBodySize;
     }
-    uri             = (uri[0] != '/') ? ("/" + uri) : uri;
-    resourcePath    = root + uri;
-    header.bodySize = std::min(header.bodySize, cfg.maxBodySize);
+    uri          = (uri[0] != '/') ? ("/" + uri) : uri;
+    resourcePath = root + uri;
+
+    if (header.bodySize > maxBodySize)
+        status = PAYLOAD_TOO_LARGE; //!
+    header.bodySize = std::min(header.bodySize, maxBodySize);
 }

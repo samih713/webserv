@@ -1,4 +1,5 @@
 #include "GetRequestHandler.hpp"
+#include "Logger.hpp"
 #include "webserv.hpp"
 #include <dirent.h>
 
@@ -70,6 +71,7 @@ vector<char> GetRequestHandler::list_directory(const string& dirPath, const stri
     ss << "</pre><hr></body>\n"
        << "</html>\n";
 
+    LOG_INFO("Server: Serving directory listing");
     string htmlContent = ss.str();
     return vector<char>(htmlContent.begin(), htmlContent.end());
 }

@@ -11,18 +11,19 @@ CachedPages::CachedPages(const ServerConfig& cfg)
     for (StatusCodeMap::const_iterator it = cfg.errorPages.begin();
          it != cfg.errorPages.end(); it++)
     {
-        if (!load_page(it->second, ws_itoa(it->first))) {
+        if (!load_error_page(it->second, it->first)) {
             LOG_ERROR("Failed to load error page: " + it->second);
             LOG_INFO("Generating error page " + ws_itoa(it->first));
             generate_error_page(it->first);
         }
     }
-    // load the indexDefault page
-    if (!load_page(cfg.indexFile, "index"))
-        LOG_ERROR("Failed to load index page " + cfg.indexFile);
+    // load the main indexDefault page
+    string index = cfg.root + "/" + cfg.indexFile;
+    if (!load_page(index))
+        LOG_ERROR("Failed to load page " + index);
 }
 
-bool CachedPages::load_page(const string& path, const string& name)
+bool CachedPages::load_error_page(const string& path, STATUS_CODE status)
 {
     ifstream pFile(path.c_str(), std::ios_base::binary);
     if (pFile.fail())
@@ -33,9 +34,26 @@ bool CachedPages::load_page(const string& path, const string& name)
         std::istreambuf_iterator<char>());
 
     page.contentLength = page.data.size();
-    pages.insert(make_pair(name, page));
+    pages.insert(make_pair(ws_itoa(status), page));
 
-    LOG_INFO("Loaded " + name + " page at: " + path);
+    LOG_INFO("Loaded error page at: " + path);
+    return true;
+}
+
+bool CachedPages::load_page(const string& path)
+{
+    ifstream pFile(path.c_str(), std::ios_base::binary);
+    if (pFile.fail())
+        return false;
+
+    Page page;
+    page.data = vector<char>((std::istreambuf_iterator<char>(pFile)),
+        std::istreambuf_iterator<char>());
+
+    page.contentLength = page.data.size();
+    pages.insert(make_pair(path, page));
+
+    LOG_INFO("Loaded page at: " + path);
     return true;
 }
 
@@ -102,4 +120,12 @@ Page& CachedPages::get_page(const string& pageName)
         return get_error_page(NOT_FOUND);
     }
     return pages.at(pageName);
+}
+
+void CachedPages::set_index_page(const string& indexPath)
+{
+    if (pages.find(indexPath) == pages.end()) {
+        if (!load_page(indexPath))
+            LOG_ERROR("Failed to load page " + indexPath);
+    }
 }

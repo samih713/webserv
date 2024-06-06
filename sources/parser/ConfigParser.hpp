@@ -76,13 +76,13 @@ static const string ERR_METHOD("Config: invalid method");
 static const string ERR_MISSING_METHODS("Config: missing allow_methods");
 static const string ERR_EMPTY_METHODS("Config: no allowed methods found");
 
+// redirect directive error messages
+static const string ERR_REDIRECT("Config: invalid redirect directive");
+static const string ERR_REDIRECT_SLASH("Config: URI is missing / in the beginning");
+static const string ERR_REDIRECT_DUP_SLASH("Config: location URI contains multiple /");
+
 #define MAX_PORT 65535
 
-// TODO:
-// check for duplicate error pages
-// handle cgi related directives
-// parse error codes and pages better
-// checking if root and root+index is valid or not
 
 #define NUM_KEYWORDS 15
 
@@ -111,15 +111,15 @@ private:
     void         parse_location_context(ServerConfig& server);
 
     // parsing config directives
-    void   parse_allow_methods(vector<string>& methods);
-    bool   parse_autoindex(void);
-    size_t parse_client_max_body_size(void);
-    void   parse_error_page(StatusCodeMap& errorPages, const string& root);
-    fd     parse_listen(in_addr_t& host, bool& defaultServer);
-    void   parse_http_redirection();
-    void   parse_index(string& indexFile, const string& root);
-    void   parse_root(string& root);
-    void   parse_server_name(string& serverName);
+    vector<string> parse_allow_methods(void);
+    bool           parse_autoindex(void);
+    size_t         parse_client_max_body_size(void);
+    void           parse_error_page(StatusCodeMap& errorPages, const string& root);
+    fd             parse_listen(in_addr_t& host, bool& defaultServer);
+    void           parse_http_redirection(RedirectionMap& redirMap);
+    void           parse_index(string& indexFile, const string& root);
+    void           parse_root(string& root);
+    void           parse_server_name(string& serverName);
 
     bool is_number(const string& str)
     {

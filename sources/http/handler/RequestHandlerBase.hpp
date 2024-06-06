@@ -30,8 +30,9 @@ public:
         return fileTypeItr->second;
     }
 
-    const vector<char>& make_error_body(STATUS_CODE status)
+    const vector<char>& make_error_body(STATUS_CODE _status)
     {
+        status  = _status;
         Page& p = cp.get_error_page(status);
         _add_header("Content-Type", p.contentType);
         _add_header("Content-Length", ws_itoa(p.contentLength));
