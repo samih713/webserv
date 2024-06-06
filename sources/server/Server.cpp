@@ -113,6 +113,7 @@ void Server::select_strat()
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
 					tcp = ConnectionManager::get_tcp(currentSocket);
                     incoming = tcp->accept();
+					usleep(10000);
 					LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
 					ConnectionManager::add_fd_pair(tcp, incoming);
 				}

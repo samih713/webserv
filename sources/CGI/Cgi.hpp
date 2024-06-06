@@ -19,7 +19,6 @@ private:
     string  _body;
     char**  _arguments;
     char**  _environment;
-    // TimeOut _timer;
 
     CachedPages& _cp;
 
