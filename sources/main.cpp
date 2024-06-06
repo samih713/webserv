@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 
         // for (size_t i = 0; i < servers.size(); i++)
         //     servers[i].print();
-        Server& webserv = Server::get_instance(servers, 10);
+        Server& webserv = Server::get_instance(servers, 100);
 #if defined(__LINUX__)
         webserv.start(SELECT);
 #elif defined(__MAC__)

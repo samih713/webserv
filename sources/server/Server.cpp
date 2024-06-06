@@ -31,7 +31,9 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cp(new CachedPages(cfg
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
 {
     LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
-	DEBUGASSERT(incoming != -1);
+	if (incoming == -1)
+		return ;
+	// DEBUGASSERT(incoming != -1);
 
     try {
         ConnectionManager::check_connection(incoming);
@@ -104,7 +106,6 @@ void Server::select_strat()
         ConnectionManager::remove_expired();
         readytoRead = ConnectionManager::get_active_sockets();
 
-        // TODO need to implement writeFds
         if (select(maxSD + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
             THROW_EXCEPTION_WITH_INFO(strerror(errno));
 
@@ -115,14 +116,11 @@ void Server::select_strat()
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
 					tcp = ConnectionManager::get_tcp(currentSocket);
                     incoming = tcp->accept();
-					LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
+					// LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
 					ConnectionManager::add_fd_pair(tcp, incoming);
 				}
                 else {
                     incoming = currentSocket;
-					if (incoming < 1) {
-						LOG_INFO("new");
-					}
 					tcp = ConnectionManager::get_tcp(currentSocket);
 				}
                 handle_connection(incoming, servers.at(*tcp));
