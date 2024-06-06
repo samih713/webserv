@@ -11,6 +11,8 @@ using std::set;
 // file related error messages
 static const string ERR_FILE_EXTENSION("Config: invalid file extension");
 static const string ERR_FILE("Config: invalid file ");
+static const string ERR_FILE_TYPE("Config: file is a directory");
+static const string ERR_FILE_PERM("Config: invalid file permissions");
 static const string ERR_OPEN("Config: cannot open file");
 static const string ERR_EMPTY("Config: file is empty");
 
@@ -109,7 +111,7 @@ private:
 
     // parsing config directives
     void   parse_index(string& indexFile, const string& root);
-    void   parse_error_page(map<STATUS_CODE, string>& errorPages, const string& root);
+    void   parse_error_page(StatusCodeMap& errorPages, const string& root);
     fd     parse_listen(in_addr_t& host, bool& defaultServer);
     void   parse_server_name(string& serverName);
     void   parse_root(string& root);

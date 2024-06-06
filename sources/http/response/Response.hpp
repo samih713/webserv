@@ -26,9 +26,6 @@ private:
     inline void  load_headers(ostringstream& os) const;
     // deleted copy assignment
     void operator=(const Response&);
-    // response constants
-
-    static const string& version;
 };
 
 #endif // RESPONSE_HPP

@@ -1,7 +1,6 @@
 #include "DeleteRequestHandler.hpp"
 #include "CachedPages.hpp"
 #include "Cgi.hpp"
-#include "debug.hpp"
 
 Response DeleteRequestHandler::handle_request(const Request& r)
 {
@@ -30,16 +29,16 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
         return (make_error_body(FORBIDDEN));
     }
 
-    //? why is this needed for DELETE
-    // string resource_type = find_resource_type(resource);
-    // if (resource_type.length() != 0)
-    //     _add_header("Content-Type", resource_type);
-
-    // If resource URI does not end with "/", set status code to 409 (Conflict)
+	struct stat fileInfo;
+	stat(resource.c_str(), &fileInfo);
+	if (S_ISDIR(fileInfo.st_mode))
+	{
+     // If resource URI does not end with "/", set status code to 409 (Conflict)
     if (!endsWith(resource, "/")) {
         LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
         return (make_error_body(CONFLICT));
     }
+	}
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {

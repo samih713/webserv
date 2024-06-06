@@ -56,7 +56,6 @@ bool Request::parse_chunked_body()
 
 // https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.3
 // TODO handle transfer size
-// ! what if there is no length specified?
 bool Request::parse_body()
 {
     DEBUGASSERT(!message.eof() && "available is negative");

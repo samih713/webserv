@@ -1,6 +1,4 @@
 #include "Request.hpp"
-#include "debug.hpp"
-
 
 // ! CGI
 Request::Request()
@@ -44,7 +42,7 @@ STATUS_CODE Request::get_status() const
 
 const string& Request::get_query_string() const
 {
-    return queryString;
+    return header.queryString;
 }
 
 void Request::set_status(STATUS_CODE s)
