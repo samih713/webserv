@@ -57,11 +57,10 @@ void Server::handle_connection(fd incoming, fd_set& activeSockets,
         Request& r = ConnectionManager::add_connection(incoming, activeSockets);
 
         r.recv(incoming);
-        if (!r.process(cfg)) //? should each request be paired with location?
+        if (!r.process(cfg))
             return;
 
-        IRequestHandler* handler = make_request_handler(r.get_method());
-        // ! need to check if request is allowed for specific resource
+        IRequestHandler* handler = make_request_handler(r);
         Response response = handler->handle_request(r);
 
         if (r.cgiStatus == IN_PROCESS) {
