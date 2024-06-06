@@ -7,12 +7,10 @@
 
 class DeleteRequestHandler: public RequestHandlerBase {
 public:
-    DeleteRequestHandler(const ServerConfig& cfg, CachedPages& cp)
-        : RequestHandlerBase(cfg, cp)
-    {
-        DEBUG_MSG("DeleteRequestHandler constructor called", B);
-    }
-    ~DeleteRequestHandler() { DEBUG_MSG("DeleteRequestHandler destructor called", B); };
+    DeleteRequestHandler(const ServerConfig& cfg)
+        : RequestHandlerBase(cfg)
+    {}
+    ~DeleteRequestHandler() {};
 
     Response handle_request(const Request& r);
 

@@ -1,5 +1,4 @@
 #include "CachedPages.hpp"
-#include "ConnectionManager.hpp"
 #include "DeleteRequestHandler.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
@@ -20,6 +19,8 @@ enum polling_strat {
     EPOLL
 };
 
+typedef map<TCPSocket, ServerConfig> servers_t;
+
 // wait message
 static const string WAIT_MESSAGE("*** Server is now waiting for connections ***");
 // default backLog
@@ -33,30 +34,40 @@ static const int MAX_EVENTS(16);
 
 class Server {
 public:
-    static Server& get_instance(ServerConfig& cfg, int backLog = DEFAULT_BACKLOG);
-    ~Server();
+    static Server& get_instance(vector<ServerConfig>& cfgs, int backLog = DEFAULT_BACKLOG)
+    {
+        static Server instance(cfgs, backLog);
+        return instance;
+    }
+
+    ~Server()
+    {
+        for (vector<ServerConfig>::iterator sc = cfgs.begin(); sc != cfgs.end(); sc++)
+            delete sc->cp;
+    }
+
     void start(enum polling_strat);
 
 private:
-    TCPSocket     listener;
-    ServerConfig& cfg;
-    CachedPages*  cp;
+    servers_t servers;
+	vector<ServerConfig> &cfgs;
+    // CachedPages* cp;
 
-    Server(ServerConfig& cfg, int backLog);
+    Server(vector<ServerConfig>& cfgs, int backLog);
 
-    IRequestHandler* make_request_handler(const string& method)
+    IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
     {
         if (method == "GET")
-            return new GetRequestHandler(cfg, *cp);
+            return new GetRequestHandler(cfg);
         else if (method == "POST")
-            return new PostRequestHandler(cfg, *cp);
+            return new PostRequestHandler(cfg);
         else if (method == "DELETE")
-            return new DeleteRequestHandler(cfg, *cp);
+            return new DeleteRequestHandler(cfg);
         else //! return 501 Not implemented
             THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
     }
 
-    void handle_connection(fd incoming, fd_set& activeSockets, fd& maxSocketDescriptor);
+    void handle_connection(fd incoming, ServerConfig& cfg);
 
     /* polling strats */
     void select_strat();

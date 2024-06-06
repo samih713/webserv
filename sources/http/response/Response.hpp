@@ -7,6 +7,7 @@
 
 //! this is needed because in a case where the request is not found, the server should
 //! return a 404 error page should be removed and combined with the CachedPages.hpp
+typedef map<STATUS_CODE, string> StatusCodeMap;
 
 static const string ERR_SEND_FAIL("Response: Failed to send: ");
 

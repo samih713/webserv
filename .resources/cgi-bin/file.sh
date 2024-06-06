@@ -1,3 +1,3 @@
 #!/bin/sh
-#sleep 10
-echo "Hello, World Bash! $name $"
+sleep 3
+echo "Hello, World Bash!"

@@ -19,7 +19,6 @@ private:
     string  _requestBody;
     char**  _arguments;
     char**  _environment;
-    TimeOut _timer; //! need more testing
 
     CachedPages& _cp;
 

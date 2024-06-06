@@ -34,7 +34,6 @@ bool CachedPages::load_page(const string& path, const string& name)
                  std::istreambuf_iterator<char>());
     page.contentLength = page.data.size();
     pages.insert(make_pair(name, page));
-
     return true;
 }
 

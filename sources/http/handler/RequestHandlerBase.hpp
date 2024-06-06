@@ -7,7 +7,7 @@
 // Base class for request handlers
 class RequestHandlerBase: public IRequestHandler {
 public:
-    RequestHandlerBase(const ServerConfig& cfg, CachedPages& cp) : cfg(cfg), cp(cp) {};
+    RequestHandlerBase(const ServerConfig& cfg) : cfg(cfg), cp(cfg.cp) {};
     ~RequestHandlerBase() {};
 
     void _add_header(const string& headerName, const string& headerValue)
@@ -29,9 +29,11 @@ public:
         return fileTypeItr->second;
     }
 
-    const vector<char>& make_error_body(STATUS_CODE status, CachedPages& cp)
+    const vector<char>& make_error_body(STATUS_CODE _status)
     {
-        Page& p = cp.get_error_page(status);
+		status = _status;
+        Page& p = cp->get_error_page(status);
+
         _add_header("Content-Type", p.contentType);
         _add_header("Content-Length", ws_itoa(p.contentLength));
         return p.data;
@@ -42,7 +44,7 @@ protected:
     HeaderMap   responseHeaders;
 
     const ServerConfig& cfg;
-    CachedPages&        cp;
+    CachedPages*        cp;
 };
 
 #endif // REQUEST_HANDLER_BASE_HPP

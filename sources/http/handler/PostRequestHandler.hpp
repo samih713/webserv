@@ -7,11 +7,9 @@
 
 class PostRequestHandler: public RequestHandlerBase {
 public:
-    PostRequestHandler(ServerConfig& cfg, CachedPages& cp) : RequestHandlerBase(cfg, cp)
-    {
-        DEBUG_MSG("PostRequestHandler constructor called", B);
-    }
-    ~PostRequestHandler() { DEBUG_MSG("PostRequestHandler destructor called", B); }
+    PostRequestHandler(ServerConfig& cfg) : RequestHandlerBase(cfg)
+    {}
+    ~PostRequestHandler() {}
 
     Response handle_request(const Request& r);
 

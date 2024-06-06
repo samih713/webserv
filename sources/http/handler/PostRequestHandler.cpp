@@ -3,7 +3,7 @@
 
 Response PostRequestHandler::handle_request(const Request& r)
 {
-    DEBUG_MSG("Handling POST request", W);
+    LOG_DEBUG("Handling POST request for resource: " + r.get_resource());
 
     // TODO need to check if the body is exceeding max body size
     // TODO need to check type of content

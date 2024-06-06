@@ -4,7 +4,7 @@
 
 Response DeleteRequestHandler::handle_request(const Request& r)
 {
-    DEBUG_MSG("Handling Delete request ... ", B);
+    LOG_DEBUG("Handling Delete request for resource: " + r.get_resource());
 
     _add_header("Server", cfg.serverName);
 
@@ -26,29 +26,26 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
     // Check if resource URI contains ".." and write permissions
     if (resource.find("..") != string::npos || access(resource.c_str(), W_OK) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Forbidden ]");
-        status = FORBIDDEN;
-        return (make_error_body(status, cp));
+        return (make_error_body(FORBIDDEN));
     }
 
 	struct stat fileInfo;
 	stat(resource.c_str(), &fileInfo);
 	if (S_ISDIR(fileInfo.st_mode))
 	{
-	    // If resource URI does not end with "/", set status code to 409 (Conflict)
-	    if (!endsWith(resource, "/")) {
-	        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
-	        status = CONFLICT;
-	        return (make_error_body(status, cp));
-	    }
+     // If resource URI does not end with "/", set status code to 409 (Conflict)
+    if (!endsWith(resource, "/")) {
+        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
+        return (make_error_body(CONFLICT));
+    }
 	}
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {
         LOG_INFO("DELETE: Resource '" + resource + "' : [ Error deleting resource ]");
-        status = INTERNAL_SERVER_ERROR;
-        return (make_error_body(status, cp));
+        return (make_error_body(INTERNAL_SERVER_ERROR));
     }
     LOG_INFO("DELETE: Resource '" + resource + "' : [ Deleted ]");
     status = OK;
-    return make_error_body(status, cp); // Return 200 OK
+    return body;
 }
