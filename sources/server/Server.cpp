@@ -38,13 +38,12 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
         ConnectionManager::check_connection(incoming);
 
         Request& r = ConnectionManager::add_connection(incoming);
-        r.recv(incoming); //! check if it loops in here again
+        r.recv(incoming);
         if (!r.process(cfg))
             return;
 
         IRequestHandler* handler = make_request_handler(r.get_method(), cfg);
 
-        // ! need to check if request is allowed for specific resource
         Response response = handler->handle_request(r);
 
         if (r.cgiStatus == NOT_SET) {
@@ -55,8 +54,6 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
             r.cgiStatus = TEMP; // set to temp to avoid double processing
             r.cgiClient = incoming;
             ConnectionManager::add_cgi_connection(r);
-			LOG_INFO("client [[["+ ws_itoa(r.cgiClient) + "]]]");
-			LOG_INFO("read [[["+ ws_itoa(r.cgiReadFd) + "]]]");
         }
         else if (r.cgiStatus == COMPLETED) {
             LOG_DEBUG("CGI is completed, sending response");
@@ -110,17 +107,13 @@ void Server::select_strat()
 
         for (fd currentSocket = 0; currentSocket <= maxSD; currentSocket++) {
             if (FD_ISSET(currentSocket, &readytoRead)) {
+				tcp = ConnectionManager::get_tcp(currentSocket);
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
-					tcp = ConnectionManager::get_tcp(currentSocket);
                     incoming = tcp->accept();
-					usleep(10000);
-					LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
 					ConnectionManager::add_fd_pair(tcp, incoming);
 				}
-                else {
+                else
                     incoming = currentSocket;
-					tcp = ConnectionManager::get_tcp(currentSocket);
-				}
                 handle_connection(incoming, servers.at(*tcp));
             }
         }

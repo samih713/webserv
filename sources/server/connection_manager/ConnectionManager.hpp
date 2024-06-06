@@ -55,6 +55,7 @@ inline fd_set ConnectionManager::add_listeners(const servers_t& servers)
 {
     fd_set listenerFDs;
     FD_ZERO(&activeSockets);
+    FD_ZERO(&listenerFDs);
     for (servers_t::const_iterator s = servers.begin(); s != servers.end(); s++) {
         fd listenerFD = s->first.get_fd();
         FD_SET(listenerFD, &activeSockets);
