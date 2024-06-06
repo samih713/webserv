@@ -38,7 +38,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
     string resource_type = find_resource_type(resource); //! doesn't make sense
     if (resource_type.length() != 0)
         _add_header("Content-Type", resource_type);
-    if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
+    if (resource.find("/cgi-bin") != string::npos) {
         CGI cgi(r, cfg, cp);
         body = cgi.execute(r.cgiStatus, r.cgiReadFd,
             r.cgiChild); // ! r.fd set reference is kinda idk

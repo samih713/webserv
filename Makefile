@@ -8,7 +8,7 @@ CXX:= c++
 DEPFLAGS:= -MMD -MP
 DEBUGFLAGS:= -ggdb3 -D__DEBUG__
 SANITIZE:= -fsanitize=address
-CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 #$(SANITIZE) $(DEBUGFLAGS)
+CXXFLAGS:= -Wall -Wextra -Werror -std=c++98 $(SANITIZE) $(DEBUGFLAGS)
 
 ### OS DETECTION ###
 ifeq ($(shell uname), Linux)

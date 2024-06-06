@@ -3,17 +3,14 @@
 /**
  * Removes expired connections from the connection map.
  *
- * @param currentSockets The set of file descriptors representing the current active
- * sockets.
- *
  * @return void
  */
-void ConnectionManager::remove_expired(fd_set& currentSockets)
+void ConnectionManager::remove_expired()
 {
     ConnectionMap::iterator it = connectionMap.begin();
     while (it != connectionMap.end())
         if (it->second.timer.is_timeout()) {
-            FD_CLR(it->first, &currentSockets);
+            FD_CLR(it->first, &activeSockets);
             close(it->first);
             connectionMap.erase(it++);
             LOG_INFO("Server: connection timed out.");

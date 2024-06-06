@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     }
 
     try {
-        string configFile = (argc == 2) ? argv[1] : "./configs/default.conf";
+        string configFile = (argc == 2) ? argv[1] : "./configs/webserv.conf";
 
         ConfigParser&        parser  = ConfigParser::get_instance(configFile);
         vector<ServerConfig> servers = parser.parse();
@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 
         // for (size_t i = 0; i < servers.size(); i++)
         //     servers[i].print();
-        Server& webserv = Server::get_instance(servers[0], 10);
+        Server& webserv = Server::get_instance(servers, 10);
 #if defined(__LINUX__)
         webserv.start(SELECT);
 #elif defined(__MAC__)
