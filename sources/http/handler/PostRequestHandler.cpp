@@ -24,7 +24,9 @@ vector<char> PostRequestHandler::process_data(const Request& r)
     // for uploads, check if the location block allows uploads
 
     if (requestBody.empty()) // no data to write
+	{
         return make_error_body(BAD_REQUEST, cp);
+	}
 
 	if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
         CGI cgi(r, cfg, cp);
