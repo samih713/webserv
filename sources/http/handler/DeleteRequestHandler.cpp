@@ -30,17 +30,17 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
         return (make_error_body(status, cp));
     }
 
-    //? why is this needed for DELETE
-    // string resource_type = find_resource_type(resource);
-    // if (resource_type.length() != 0)
-    //     _add_header("Content-Type", resource_type);
-
-    // If resource URI does not end with "/", set status code to 409 (Conflict)
-    if (!endsWith(resource, "/")) {
-        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
-        status = CONFLICT;
-        return (make_error_body(status, cp));
-    }
+	struct stat fileInfo;
+	stat(resource.c_str(), &fileInfo);
+	if (S_ISDIR(fileInfo.st_mode))
+	{
+	    // If resource URI does not end with "/", set status code to 409 (Conflict)
+	    if (!endsWith(resource, "/")) {
+	        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
+	        status = CONFLICT;
+	        return (make_error_body(status, cp));
+	    }
+	}
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {

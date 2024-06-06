@@ -138,7 +138,7 @@
             const data = document.getElementById('data').value;
 
             // Send DELETE request to delete the file
-            const response = await fetch(`sample_pages/${encodeURIComponent(data)}`, {
+            const response = await fetch(`/sample_pages/${encodeURIComponent(data)}`, {
                 method: 'DELETE'
             });
 

@@ -8,16 +8,18 @@ cgitb.enable()
 #print("Content-Type: text/html\n")
 
 # Parse query string
-query_string = os.environ.get('QUERY_STRING', '')
-form = cgi.FieldStorage()
-data = form.getvalue('username')
+# query_string = os.environ.get('QUERY_STRING', '')
+# form = cgi.parse_qs(query_string)
+#username = form.get("username", [""])[0]
+
+username = os.environ.get('username','')
 
 print(f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CGI Test Result</title>
+    <title>GET Test Result</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -40,8 +42,8 @@ print(f"""
 </head>
 <body>
     <div class="container">
-        <h1>CGI Test Result</h1>
-        <p>Hello, {data}!</p>
+        <h1>GET Test Result</h1>
+        <p>Hello, {username} !</p>
     </div>
 </body>
 </html>
