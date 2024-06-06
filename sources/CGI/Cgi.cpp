@@ -102,6 +102,7 @@ pid_t CGI::execute_child(fd& cgiReadFd)
 vector<char> CGI::execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild)
 {
     if (cgiStatus == NOT_SET) {
+		// LOG_DEBUG("here");
         cgiStatus = IN_PROCESS;
         cgiChild  = execute_child(cgiReadFd);
         if (cgiChild == -1) {
@@ -112,22 +113,21 @@ vector<char> CGI::execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild)
 
     vector<char> body;
 
-    if (waitpid(cgiChild, NULL, WNOHANG) == cgiChild) {
-        char buffer[1024];
+    if ((waitpid(cgiChild, NULL, WNOHANG) == cgiChild)) {
+        char buffer[1024] = {0};
         while (true) {
             ssize_t bytesRead = read(cgiReadFd, buffer, sizeof(buffer));
-            DEBUGASSERT(bytesRead < 0);
+            if (bytesRead == 0)
+                break;
+            DEBUGASSERT(bytesRead > 0);
             if (bytesRead > 0)
                 body.insert(body.end(), buffer, buffer + bytesRead);
             if (bytesRead == -1) {
                 LOG_ERROR("CGI: Error reading from pipe: " + string(strerror(errno)));
                 return (_cp.get_error_page(INTERNAL_SERVER_ERROR).data);
             }
-            if (bytesRead == 0)
-                break;
         }
         cgiStatus = COMPLETED;
     }
-
     return body;
 }

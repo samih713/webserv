@@ -31,7 +31,7 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cp(new CachedPages(cfg
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
 {
     LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
-	DEBUGASSERT(incoming > 1);
+	DEBUGASSERT(incoming != -1);
 
     try {
         ConnectionManager::check_connection(incoming);
@@ -44,6 +44,7 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
         }
 
         IRequestHandler* handler = make_request_handler(r.get_method(), cfg);
+
         // ! need to check if request is allowed for specific resource
         Response response = handler->handle_request(r);
 
@@ -52,11 +53,11 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
             ConnectionManager::remove_connection(incoming);
         }
         else if (r.cgiStatus == IN_PROCESS) {
-			LOG_INFO("In process [" + ws_itoa(incoming) + "]");
             r.cgiStatus = TEMP; // set to temp to avoid double processing
             r.cgiClient = incoming;
-			LOG_INFO("In process [" + ws_itoa(r.cgiClient) + "]");
             ConnectionManager::add_cgi_connection(r);
+			LOG_INFO("client [[["+ ws_itoa(r.cgiClient) + "]]]");
+			LOG_INFO("read [[["+ ws_itoa(r.cgiReadFd) + "]]]");
         }
         else if (r.cgiStatus == COMPLETED) {
             LOG_DEBUG("CGI is completed, sending response");
@@ -114,9 +115,7 @@ void Server::select_strat()
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
 					tcp = ConnectionManager::get_tcp(currentSocket);
                     incoming = tcp->accept();
-					if (incoming < 1) {
-						LOG_INFO("listener");
-					}
+					LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
 					ConnectionManager::add_fd_pair(tcp, incoming);
 				}
                 else {
@@ -126,7 +125,7 @@ void Server::select_strat()
 					}
 					tcp = ConnectionManager::get_tcp(currentSocket);
 				}
-                handle_connection(incoming, servers.at(*tcp)); //!
+                handle_connection(incoming, servers.at(*tcp));
             }
         }
     }

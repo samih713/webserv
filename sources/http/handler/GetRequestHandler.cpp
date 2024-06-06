@@ -40,8 +40,10 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         _add_header("Content-Type", resource_type);
     if (resource.find("/cgi-bin") != string::npos) {
         CGI cgi(r, cfg, cp);
+
         body = cgi.execute(r.cgiStatus, r.cgiReadFd,
             r.cgiChild); // ! r.fd set reference is kinda idk
+
         _add_header("Content-Length", ws_itoa(body.size()));
     }
     else {
