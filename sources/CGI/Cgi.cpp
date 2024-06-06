@@ -1,7 +1,7 @@
 #include "Cgi.hpp"
 
 CGI::CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp)
-    : _body(request.get_body()), _cp(cp)
+    : _requestBody(request.get_body()), _cp(cp)
 {
     string resource = request.get_resource();
     _filePath       = resource;

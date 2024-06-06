@@ -25,11 +25,11 @@ vector<char> PostRequestHandler::process_data(const Request& r)
 
     if (requestBody.empty()) // no data to write
 	{
-        return make_error_body(BAD_REQUEST, cp);
+        return make_error_body(BAD_REQUEST);
 	}
 
 	if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
-        CGI cgi(r, cfg, cp);
+        CGI cgi(r, cfg, *cp);
         responseBody = cgi.execute(r.cgiStatus, r.cgiReadFd,
             r.cgiChild); // ! r.fd set reference is kinda idk
        // _add_header("Content-Length", ws_itoa(responseBody.size()));
@@ -40,7 +40,7 @@ vector<char> PostRequestHandler::process_data(const Request& r)
 	    if (!outputFile.is_open()) // failed to open file
 	    {
 	        cout << "Failed to open file\n";
-	        return make_error_body(INTERNAL_SERVER_ERROR, cp);
+	        return make_error_body(INTERNAL_SERVER_ERROR);
 	    }
 
 	    // need to check if file is too big (return 413 if so)
