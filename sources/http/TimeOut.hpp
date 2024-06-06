@@ -12,6 +12,8 @@ public:
     void update_time() { lastEvent = time(0); }
     bool is_timeout() { return (time(0) - lastEvent) > timeOut; };
 
+    struct Exception: public std::exception {};
+
 private:
     const static time_t timeOut = DEFAULT_TIMEOUT;
     time_t              lastEvent;
