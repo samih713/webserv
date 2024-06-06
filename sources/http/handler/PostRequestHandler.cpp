@@ -1,4 +1,5 @@
 #include "PostRequestHandler.hpp"
+#include "Cgi.hpp"
 
 Response PostRequestHandler::handle_request(const Request& r)
 {
@@ -25,25 +26,33 @@ vector<char> PostRequestHandler::process_data(const Request& r)
     if (requestBody.empty()) // no data to write
         return make_error_body(BAD_REQUEST, cp);
 
-    // append to file
-    cout << resource << endl;
-    ofstream outputFile(resource.c_str(), std::ios_base::app);
-    if (!outputFile.is_open()) // failed to open file
-    {
-        cout << "Failed to open file\n";
-        return make_error_body(INTERNAL_SERVER_ERROR, cp);
+	if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
+        CGI cgi(r, cfg, cp);
+        responseBody = cgi.execute(r.cgiStatus, r.cgiReadFd,
+            r.cgiChild); // ! r.fd set reference is kinda idk
+       // _add_header("Content-Length", ws_itoa(responseBody.size()));
     }
+	else{
+    	// append to file
+	    ofstream outputFile(resource.c_str(), std::ios_base::app);
+	    if (!outputFile.is_open()) // failed to open file
+	    {
+	        cout << "Failed to open file\n";
+	        return make_error_body(INTERNAL_SERVER_ERROR, cp);
+	    }
 
-    // need to check if file is too big (return 413 if so)
-    // need to check if the file type is allowed (return 415 if not)
-    // need to handle CGI POST requests
-    outputFile << requestBody;
-    outputFile.close();
+	    // need to check if file is too big (return 413 if so)
+	    // need to check if the file type is allowed (return 415 if not)
+	    // need to handle CGI POST requests
+	    outputFile << requestBody;
+	    outputFile.close();
+		//! build response body
+	    string successMsg = "POST request was successful.";
+	    responseBody.assign(successMsg.begin(), successMsg.end());
+	}
 
     status = OK;
-    //! build response body
-    string successMsg = "POST request was successful.";
-    responseBody.assign(successMsg.begin(), successMsg.end());
+    
     _add_header("Content-Length", ws_itoa(responseBody.size()));
     _add_header("Content-Type", "text/html;");
 
