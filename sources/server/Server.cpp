@@ -30,20 +30,17 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cp(new CachedPages(cfg
 // TODO this function does not work with kqueue, only select
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
 {
-    LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
-	if (incoming == -1)
+	if (incoming < 0)
 		return ;
-	// DEBUGASSERT(incoming != -1);
 
+    LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
     try {
         ConnectionManager::check_connection(incoming);
 
         Request& r = ConnectionManager::add_connection(incoming);
         r.recv(incoming); //! check if it loops in here again
-        if (!r.process(cfg)) {
-            // ConnectionManager::remove_connection(incoming);
+        if (!r.process(cfg))
             return;
-        }
 
         IRequestHandler* handler = make_request_handler(r.get_method(), cfg);
 
@@ -116,7 +113,7 @@ void Server::select_strat()
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
 					tcp = ConnectionManager::get_tcp(currentSocket);
                     incoming = tcp->accept();
-					// LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
+					LOG_INFO("incoming: [" + ws_itoa(incoming) + "]");
 					ConnectionManager::add_fd_pair(tcp, incoming);
 				}
                 else {

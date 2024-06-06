@@ -113,6 +113,7 @@ fd TCPSocket::accept() const
     if (newSocket == invalidFD) {
         if (errno != EAGAIN && errno != EWOULDBLOCK)
             THROW_EXCEPTION_WITH_INFO(ERR_ACCP);
+		// THROW_EXCEPTION_WITH_INFO(ERR_ACCP); //! set error page to 503
     }
     return newSocket;
 }
