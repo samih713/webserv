@@ -17,13 +17,16 @@ public:
 
     const string find_resource_type(const string& resource)
     {
-        size_t extension_index = resource.find_last_of('.');
-        string file_extension;
-        if (extension_index != string::npos)
-            file_extension = resource.substr(extension_index + 1);
-        else
-            file_extension = "";
-        return fileTypes.find(file_extension)->second; //!
+        size_t extensionPos = resource.find_last_of('.');
+        if (extensionPos == string::npos)
+            return ""; // no matching extension
+
+        string fileExtension = resource.substr(extensionPos + 1);
+
+        HeaderMap::const_iterator fileTypeItr = fileTypes.find(fileExtension);
+        if (fileTypeItr == fileTypes.end())
+            return "";
+        return fileTypeItr->second;
     }
 
     const vector<char>& make_error_body(STATUS_CODE _status)

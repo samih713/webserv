@@ -1,37 +1,62 @@
 #include "PostRequestHandler.hpp"
+#include "Cgi.hpp"
 
 Response PostRequestHandler::handle_request(const Request& r)
 {
     LOG_DEBUG("Handling POST request for resource: " + r.get_resource());
 
-    vector<char>  body;
-    const string& resource = r.get_resource();
-    string        fileToWrite;
+    // TODO need to check if the body is exceeding max body size
+    // TODO need to check type of content
 
+    status = r.get_status();
     _add_header("Server", cfg.serverName);
 
-    FileType fileType = get_file_type(resource);
-    if (fileType == NO_EXIST) {
-        // resource does not exist so create it
-    }
-    else if (fileType == NO_PERM) {
-        // resource exists but no permission to write
-        // return 403 Forbidden
-    }
-    else if (fileType == REG_FILE) {
-        // resource exists and is a regular file
-        // append to file
-    }
-    else if (fileType == DIR) {
-        // resource exists and is a directory
-        //
-    }
-    else {
-        // unexpected error
-    }
-    (void) fileType;
-
-    (void) cp;
-
+    vector<char> body = process_data(r);
     return Response(status, responseHeaders, body);
+}
+
+vector<char> PostRequestHandler::process_data(const Request& r)
+{
+    const string& resource    = r.get_resource();
+    const string& requestBody = r.get_body();
+    vector<char>  responseBody;
+
+    // for uploads, check if the location block allows uploads
+
+    if (requestBody.empty()) // no data to write
+	{
+        return make_error_body(BAD_REQUEST);
+	}
+
+	if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
+        CGI cgi(r, cfg, *cp);
+        responseBody = cgi.execute(r.cgiStatus, r.cgiReadFd,
+            r.cgiChild); // ! r.fd set reference is kinda idk
+       // _add_header("Content-Length", ws_itoa(responseBody.size()));
+    }
+	else{
+    	// append to file
+	    ofstream outputFile(resource.c_str(), std::ios_base::app);
+	    if (!outputFile.is_open()) // failed to open file
+	    {
+	        cout << "Failed to open file\n";
+	        return make_error_body(INTERNAL_SERVER_ERROR);
+	    }
+
+	    // need to check if file is too big (return 413 if so)
+	    // need to check if the file type is allowed (return 415 if not)
+	    // need to handle CGI POST requests
+	    outputFile << requestBody;
+	    outputFile.close();
+		//! build response body
+	    string successMsg = "POST request was successful.";
+	    responseBody.assign(successMsg.begin(), successMsg.end());
+	}
+
+    status = OK;
+    
+    _add_header("Content-Length", ws_itoa(responseBody.size()));
+    _add_header("Content-Type", "text/html;");
+
+    return responseBody;
 }

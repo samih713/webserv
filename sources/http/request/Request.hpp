@@ -51,7 +51,6 @@ private:
     Header       header;
     stringstream message;
     string       body;
-    string       queryString;
 
     // deleted copy assigment
     void operator=(const Request&);

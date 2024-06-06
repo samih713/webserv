@@ -3,7 +3,7 @@
 #ifndef FILETYPE_HPP
 #define FILETYPE_HPP
 
-static const pair<string, string> init_filetypes[] = {
+static const pair<string, string> typeList[] = {
     make_pair("html", "text/html"),
     make_pair("css", "text/css"),
     make_pair("js", "application/javascript"),
@@ -25,7 +25,7 @@ static const pair<string, string> init_filetypes[] = {
     make_pair("py", "python"),
 };
 
-static const HeaderMap fileTypes(init_filetypes,
-    init_filetypes + sizeof(init_filetypes) / sizeof(init_filetypes[0]));
+static const HeaderMap fileTypes(typeList,
+    typeList + sizeof(typeList) / sizeof(typeList[0]));
 
 #endif // FILETYPE_HPP

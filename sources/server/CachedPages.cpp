@@ -1,35 +1,14 @@
 #include "CachedPages.hpp"
 #include "Logger.hpp"
 
-typedef map<STATUS_CODE, string> StatusCodeMap;
-
 // ! combine it please
-/**
- * @brief Creates a map of status codes and their corresponding string representations.
- *
- * This function creates a map where the keys are status codes and the values are their
- * string representations. The status codes are defined in the STATUS_CODE_LIST macro.
- *
- * @return A StatusCodeMap object containing the status codes and their string
- * representations.
- */
-static StatusCodeMap createStatusCodeMap()
-{
-    StatusCodeMap map;
-#define X(a) map.insert(make_pair(a, #a));
-    STATUS_CODE_LIST
-#undef X
-    return map;
-}
-
-const StatusCodeMap status_codes_map = createStatusCodeMap();
 
 // loads all the error pages found in the config,
 // if the loading fails then generate the error page and add it to the map
 CachedPages::CachedPages(const ServerConfig& cfg)
 {
     //  load the error pages in config
-    for (map<STATUS_CODE, string>::const_iterator it = cfg.errorPages.begin();
+    for (StatusCodeMap::const_iterator it = cfg.errorPages.begin();
          it != cfg.errorPages.end(); it++)
     {
         if (!load_page(it->second, ws_itoa(it->first))) {

@@ -57,6 +57,7 @@
 #if defined(__MAC__)
 #include <sys/event.h>
 #endif
+
 /* --------------------------------- USING ---------------------------------- */
 using std::cerr;
 using std::cout;
@@ -76,17 +77,16 @@ using std::stack;
 using std::string;
 using std::stringstream;
 using std::vector;
+
 /* -------------------------------- TYPEDEFS -------------------------------- */
-// clang-format off
-typedef vector<pair<string, string> > vsp;
 typedef map<string, string> HeaderMap;
-// clang-format on
-// socket_descriptor type
-typedef int fd;
+typedef int                 fd; // socket_descriptor type
+
 /* --------------------------------- MACROS --------------------------------- */
 #define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
     static_cast<const ostringstream&>((ostringstream() << std::dec << number)).str()
+
 /* ----------------------------- ERROR MESSAGES ----------------------------- */
 #define THROW_EXCEPTION_WITH_INFO(msg)                                                   \
     do {                                                                                 \
@@ -95,7 +95,7 @@ typedef int fd;
         throw runtime_error(oss.str());                                                  \
     } while (0)
 
-static string ERR_NULL("Socket: null ptr error");
+static string ERR_NULL("Socket: null ptr error"); //* unused
 static string ERR_CREAT("Socket: creation failed");
 static string ERR_BIND("Socket: binding failed");
 static string ERR_NBIND("Socket: not bound to a port");
@@ -103,43 +103,6 @@ static string ERR_LIST("Socket: listen failed");
 static string ERR_NLIST("Socket: not listening");
 static string ERR_ACCP("Socket: accept failed");
 
-static string ERR_MEMORY_ALLOC("Memory: allocation failed");
-
-/* --------------------------- UTILITY FUNCTIONS ---------------------------- */
-enum FileType {
-    REG_FILE = 0,
-    DIR,
-    NO_EXIST,
-    NO_PERM,
-    UNEXPECTED
-};
-
-/**
- * @brief Determine the type of a given file.
- *
- * This function checks the type of a file specified by its path.
- * It can determine if the file is a regular file, a directory,
- * if it does not exist, if there is no permission to read/write,
- * or if it is an unexpected file type.
- *
- * @param file The path to the file.
- * @return FileType indicating the type of the file or an error.
- */
-inline FileType get_file_type(const string& file)
-{
-    struct stat fileInfo;
-    if (stat(file.c_str(), &fileInfo) == -1)
-        return NO_EXIST;
-
-    if (access(file.c_str(), R_OK | W_OK) == -1)
-        return NO_PERM;
-
-    if (S_ISDIR(fileInfo.st_mode))
-        return DIR;
-    else if (S_ISREG(fileInfo.st_mode))
-        return REG_FILE;
-
-    return UNEXPECTED;
-}
+static string ERR_MEMORY_ALLOC("Memory: allocation failed"); //* unused
 
 #endif // WEBSERV_HPP

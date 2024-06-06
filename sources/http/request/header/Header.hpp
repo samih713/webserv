@@ -27,6 +27,7 @@ struct Header {
     // members
     string    method;
     string    resource;
+    string    queryString;
     string    version;
     size_t    bodySize;
     HeaderMap fields;
@@ -41,6 +42,7 @@ private:
     void process_fields();
     void is_chunked(const HeaderMap::const_iterator it);
     void find_content_length(HeaderMap::const_iterator it);
+    void parse_query_string(string& resource);
 };
 
 // errors

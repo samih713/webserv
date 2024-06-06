@@ -1,7 +1,7 @@
 #include "Cgi.hpp"
 
 CGI::CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp)
-    : _body(request.get_body()), _cp(cp)
+    : _requestBody(request.get_body()), _cp(cp)
 {
     string resource = request.get_resource();
     _filePath       = resource;
@@ -44,19 +44,11 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
     envStrings.push_back("PATH_INFO=" + cfg.locations.at("/cgi-bin").root);
     envStrings.push_back("REQUEST_METHOD=" + request.get_method());
 
-    // "PATH_TRANSLATED" "REMOTEaddr" "REMOTE_IDENT" "REMOTE_USER"
-
-    // https://example.com/path/to/page?name=ferret&color=purple
-    // QUERY_STRING=name=ferret color=purple
-
-    //! this needs to be looked at
-    // string envQueryString = "QUERY_STRING=";
-    // char*  token          = strtok(const_cast<char*>(_queryString.c_str()), "&");
-    // // Iterate through the tokens and push
-    // while (token != NULL) {
-    //     envQueryString.push_back(token);
-    //     token = strtok(NULL, "&");
-    // }
+    char*  token = strtok(const_cast<char*>(_queryString.c_str()), "&");
+    while (token != NULL) {
+        envStrings.push_back(token);
+        token = strtok(NULL, "&");
+    }
 
     // Allocate memory for char* array
     char** envp = new char*[envStrings.size() + 1];
@@ -72,11 +64,14 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
 pid_t CGI::execute_child(fd& cgiReadFd)
 {
     int pipe_fd[2];
+	int pipe_in[2];
 
-    if (pipe(pipe_fd)) {
+    if (pipe(pipe_fd) || pipe(pipe_in)) {
         LOG_ERROR("CGI: Error creating pipe: " + string(strerror(errno)));
         return -1;
     }
+
+	write(pipe_in[1], _requestBody.c_str(), _requestBody.length());
 
     pid_t cgiChild = fork();
     if (cgiChild == -1) {
@@ -86,6 +81,9 @@ pid_t CGI::execute_child(fd& cgiReadFd)
 
     if (cgiChild == 0) {
         dup2(pipe_fd[1], STDOUT_FILENO);
+		dup2(pipe_in[0], STDIN_FILENO);
+		close(pipe_in[0]);
+        close(pipe_in[1]);
         close(pipe_fd[0]);
         close(pipe_fd[1]);
 
@@ -94,6 +92,9 @@ pid_t CGI::execute_child(fd& cgiReadFd)
             _exit(EXIT_FAILURE);
         }
     }
+	
+	close(pipe_in[0]);
+    close(pipe_in[1]);
     cgiReadFd = pipe_fd[0];
     close(pipe_fd[1]);
     return cgiChild;
