@@ -26,8 +26,6 @@ vector<char> PostRequestHandler::process_data(const Request& r)
     if (requestBody.empty()) // no data to write
         return make_error_body(BAD_REQUEST, cp);
 
-	cout<<resource<<endl;
-
 	if (resource.find("/cgi-bin") != string::npos) { //! cgi check again
         CGI cgi(r, cfg, cp);
         responseBody = cgi.execute(r.cgiStatus, r.cgiReadFd,
