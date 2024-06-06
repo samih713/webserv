@@ -3,7 +3,7 @@
 // ! CGI
 Request::Request()
     : cgiStatus(NOT_SET), cgiReadFd(NOT_SET), cgiClient(NOT_SET), cgiChild(9999999),
-      status(OK)
+      status(OK), locationMatch()
 {}
 
 Request::~Request() {}
@@ -11,7 +11,8 @@ Request::~Request() {}
 Request::Request(const Request& other)
     : cgiStatus(other.cgiStatus), cgiReadFd(other.cgiReadFd), cgiClient(other.cgiClient),
       cgiChild(other.cgiChild), status(other.status), header(other.header),
-      message(other.message.str()), body(other.body)
+      message(other.message.str()), body(other.body), resourcePath(other.resourcePath),
+      locationMatch(other.locationMatch)
 {}
 
 
@@ -45,6 +46,16 @@ const string& Request::get_query_string() const
     return header.queryString;
 }
 
+const string& Request::get_resource_path() const
+{
+    return resourcePath;
+}
+
+const string& Request::get_location_match() const
+{
+    return locationMatch;
+}
+
 void Request::set_status(STATUS_CODE s)
 {
     status = s;
@@ -54,6 +65,7 @@ ostream& operator<<(ostream& os, const Request& r)
 {
     os << "Method: " << r.header.method << endl;
     os << "Request-Target: " << r.header.resource << endl;
+    os << "Request-Path: " << r.resourcePath << endl;
     if (!r.get_query_string().empty())
         os << "Query: " << r.get_query_string() << endl;
     os << "HTTP-Version: " << r.header.version << endl;

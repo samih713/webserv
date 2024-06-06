@@ -27,12 +27,15 @@ public:
 
     Page& get_error_page(STATUS_CODE status);
     Page& get_page(const string& pageName);
+    void  set_index_page(const string& indexPage);
 
 private:
-    //* name, struct Page
+    //* filePath, struct Page
     map<string, Page> pages;
-    bool              load_page(const string& path, const string& name);
-    void              generate_error_page(STATUS_CODE status);
+
+    bool load_error_page(const string& path, STATUS_CODE status);
+    bool load_page(const string& path);
+    void generate_error_page(STATUS_CODE status);
 };
 
 #endif // CACHED_PAGES_HPP

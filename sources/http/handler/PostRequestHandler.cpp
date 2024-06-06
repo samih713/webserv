@@ -54,7 +54,7 @@ vector<char> PostRequestHandler::process_data(const Request& r)
 	}
 
     status = OK;
-    
+
     _add_header("Content-Length", ws_itoa(responseBody.size()));
     _add_header("Content-Type", "text/html;");
 

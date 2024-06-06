@@ -1,3 +1,4 @@
+#include "CachedPages.hpp"
 #include "FileType.hpp"
 #include "IRequestHandler.hpp"
 

@@ -58,7 +58,18 @@ private:
     // IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
     IRequestHandler* make_request_handler(const Request& r, ServerConfig& cfg)
     {
-		const string &method = r.get_method();
+        vector<string>& methods       = cfg.methods;
+        const string&   locationMatch = r.get_location_match();
+
+        if (!locationMatch.empty())
+            methods = cfg.locations.at(locationMatch).methods;
+
+        const string& method = r.get_method();
+        if (method != "GET" && method != "POST" && method != "DELETE")
+			r.set_status(NOT_IMPLEMENTED);
+        else if (std::find(methods.begin(), methods.end(), method) == methods.end())
+			r.set_status(METHOD_NOT_ALLOWED);
+
 		if (r.get_status() != OK)
 			return new ErrorHandler(cfg);
         else if (method == "GET")
@@ -67,8 +78,8 @@ private:
             return new PostRequestHandler(cfg);
         else if (method == "DELETE")
             return new DeleteRequestHandler(cfg);
-        else //! return 501 Not implemented
-            THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
+        else
+            return NULL;
     }
 
     void handle_connection(fd incoming, ServerConfig& cfg);

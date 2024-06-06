@@ -6,18 +6,19 @@
 Response GetRequestHandler::handle_request(const Request& r)
 {
     // LOG_INFO("Handling GET request ... "); //? commented due to many prints
+    _add_header("Server", cfg.serverName);
     const vector<char>& body = get_resource(r);
     return Response(status, responseHeaders, body);
 }
 
 const vector<char> GetRequestHandler::get_resource(const Request& r)
 {
-    status          = r.get_status();
-    string resource = r.get_resource();
+    status = r.get_status();
 
-    vector<char> body;
+    const string& resource     = r.get_resource();
+    const string& resourcePath = r.get_resource_path();
 
-    _add_header("Server", cfg.serverName);
+    // return list_directory(resourcePath, resource); //! dir listing
 
     // default path
     if (resource == (cfg.root + "/")) {
@@ -27,7 +28,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         return p.data;
     }
 
-    ifstream resource_file(resource.c_str(), std::ios_base::binary);
+    ifstream resource_file(resourcePath.c_str(), std::ios_base::binary);
     if (resource_file.fail())
         status = NOT_FOUND; //! need more error handling, eg: forbidden, not allowed, etc
 
@@ -35,8 +36,9 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
     if (status >= 400)
         return (make_error_body(status));
 
-    string resource_type = find_resource_type(resource); //! doesn't make sense
-    if (resource_type.length() != 0)
+    vector<char> body;
+    string       resource_type = find_resource_type(resource); //! doesn't make sense
+    if (resource_type.length() != 0)                           //! and what if it is zero?
         _add_header("Content-Type", resource_type);
     if (resource.find("/cgi-bin") != string::npos) {
         CGI cgi(r, cfg, *cp);

@@ -13,6 +13,7 @@ struct Location {
     bool           autoindex;
     size_t         maxBodySize;
     vector<string> methods;
+
     Location() : indexFile("index.html"), autoindex(false), maxBodySize(1000000) {}
 };
 
@@ -25,6 +26,7 @@ struct ServerConfig {
     string                indexFile;
     bool                  autoindex;
     size_t                maxBodySize;
+    vector<string>        methods;
     StatusCodeMap         errorPages;
     map<string, Location> locations;
   	CachedPages*           cp;
@@ -45,6 +47,15 @@ struct ServerConfig {
         cout << "  indexFile: " << indexFile << endl;
         cout << "  autoindex: " << (autoindex == true ? "yes" : "no") << endl;
         cout << "  maxBodySize: " << maxBodySize << endl;
+        cout << "  methods: [";
+        for (vector<string>::const_iterator itr = methods.begin(); itr != methods.end();
+             ++itr)
+        {
+            cout << *itr;
+            if (itr + 1 != methods.end())
+                cout << ", ";
+        }
+        cout << "]" << endl;
         cout << "  locations: [" << endl;
         for (map<string, Location>::const_iterator itr = locations.begin();
              itr != locations.end(); ++itr)

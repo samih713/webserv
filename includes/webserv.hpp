@@ -30,6 +30,7 @@
 
 /* -------------------------------- INCLUDES -------------------------------- */
 #include "debug.hpp"
+#include <algorithm>
 #include <arpa/inet.h>
 #include <cerrno>
 #include <cstdio>
@@ -37,6 +38,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <netdb.h>
@@ -83,7 +85,6 @@ typedef map<string, string> HeaderMap;
 typedef int                 fd; // socket_descriptor type
 
 /* --------------------------------- MACROS --------------------------------- */
-#define ws_tostr(name) #name
 #define ws_itoa(number)                                                                  \
     static_cast<const ostringstream&>((ostringstream() << std::dec << number)).str()
 

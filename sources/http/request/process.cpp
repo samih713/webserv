@@ -40,7 +40,6 @@ bool Request::process(const ServerConfig& cfg)
 void Request::apply_config(const ServerConfig& cfg)
 {
     // check if the resource path matches a location
-    string locationMatch;
     for (map<string, Location>::const_iterator location = cfg.locations.begin();
          location != cfg.locations.end(); ++location)
     {
@@ -51,15 +50,19 @@ void Request::apply_config(const ServerConfig& cfg)
     }
 
     // update resource path and body size
-    if (locationMatch.empty())
-        header.resource = cfg.root + "/" + header.resource;
-    else {
-        const string& locationRoot = cfg.locations.at(locationMatch).root;
-        const string& uri          = header.resource.substr(locationMatch.size());
-        if (uri[0] == '/')
-            header.resource = locationRoot + uri;
-        else
-            header.resource = locationRoot + "/" + uri;
+    string& uri         = header.resource;
+    string  root        = cfg.root;
+    size_t  maxBodySize = cfg.maxBodySize;
+    if (!locationMatch.empty()) {
+        const Location& location = cfg.locations.at(locationMatch);
+        root                     = location.root;
+        uri                      = header.resource.substr(locationMatch.size());
+        maxBodySize              = location.maxBodySize;
     }
-    header.bodySize = std::min(header.bodySize, cfg.maxBodySize);
+    uri          = (uri[0] != '/') ? ("/" + uri) : uri;
+    resourcePath = root + uri;
+
+    if (header.bodySize > maxBodySize)
+        status = PAYLOAD_TOO_LARGE; //!
+    header.bodySize = std::min(header.bodySize, maxBodySize);
 }
