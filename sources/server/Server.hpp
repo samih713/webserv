@@ -1,4 +1,5 @@
 #include "CachedPages.hpp"
+#include "ErrorHandler.hpp"
 #include "DeleteRequestHandler.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
@@ -51,13 +52,16 @@ public:
 private:
     servers_t servers;
 	vector<ServerConfig> &cfgs;
-    // CachedPages* cp;
 
     Server(vector<ServerConfig>& cfgs, int backLog);
 
-    IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
+    // IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
+    IRequestHandler* make_request_handler(const Request& r, ServerConfig& cfg)
     {
-        if (method == "GET")
+		const string &method = r.get_method();
+		if (r.get_status() != OK)
+			return new ErrorHandler(cfg);
+        else if (method == "GET")
             return new GetRequestHandler(cfg);
         else if (method == "POST")
             return new PostRequestHandler(cfg);

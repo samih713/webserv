@@ -42,7 +42,7 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
         if (!r.process(cfg))
             return;
 
-        IRequestHandler* handler = make_request_handler(r.get_method(), cfg);
+        IRequestHandler* handler = make_request_handler(r, cfg);
 
         Response response = handler->handle_request(r);
 

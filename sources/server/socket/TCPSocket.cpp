@@ -6,11 +6,12 @@ TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP)
     // : Socket(family, type, 0, SOCK_FLAG)
     : socketFD(invalidFD), isBound(false), isListening(false)
 {
-    int flag;
 #if defined(__LINUX__)
+    int flag;
     flag     = SOCK_FLAG;
     socketFD = socket(family, type | SOCK_FLAG, IPPROTO_TCP);
 #elif defined(__MAC__)
+    int flag;
     flag     = SOCK_FLAG;
     socketFD = socket(family, type, IPPROTO_TCP);
     flag |= fcntl(socketFD, F_GETFL, 0);
