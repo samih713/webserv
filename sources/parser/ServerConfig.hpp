@@ -5,6 +5,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+typedef map<string, string> RedirectionMap;
+
 class CachedPages;
 
 struct Location {
@@ -13,6 +15,8 @@ struct Location {
     bool           autoindex;
     size_t         maxBodySize;
     vector<string> methods;
+    RedirectionMap redirections;
+
 
     Location() : indexFile("index.html"), autoindex(false), maxBodySize(1000000) {}
 };

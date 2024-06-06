@@ -21,7 +21,7 @@ vector<char> GetRequestHandler::list_directory(const string& dirPath, const stri
 {
     DIR* directory = opendir(dirPath.c_str());
     if (directory == NULL)
-        return cp.get_error_page(INTERNAL_SERVER_ERROR).data;
+        return cp->get_error_page(INTERNAL_SERVER_ERROR).data;
 
     stringstream ss;
     ss << "<html" << "<head><title>Index of " << uri << "</title></head>\n"
@@ -38,7 +38,7 @@ vector<char> GetRequestHandler::list_directory(const string& dirPath, const stri
         struct stat fileInfo;
         if (stat((dirPath + "/" + entryName).c_str(), &fileInfo) == -1) {
             closedir(directory);
-            return cp.get_error_page(INTERNAL_SERVER_ERROR).data;
+            return cp->get_error_page(INTERNAL_SERVER_ERROR).data;
         }
 
         DirEntry entry;

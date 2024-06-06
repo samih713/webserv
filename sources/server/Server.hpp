@@ -55,8 +55,7 @@ private:
 
     Server(vector<ServerConfig>& cfgs, int backLog);
 
-    // IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
-    IRequestHandler* make_request_handler(const Request& r, ServerConfig& cfg)
+    IRequestHandler* make_request_handler(Request& r, ServerConfig& cfg)
     {
         vector<string>& methods       = cfg.methods;
         const string&   locationMatch = r.get_location_match();

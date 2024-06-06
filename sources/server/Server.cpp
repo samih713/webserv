@@ -43,7 +43,6 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
             return;
 
         IRequestHandler* handler = make_request_handler(r, cfg);
-
         Response response = handler->handle_request(r);
 
         if (r.cgiStatus == NOT_SET) {
