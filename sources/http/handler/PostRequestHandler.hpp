@@ -17,6 +17,7 @@ public:
 
 private:
     vector<char> process_data(const Request& r);
+    bool         parse_request_body(const string& body);
 };
 
 #endif // POST_REQUEST_HANDLER_HPP

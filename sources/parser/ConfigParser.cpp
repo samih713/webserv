@@ -137,7 +137,7 @@ void ConfigParser::parse_index(string& indexFile, const string& root)
     if (is_keyword(*_itr) || _itr->find("/") != string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
-    indexFile = root + "/" + *_itr;
+    indexFile = *_itr;
 
     check_semicolon();
 }
@@ -287,9 +287,25 @@ vector<string> ConfigParser::parse_allow_methods(void)
     return methods;
 }
 
-void ConfigParser::parse_http_redirection()
+void ConfigParser::parse_http_redirection(RedirectionMap& redirMap)
 {
-    // redirect [uri] [other uri]
+    ++_itr; // move to the URI being redirected
+    string redirectFrom = *_itr;
+    if (redirectFrom[0] != '/') // uri should begin with /
+        THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_SLASH);
+    else if (redirectFrom.find_first_of("/") != redirectFrom.find_last_of("/"))
+        THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_DUP_SLASH);
+
+    ++_itr; // move to the target URI
+    string redirectTo = *_itr;
+    if (redirectTo[0] != '/') // uri should begin with /
+        THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_SLASH);
+    else if (redirectTo.find_first_of("/") != redirectTo.find_last_of("/"))
+        THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_DUP_SLASH);
+
+    redirMap[redirectFrom] = redirectTo;
+
+    check_semicolon();
 }
 
 void ConfigParser::parse_location_context(ServerConfig& server)
@@ -329,8 +345,8 @@ void ConfigParser::parse_location_context(ServerConfig& server)
             parse_index(location.indexFile, location.root + uri);
         else if (*_itr == "autoindex")
             location.autoindex = parse_autoindex();
-        // else if (*itr == "redirect")
-        // location.
+        else if (*_itr == "redirect")
+            parse_http_redirection(location.redirections);
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else

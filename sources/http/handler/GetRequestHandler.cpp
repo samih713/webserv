@@ -15,57 +15,71 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 {
     status = r.get_status();
 
-    const string& resource     = r.get_resource();
-    const string& resourcePath = r.get_resource_path();
+    const string& resource      = r.get_resource();
+    const string& resourcePath  = r.get_resource_path();
+    const string& locationMatch = r.get_location_match();
 
-    // return list_directory(resourcePath, resource); //! dir listing
+    string defaultPath = cfg.root + "/";
+    string index       = defaultPath + cfg.indexFile;
+    bool   autoindex   = cfg.autoindex;
 
-    // default path
-    if (!r.get_location_match().empty()) {
-        // found matching location
+    if (!locationMatch.empty()) {
+        const Location& location = cfg.locations.at(locationMatch);
+
+        autoindex   = location.autoindex;
+        defaultPath = location.root + "/";
+        index       = defaultPath + location.indexFile;
+        cp.set_index_page(index);
+        // TODO handle redirection
     }
-    else if (resourcePath == (cfg.root + "/")) {
-        // TODO if the index file does not exist + autoindex is on, list dir.
-        cout << "default path" << endl;
-
-        Page& p = cp.get_page("index");
-        _add_header("Content-Type", p.contentType);
-        _add_header("Content-Length", ws_itoa(p.contentLength));
-        return p.data;
-    }
-
-    ifstream resource_file(resourcePath.c_str(), std::ios_base::binary);
-    if (resource_file.fail())
-        status = NOT_FOUND; //! need more error handling, eg: forbidden, not allowed, etc
-
-    // errors
-    if (status >= 400)
-        return (make_error_body(status));
 
     vector<char> body;
-    string       resource_type = find_resource_type(resource); //! doesn't make sense
-    if (resource_type.length() != 0)                           //! and what if it is zero?
-        _add_header("Content-Type", resource_type);
-    if (resource.find("/cgi-bin") != string::npos) {
+    struct stat  fileInfo;
+    stat(resourcePath.c_str(), &fileInfo);
+    if (S_ISDIR(fileInfo.st_mode)) {
+        ifstream indexFile(index.c_str(), std::ios_base::binary);
+        if (indexFile.good()) {
+            Page& p = cp.get_page(index);
+            _add_header("Content-Type", p.contentType);
+            _add_header("Content-Length", ws_itoa(p.contentLength));
+            return p.data;
+        }
+        else if (autoindex) {
+            body = list_directory(resourcePath, resource);
+            _add_header("Content-Type", "text/html");
+            _add_header("Content-Length", ws_itoa(body.size()));
+            return body;
+        }
+        return make_error_body(NOT_FOUND);
+    }
+
+    ifstream resourceFile(resourcePath.c_str(), std::ios_base::binary);
+    if (resourceFile.fail())
+        return make_error_body(NOT_FOUND);
+    else if (access(resourcePath.c_str(), R_OK) == -1)
+        return make_error_body(FORBIDDEN);
+
+    string resource_type = find_resource_type(resource);
+    if (resource_type.length() == 0)
+        return make_error_body(UNSUPPORTED_MEDIA_TYPE);
+
+    _add_header("Content-Type", resource_type);
+
+    if (locationMatch == "/cgi-bin" && resource.find("/cgi-bin") != string::npos) {
         CGI cgi(r, cfg, cp);
-        body = cgi.execute(r.cgiStatus, r.cgiReadFd,
-            r.cgiChild); // ! r.fd set reference is kinda idk
+        body = cgi.execute(r.cgiStatus, r.cgiReadFd, r.cgiChild);
         _add_header("Content-Length", ws_itoa(body.size()));
     }
     else {
-        body = vector<char>((std::istreambuf_iterator<char>(resource_file)),
+        body = vector<char>((std::istreambuf_iterator<char>(resourceFile)),
             std::istreambuf_iterator<char>());
         _add_header("Content-Length", ws_itoa(body.size()));
     }
 
-    /* authentication function goes here for the requested resource */
-    // DEBUG_MSG("Resource '" + resource + "' : [" + ws_itoa(resource_size) + "]", W);
-
-    // TODO caching control */
-
+    // TODO authentication function goes here for the requested resource
+    // TODO caching control
     // TODO compression/encoding
-
-    // TODO support range requests, usefull for large files
+    // TODO support range requests, useful for large files
 
     return body;
 }
