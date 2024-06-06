@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET Request Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+        .title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            z-index: 1;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .card a:hover {
+            color: #007BFF;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+			background: linear-gradient(45deg, #011d47, #005cd5, #9ba0ff, hsl(176, 100%, 91%));
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            z-index: 0;
+        }
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"], input[type="submit"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <h1 class="title">GET Request Test Page</h1>
+    <div class="container">
+        <div class="card">
+            <p>This is the page for testing GET requests.</p>
+            <form action="/cgi-bin/get_test.cgi" method="GET">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

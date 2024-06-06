@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Serve 1.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 3em;
+            margin-bottom: 100px;
+            z-index: 1;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .bcont {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+            width: 200px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.5);
+        }
+
+        .card a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .card a:hover {
+            color: #007BFF;
+        }
+
+        .border {
+            display: flex;
+            gap: 50px;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #011d47, #005cd5, #9ba0ff, hsl(176, 100%, 91%));
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            z-index: 0;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .team-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .team-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .team-card img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+        }
+
+        .team-card a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .team-card a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background"></div>
+    <h1 class="title">Welcome to Web Server</h1>
+    <div class="container">
+        <div class="bcont">
+            <div class="border">
+                <div class="card">
+                    <a href="get_request_test.html">GET Request Test</a>
+                </div>
+                <div class="card">
+                    <a href="post_request_test.html">POST Request Test</a>
+                </div>
+                <div class="card">
+                    <a href="delete_request_test.html">DELETE Request Test</a>
+                </div>
+            </div>
+            <div class="border">
+                <div class="card">
+                    <a href="cgi_test.html">CGI Test</a>
+                </div>
+                <div class="card">
+                    <a href="file_upload_test.html">File Upload Test</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <h1>Team Members</h1>
+        <div class="team-container">
+            <div class="team-card">
+                <img src="/assets/hash.jpeg" alt="Hashim">
+                <h3>Hashim Mohamed</h3>
+                <a href="https://github.com/hashimMH">GitHub</a>
+            </div>
+            <div class="team-card">
+                <img src="/assets/samih.png" alt="Samih">
+                <h3>Samih</h3>
+                <a href="https://github.com/samih713">GitHub</a>
+            </div>
+            <div class="team-card">
+                <img src="/assets/tanvir.png" alt="Tanvir">
+                <h3>Tanvir Ahmed Anas</h3>
+                <a href="https://github.com/Taanviir">GitHub</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

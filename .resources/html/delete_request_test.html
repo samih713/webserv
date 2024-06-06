@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DELETE Request Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .card a:hover {
+            color: #007BFF;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+			background: linear-gradient(45deg, #011d47, #005cd5, #9ba0ff, hsl(176, 100%, 91%));
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            z-index: 0;
+        }
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"], input[type="email"], input[type="submit"], input[type="button"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        input[type="button"] {
+            background-color: #c60000;
+            color: white;
+            cursor: pointer;
+			margin-top: 3%;
+			width: 300px;
+            transition: background-color 0.2s;
+        }
+        input[type="button"]:hover {
+            background-color: #600909;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <div class="card">
+            <h1>DELETE Test Page</h1>
+            <p>This is the page for testing DELETE requests.</p>
+            <form id="createForm" action="/sample_pages" method="POST">
+                <input type="text" name="data" id="data" placeholder="File Name" required>
+				<input type="text" name="message" id="msg" placeholder="Message" required>
+                <input type="submit" value="Create File">
+            </form>
+            <input type="button" value="DELETE" id="deleteButton">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('createForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const data = document.getElementById('data').value;
+			const Msg = document.getElementById('msg').value;
+
+            // Send POST request to create the file
+            const response = await fetch(`/sample_pages/${encodeURIComponent(data)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Msg })
+            });
+
+            if (response.ok) {
+                alert('File created successfully!');
+            } else {
+                alert('Failed to create file.');
+            }
+        };
+
+        document.getElementById('deleteButton').onclick = async function() {
+            const data = document.getElementById('data').value;
+
+            // Send DELETE request to delete the file
+            const response = await fetch(`sample_pages/${encodeURIComponent(data)}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert('File deleted successfully!');
+            } else {
+                alert('Failed to delete file.');
+            }
+        };
+    </script>
+</body>
+</html>
