@@ -39,23 +39,30 @@ public:
         static Server instance(cfgs, backLog);
         return instance;
     }
-    ~Server() { delete cp; }
+
+    ~Server()
+    {
+        for (vector<ServerConfig>::iterator sc = cfgs.begin(); sc != cfgs.end(); sc++)
+            delete sc->cp;
+    }
+
     void start(enum polling_strat);
 
 private:
-    servers_t    servers;
-    CachedPages* cp;
+    servers_t servers;
+	vector<ServerConfig> &cfgs;
+    // CachedPages* cp;
 
     Server(vector<ServerConfig>& cfgs, int backLog);
 
     IRequestHandler* make_request_handler(const string& method, ServerConfig& cfg)
     {
         if (method == "GET")
-            return new GetRequestHandler(cfg, *cp);
+            return new GetRequestHandler(cfg);
         else if (method == "POST")
-            return new PostRequestHandler(cfg, *cp);
+            return new PostRequestHandler(cfg);
         else if (method == "DELETE")
-            return new DeleteRequestHandler(cfg, *cp);
+            return new DeleteRequestHandler(cfg);
         else //! return 501 Not implemented
             THROW_EXCEPTION_WITH_INFO("Request Method not implemented\n");
     }

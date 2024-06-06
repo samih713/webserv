@@ -7,7 +7,7 @@
 
 class PostRequestHandler: public RequestHandlerBase {
 public:
-    PostRequestHandler(ServerConfig& cfg, CachedPages& cp) : RequestHandlerBase(cfg, cp)
+    PostRequestHandler(ServerConfig& cfg) : RequestHandlerBase(cfg)
     {}
     ~PostRequestHandler() {}
 

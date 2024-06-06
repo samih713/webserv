@@ -14,11 +14,11 @@
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
  */
-Server::Server(vector<ServerConfig>& cfgs, int backLog) : cp(new CachedPages(cfgs[0])) //!
+Server::Server(vector<ServerConfig>& cfgs, int backLog) : cfgs(cfgs)
 {
     for (vector<ServerConfig>::iterator sc = cfgs.begin(); sc != cfgs.end(); sc++) {
+		sc->cp = new CachedPages(*sc);
         servers[TCPSocket(sc->port, backLog, sc->host)] = *sc;
-
         string s_host = inet_ntoa(*(struct in_addr*) &sc->host);
         LOG_INFO("Server created on port [" + s_host + ":" + ws_itoa(sc->port) + "]");
     }

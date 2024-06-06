@@ -7,8 +7,8 @@
 
 class DeleteRequestHandler: public RequestHandlerBase {
 public:
-    DeleteRequestHandler(const ServerConfig& cfg, CachedPages& cp)
-        : RequestHandlerBase(cfg, cp)
+    DeleteRequestHandler(const ServerConfig& cfg)
+        : RequestHandlerBase(cfg)
     {}
     ~DeleteRequestHandler() {};
 

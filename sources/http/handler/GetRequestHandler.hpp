@@ -7,7 +7,7 @@
 
 class GetRequestHandler: public RequestHandlerBase {
 public:
-    GetRequestHandler(ServerConfig& cfg, CachedPages& cp) : RequestHandlerBase(cfg, cp) {}
+    GetRequestHandler(ServerConfig& cfg) : RequestHandlerBase(cfg) {}
     ~GetRequestHandler() {}
 
     Response handle_request(const Request& r);

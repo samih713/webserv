@@ -1,8 +1,11 @@
 #include "Message.hpp"
+// #include "CachedPages.hpp"
 #include "webserv.hpp"
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+
+class CachedPages;
 
 struct Location {
     string         root;
@@ -24,6 +27,7 @@ struct ServerConfig {
     size_t                   maxBodySize;
     map<STATUS_CODE, string> errorPages; //! maybe need default values
     map<string, Location>    locations;
+	CachedPages *cp;
 
     ServerConfig()
         : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
