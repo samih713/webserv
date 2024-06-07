@@ -1,6 +1,6 @@
+#include "Logger.hpp"
 #include "Response.hpp"
 #include "ServerConfig.hpp"
-#include "Logger.hpp"
 
 #ifndef IREQUEST_HANDLER_HPP
 #define IREQUEST_HANDLER_HPP

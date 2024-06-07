@@ -1,6 +1,6 @@
 #include "CachedPages.hpp"
-#include "ErrorHandler.hpp"
 #include "DeleteRequestHandler.hpp"
+#include "ErrorHandler.hpp"
 #include "GetRequestHandler.hpp"
 #include "IRequestHandler.hpp"
 #include "Logger.hpp"
@@ -50,8 +50,8 @@ public:
     void start(enum polling_strat);
 
 private:
-    servers_t servers;
-	vector<ServerConfig> &cfgs;
+    servers_t             servers;
+    vector<ServerConfig>& cfgs;
 
     Server(vector<ServerConfig>& cfgs, int backLog);
 
@@ -65,12 +65,12 @@ private:
 
         const string& method = r.get_method();
         if (method != "GET" && method != "POST" && method != "DELETE")
-			r.set_status(NOT_IMPLEMENTED);
+            r.set_status(NOT_IMPLEMENTED);
         else if (std::find(methods.begin(), methods.end(), method) == methods.end())
-			r.set_status(METHOD_NOT_ALLOWED);
+            r.set_status(METHOD_NOT_ALLOWED);
 
-		if (r.get_status() != OK)
-			return new ErrorHandler(cfg);
+        if (r.get_status() != OK)
+            return new ErrorHandler(cfg);
         else if (method == "GET")
             return new GetRequestHandler(cfg);
         else if (method == "POST")

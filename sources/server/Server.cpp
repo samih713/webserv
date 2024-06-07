@@ -17,7 +17,7 @@
 Server::Server(vector<ServerConfig>& cfgs, int backLog) : cfgs(cfgs)
 {
     for (vector<ServerConfig>::iterator sc = cfgs.begin(); sc != cfgs.end(); sc++) {
-		sc->cp = new CachedPages(*sc);
+        sc->cp                                          = new CachedPages(*sc);
         servers[TCPSocket(sc->port, backLog, sc->host)] = *sc;
         string s_host = inet_ntoa(*(struct in_addr*) &sc->host);
         LOG_INFO("Server created on port [" + s_host + ":" + ws_itoa(sc->port) + "]");
@@ -30,8 +30,8 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cfgs(cfgs)
 // TODO this function does not work with kqueue, only select
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
 {
-	if (incoming < 0)
-		return ;
+    if (incoming < 0)
+        return;
 
     LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
     try {
@@ -42,8 +42,8 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
         if (!r.process(cfg))
             return;
 
-        IRequestHandler* handler = make_request_handler(r, cfg);
-        Response response = handler->handle_request(r);
+        IRequestHandler* handler  = make_request_handler(r, cfg);
+        Response         response = handler->handle_request(r);
 
         if (r.cgiStatus == NOT_SET) {
             response.send_response(incoming);
@@ -92,7 +92,7 @@ void Server::select_strat()
     fd_set listenerFDs = ConnectionManager::add_listeners(servers);
     fd_set readytoRead;
 
-	const TCPSocket* tcp;
+    const TCPSocket* tcp;
     while (true) {
         LOG_INFO("Server: Waiting for connections ...");
 
@@ -106,11 +106,11 @@ void Server::select_strat()
 
         for (fd currentSocket = 0; currentSocket <= maxSD; currentSocket++) {
             if (FD_ISSET(currentSocket, &readytoRead)) {
-				tcp = ConnectionManager::get_tcp(currentSocket);
+                tcp = ConnectionManager::get_tcp(currentSocket);
                 if (FD_ISSET(currentSocket, &listenerFDs)) {
                     incoming = tcp->accept();
-					ConnectionManager::add_fd_pair(tcp, incoming);
-				}
+                    ConnectionManager::add_fd_pair(tcp, incoming);
+                }
                 else
                     incoming = currentSocket;
                 handle_connection(incoming, servers.at(*tcp));

@@ -14,11 +14,11 @@ public:
     vector<char> execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild);
 
 private:
-    string  _queryString;
-    string  _filePath;
-    string  _requestBody;
-    char**  _arguments;
-    char**  _environment;
+    string _queryString;
+    string _filePath;
+    string _requestBody;
+    char** _arguments;
+    char** _environment;
 
     CachedPages& _cp;
 

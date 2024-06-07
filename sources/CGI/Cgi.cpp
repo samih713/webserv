@@ -44,7 +44,7 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
     envStrings.push_back("PATH_INFO=" + cfg.locations.at("/cgi-bin").root);
     envStrings.push_back("REQUEST_METHOD=" + request.get_method());
 
-    char*  token = strtok(const_cast<char*>(_queryString.c_str()), "&");
+    char* token = strtok(const_cast<char*>(_queryString.c_str()), "&");
     while (token != NULL) {
         envStrings.push_back(token);
         token = strtok(NULL, "&");
@@ -64,14 +64,14 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
 pid_t CGI::execute_child(fd& cgiReadFd)
 {
     int pipe_fd[2];
-	int pipe_in[2];
+    int pipe_in[2];
 
     if (pipe(pipe_fd) || pipe(pipe_in)) {
         LOG_ERROR("CGI: Error creating pipe: " + string(strerror(errno)));
         return -1;
     }
 
-	write(pipe_in[1], _requestBody.c_str(), _requestBody.length());
+    write(pipe_in[1], _requestBody.c_str(), _requestBody.length());
 
     pid_t cgiChild = fork();
     if (cgiChild == -1) {
@@ -81,8 +81,8 @@ pid_t CGI::execute_child(fd& cgiReadFd)
 
     if (cgiChild == 0) {
         dup2(pipe_fd[1], STDOUT_FILENO);
-		dup2(pipe_in[0], STDIN_FILENO);
-		close(pipe_in[0]);
+        dup2(pipe_in[0], STDIN_FILENO);
+        close(pipe_in[0]);
         close(pipe_in[1]);
         close(pipe_fd[0]);
         close(pipe_fd[1]);
@@ -92,8 +92,8 @@ pid_t CGI::execute_child(fd& cgiReadFd)
             _exit(EXIT_FAILURE);
         }
     }
-	
-	close(pipe_in[0]);
+
+    close(pipe_in[0]);
     close(pipe_in[1]);
     cgiReadFd = pipe_fd[0];
     close(pipe_fd[1]);
@@ -103,7 +103,7 @@ pid_t CGI::execute_child(fd& cgiReadFd)
 vector<char> CGI::execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild)
 {
     if (cgiStatus == NOT_SET) {
-		// LOG_DEBUG("here");
+        // LOG_DEBUG("here");
         cgiStatus = IN_PROCESS;
         cgiChild  = execute_child(cgiReadFd);
         if (cgiChild == -1) {
@@ -114,8 +114,8 @@ vector<char> CGI::execute(int& cgiStatus, fd& cgiReadFd, pid_t& cgiChild)
 
     vector<char> body;
 
-    if ((waitpid(cgiChild, NULL, WNOHANG) == cgiChild)) {
-        char buffer[1024] = {0};
+    if (waitpid(cgiChild, NULL, WNOHANG) == cgiChild) {
+        char buffer[1024] = { 0 };
         while (true) {
             ssize_t bytesRead = read(cgiReadFd, buffer, sizeof(buffer));
             if (bytesRead == 0)

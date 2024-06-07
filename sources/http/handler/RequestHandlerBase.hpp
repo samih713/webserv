@@ -32,7 +32,7 @@ public:
 
     const vector<char>& make_error_body(STATUS_CODE _status)
     {
-		status = _status;
+        status  = _status;
         Page& p = cp->get_error_page(status);
 
         _add_header("Content-Type", p.contentType);

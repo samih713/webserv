@@ -29,16 +29,16 @@ const vector<char> DeleteRequestHandler::get_resource(const Request& r)
         return (make_error_body(FORBIDDEN));
     }
 
-	struct stat fileInfo;
-	stat(resource.c_str(), &fileInfo);
-	if (S_ISDIR(fileInfo.st_mode))
-	{
-     // If resource URI does not end with "/", set status code to 409 (Conflict)
-    if (!endsWith(resource, "/")) {
-        LOG_ERROR("DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
-        return (make_error_body(CONFLICT));
+    struct stat fileInfo;
+    stat(resource.c_str(), &fileInfo);
+    if (S_ISDIR(fileInfo.st_mode)) {
+        // If resource URI does not end with "/", set status code to 409 (Conflict)
+        if (!endsWith(resource, "/")) {
+            LOG_ERROR(
+                "DELETE: Resource '" + resource + "' : [ URI does not end with '/' ]");
+            return (make_error_body(CONFLICT));
+        }
     }
-	}
 
     // all checks passed, delete the resource
     if (remove(resource.c_str()) == -1) {

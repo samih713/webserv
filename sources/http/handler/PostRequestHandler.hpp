@@ -7,8 +7,7 @@
 
 class PostRequestHandler: public RequestHandlerBase {
 public:
-    PostRequestHandler(ServerConfig& cfg) : RequestHandlerBase(cfg)
-    {}
+    PostRequestHandler(ServerConfig& cfg) : RequestHandlerBase(cfg) {}
     ~PostRequestHandler() {}
 
     Response handle_request(const Request& r);

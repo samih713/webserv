@@ -33,7 +33,7 @@ struct ServerConfig {
     vector<string>        methods;
     StatusCodeMap         errorPages;
     map<string, Location> locations;
-  	CachedPages*           cp;
+    CachedPages*          cp;
 
     ServerConfig()
         : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),

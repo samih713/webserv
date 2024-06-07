@@ -22,7 +22,7 @@ public:
     static inline fd&              get_max_sd();
     static inline fd_set&          get_active_sockets();
     static inline const TCPSocket* get_tcp(fd& socketD);
-    static inline void                    add_fd_pair(const TCPSocket* tcp, fd newFD);
+    static inline void             add_fd_pair(const TCPSocket* tcp, fd newFD);
 
 private:
     static TCPfdMap      TCPMap;
@@ -102,8 +102,9 @@ inline Request& ConnectionManager::add_connection(fd newConnection)
     return (r);
 }
 
-inline void ConnectionManager::add_fd_pair(const TCPSocket* tcp, fd newFD) {
-	TCPMap.insert(make_pair(newFD, tcp));
+inline void ConnectionManager::add_fd_pair(const TCPSocket* tcp, fd newFD)
+{
+    TCPMap.insert(make_pair(newFD, tcp));
 }
 
 /**

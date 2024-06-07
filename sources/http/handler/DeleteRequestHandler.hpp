@@ -7,9 +7,7 @@
 
 class DeleteRequestHandler: public RequestHandlerBase {
 public:
-    DeleteRequestHandler(const ServerConfig& cfg)
-        : RequestHandlerBase(cfg)
-    {}
+    DeleteRequestHandler(const ServerConfig& cfg) : RequestHandlerBase(cfg) {}
     ~DeleteRequestHandler() {};
 
     Response handle_request(const Request& r);

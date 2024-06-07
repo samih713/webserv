@@ -1,6 +1,6 @@
+#include "Logger.hpp"
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
-#include "Logger.hpp"
 
 #ifndef CACHED_PAGES_HPP
 #define CACHED_PAGES_HPP
