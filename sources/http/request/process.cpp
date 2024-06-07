@@ -63,6 +63,6 @@ void Request::apply_config(const ServerConfig& cfg)
     resourcePath = root + uri;
 
     if (header.bodySize > maxBodySize)
-        status = PAYLOAD_TOO_LARGE; //!
+        set_status(PAYLOAD_TOO_LARGE);
     header.bodySize = std::min(header.bodySize, maxBodySize);
 }
