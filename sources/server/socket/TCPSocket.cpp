@@ -7,14 +7,10 @@ TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP)
     : socketFD(invalidFD), isBound(false), isListening(false)
 {
 #if defined(__LINUX__)
-    int flag;
-    flag     = SOCK_FLAG;
     socketFD = socket(family, type | SOCK_FLAG, IPPROTO_TCP);
 #elif defined(__MAC__)
-    int flag;
-    flag     = SOCK_FLAG;
     socketFD = socket(family, type, IPPROTO_TCP);
-    flag |= fcntl(socketFD, F_GETFL, 0);
+    int flag |= fcntl(socketFD, F_GETFL, 0);
     fcntl(socketFD, F_SETFL, flag);
 #endif // conditional
 

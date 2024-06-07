@@ -7,14 +7,13 @@ Response GetRequestHandler::handle_request(const Request& r)
 {
     // LOG_INFO("Handling GET request ... "); //? commented due to many prints
     _add_header("Server", cfg.serverName);
+    status = r.get_status();
     const vector<char>& body = get_resource(r);
     return Response(status, responseHeaders, body);
 }
 
 const vector<char> GetRequestHandler::get_resource(const Request& r)
 {
-    status = r.get_status();
-
     const string& resource      = r.get_resource();
     const string& resourcePath  = r.get_resource_path();
     const string& locationMatch = r.get_location_match();
@@ -69,17 +68,13 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         CGI cgi(r, cfg, *cp);
         body = cgi.execute(r.cgiStatus, r.cgiReadFd, r.cgiChild);
         _add_header("Content-Length", ws_itoa(body.size()));
-    }
-    else {
-        body = vector<char>((std::istreambuf_iterator<char>(resourceFile)),
-            std::istreambuf_iterator<char>());
-        _add_header("Content-Length", ws_itoa(body.size()));
+        status = OK;
+        return body;
     }
 
-    // TODO authentication function goes here for the requested resource
-    // TODO caching control
-    // TODO compression/encoding
-    // TODO support range requests, useful for large files
-
+    body = vector<char>((std::istreambuf_iterator<char>(resourceFile)),
+        std::istreambuf_iterator<char>());
+    _add_header("Content-Length", ws_itoa(body.size()));
+    status = OK;
     return body;
 }

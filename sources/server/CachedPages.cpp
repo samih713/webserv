@@ -1,8 +1,6 @@
 #include "CachedPages.hpp"
 #include "Logger.hpp"
 
-// ! combine it please
-
 // loads all the error pages found in the config,
 // if the loading fails then generate the error page and add it to the map
 CachedPages::CachedPages(const ServerConfig& cfg)
@@ -19,6 +17,8 @@ CachedPages::CachedPages(const ServerConfig& cfg)
     }
     // load the main indexDefault page
     string index = cfg.root + "/" + cfg.indexFile;
+    if (cfg.locations.find("/") != cfg.locations.end())
+        index = cfg.locations.at("/").root + "/" + cfg.locations.at("/").indexFile;
     if (!load_page(index))
         LOG_ERROR("Failed to load page " + index);
 }

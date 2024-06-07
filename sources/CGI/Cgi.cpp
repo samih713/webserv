@@ -63,15 +63,15 @@ char** CGI::set_environment(const Request& request, const ServerConfig& cfg)
 
 pid_t CGI::execute_child(fd& cgiReadFd)
 {
-    int pipe_fd[2];
-    int pipe_in[2];
+    int pipeFD[2];
+    int pipeIn[2];
 
-    if (pipe(pipe_fd) || pipe(pipe_in)) {
+    if (pipe(pipeFD) || pipe(pipeIn)) {
         LOG_ERROR("CGI: Error creating pipe: " + string(strerror(errno)));
         return -1;
     }
 
-    write(pipe_in[1], _requestBody.c_str(), _requestBody.length());
+    write(pipeIn[1], _requestBody.c_str(), _requestBody.length());
 
     pid_t cgiChild = fork();
     if (cgiChild == -1) {
@@ -80,12 +80,12 @@ pid_t CGI::execute_child(fd& cgiReadFd)
     }
 
     if (cgiChild == 0) {
-        dup2(pipe_fd[1], STDOUT_FILENO);
-        dup2(pipe_in[0], STDIN_FILENO);
-        close(pipe_in[0]);
-        close(pipe_in[1]);
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
+        dup2(pipeFD[1], STDOUT_FILENO);
+        dup2(pipeIn[0], STDIN_FILENO);
+        close(pipeIn[0]);
+        close(pipeIn[1]);
+        close(pipeFD[0]);
+        close(pipeFD[1]);
 
         if (execve(_arguments[0], _arguments, _environment) == -1) {
             LOG_ERROR("CGI: Error executing execve: " + string(strerror(errno)));
@@ -93,10 +93,10 @@ pid_t CGI::execute_child(fd& cgiReadFd)
         }
     }
 
-    close(pipe_in[0]);
-    close(pipe_in[1]);
-    cgiReadFd = pipe_fd[0];
-    close(pipe_fd[1]);
+    close(pipeIn[0]);
+    close(pipeIn[1]);
+    cgiReadFd = pipeFD[0];
+    close(pipeFD[1]);
     return cgiChild;
 }
 
