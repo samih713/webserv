@@ -39,6 +39,9 @@ bool Request::process(const ServerConfig& cfg)
  */
 void Request::apply_config(const ServerConfig& cfg)
 {
+    string& uri = header.resource;
+    if (cfg.redirections.find(uri) != cfg.redirections.end())
+        cfg.redirect_to(uri);
     // check if the resource path matches a location
     for (map<string, Location>::const_iterator location = cfg.locations.begin();
          location != cfg.locations.end(); ++location)
@@ -50,9 +53,8 @@ void Request::apply_config(const ServerConfig& cfg)
     }
 
     // update resource path and body size
-    string& uri         = header.resource;
-    string  root        = cfg.root;
-    size_t  maxBodySize = cfg.maxBodySize;
+    string root        = cfg.root;
+    size_t maxBodySize = cfg.maxBodySize;
     if (!locationMatch.empty()) {
         const Location& location = cfg.locations.at(locationMatch);
         root                     = location.root;

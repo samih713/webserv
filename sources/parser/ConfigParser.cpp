@@ -345,8 +345,6 @@ void ConfigParser::parse_location_context(ServerConfig& server)
             parse_index(location.indexFile, location.root + uri);
         else if (*_itr == "autoindex")
             location.autoindex = parse_autoindex();
-        else if (*_itr == "redirect")
-            parse_http_redirection(location.redirections);
         else if (*_itr == ";" || *_itr == "{")
             ++_itr;
         else
@@ -388,6 +386,8 @@ ServerConfig ConfigParser::parse_server_context(void)
             server.methods = parse_allow_methods();
         else if (*_itr == "error_page")
             parse_error_page(server.errorPages, server.root);
+        else if (*_itr == "redirect")
+            parse_http_redirection(server.redirections);
         else if (*_itr == "location")
             parse_location_context(server);
         else if (*_itr == ";" || *_itr == "{")

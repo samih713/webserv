@@ -29,7 +29,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         defaultPath = location.root + "/";
         index       = defaultPath + location.indexFile;
         cp->set_index_page(index);
-        // TODO handle redirection
     }
 
     vector<char> body;

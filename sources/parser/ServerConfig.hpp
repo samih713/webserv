@@ -15,8 +15,6 @@ struct Location {
     bool           autoindex;
     size_t         maxBodySize;
     vector<string> methods;
-    RedirectionMap redirections;
-
 
     Location() : indexFile("index.html"), autoindex(false), maxBodySize(1000000) {}
 };
@@ -34,6 +32,22 @@ struct ServerConfig {
     StatusCodeMap         errorPages;
     map<string, Location> locations;
     CachedPages*          cp;
+    RedirectionMap redirections;
+
+    bool redirect_to(string& uri) const
+    {
+        for (RedirectionMap::const_iterator it = redirections.begin();
+             it != redirections.end(); it++)
+        {
+            const string& from = it->first;
+            const string& to   = it->second;
+            if (uri.find(from) == 0) { // Check if the URI starts with 'from'
+                uri = to + uri.substr(from.length()); // Replace the prefix
+                return true;
+            }
+        }
+        return false;
+    }
 
     ServerConfig()
         : port(8080), host(htonl(INADDR_ANY)), defaultServer(false),
