@@ -18,8 +18,6 @@ int main(int argc, char** argv)
         vector<ServerConfig> servers = parser.parse();
         LOG_INFO("Parsing " + configFile);
 
-        // for (size_t i = 0; i < servers.size(); i++)
-        //     servers[i].print();
         Server& webserv = Server::get_instance(servers, 100);
 #if defined(__LINUX__)
         webserv.start(SELECT);

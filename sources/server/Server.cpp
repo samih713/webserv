@@ -35,7 +35,7 @@ void Server::handle_connection(fd incoming, ServerConfig& cfg)
     if (incoming < 0)
         return;
 
-    LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
+    LOG_INFO("Server: Handling connection for [" + ws_itoa(incoming) + "]");
     try {
         ConnectionManager::check_connection(incoming);
 
