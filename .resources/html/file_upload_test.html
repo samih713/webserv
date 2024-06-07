@@ -112,11 +112,31 @@
 		<div class="card">
 			<h1 class="title">File Upload Test Page</h1>
 			<p>This is the page for testing file uploads.</p>
-			<form action="/upload" method="POST" enctype="multipart/form-data">
+			<form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
 				<input type="file" name="file" required>
 				<input type="submit" value="Upload">
 			</form>
 		</div>
+		<script>
+			document.getElementById('uploadForm').addEventListener('submit', function(event) {
+				event.preventDefault(); // Prevent the default form submission
+	
+				var formData = new FormData(this);
+	
+				fetch('/upload', {
+					method: 'POST',
+					body: formData
+				}).then(response => {
+					if (response.ok) {
+						alert('Upload successful!');
+					} else {
+						alert('Upload failed. Please try again.');
+					}
+				}).catch(error => {
+					alert('An error occurred. Please try again.');
+				});
+			});
+		</script>
 	</div>
 </body>
 </html>
