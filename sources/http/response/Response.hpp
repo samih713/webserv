@@ -15,6 +15,7 @@ public:
     ~Response();
     Response(const Response& other);
     void send_response(fd recv_socket) const;
+	bool sent;
 
 private:
     STATUS_CODE  status;

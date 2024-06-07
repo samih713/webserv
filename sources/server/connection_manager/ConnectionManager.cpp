@@ -9,7 +9,7 @@ void ConnectionManager::remove_expired()
 {
     ConnectionMap::iterator it = connectionMap.begin();
     while (it != connectionMap.end())
-        if (it->second.timer.is_timeout()) {
+        if (it->second.timer.is_timeout() && it->second.sent == true) {
             FD_CLR(it->first, &activeSockets);
             close(it->first);
             connectionMap.erase(it++);
@@ -30,6 +30,8 @@ void ConnectionManager::remove_expired()
 void ConnectionManager::check_connection(fd currentSocket)
 {
     ConnectionMap::iterator it = connectionMap.find(currentSocket);
-    if (it != connectionMap.end() && it->second.timer.is_timeout())
-        throw TimeOut::Exception();
+    if (it != connectionMap.end() && it->second.timer.is_timeout()) {
+        it->second.set_status(REQUEST_TIMEOUT);
+		it->second.cgiStatus = COMPLETED;
+	}
 }

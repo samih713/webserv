@@ -32,9 +32,6 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cfgs(cfgs)
 // TODO this function does not work with kqueue, only select
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
 {
-    if (incoming < 0)
-        return;
-
     LOG_INFO("Server: handling connection for [" + ws_itoa(incoming) + "]");
     try {
         ConnectionManager::check_connection(incoming);

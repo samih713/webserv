@@ -12,7 +12,7 @@
  * @param body The body of the response
  */
 Response::Response(STATUS_CODE status, const HeaderMap& headers, const vector<char>& body)
-    : status(status), headers(headers), body(body)
+    : sent(false), status(status), headers(headers), body(body)
 {
     LOG_DEBUG("Response: called for status: " + ws_itoa(status));
 }
@@ -33,7 +33,7 @@ Response::~Response() {}
  * @param other The Response object to be copied
  */
 Response::Response(const Response& other)
-    : status(other.status), headers(other.headers), body(other.body)
+    : sent(other.sent), status(other.status), headers(other.headers), body(other.body)
 {
     LOG_DEBUG("Response: Copy constructor called");
 }

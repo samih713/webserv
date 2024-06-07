@@ -2,17 +2,17 @@
 
 // ! CGI
 Request::Request()
-    : cgiStatus(NOT_SET), cgiReadFd(NOT_SET), cgiClient(NOT_SET), cgiChild(9999999),
-      status(OK), locationMatch()
+    : sent(false), cgiStatus(NOT_SET), cgiReadFd(NOT_SET), cgiClient(NOT_SET),
+      cgiChild(9999999), status(OK), locationMatch()
 {}
 
 Request::~Request() {}
 
 Request::Request(const Request& other)
-    : cgiStatus(other.cgiStatus), cgiReadFd(other.cgiReadFd), cgiClient(other.cgiClient),
-      cgiChild(other.cgiChild), status(other.status), header(other.header),
-      message(other.message.str()), body(other.body), resourcePath(other.resourcePath),
-      locationMatch(other.locationMatch)
+    : sent(other.sent), cgiStatus(other.cgiStatus), cgiReadFd(other.cgiReadFd),
+      cgiClient(other.cgiClient), cgiChild(other.cgiChild), status(other.status),
+      header(other.header), message(other.message.str()), body(other.body),
+      resourcePath(other.resourcePath), locationMatch(other.locationMatch)
 {}
 
 

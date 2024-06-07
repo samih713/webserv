@@ -13,6 +13,7 @@ public:
     Response handle_request(const Request& r)
     {
         const vector<char>& body = get_resource(r);
+		r.sent = true;
         return Response(status, responseHeaders, body);
     };
 
