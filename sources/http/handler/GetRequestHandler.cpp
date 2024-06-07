@@ -7,7 +7,7 @@ Response GetRequestHandler::handle_request(const Request& r)
 {
     // LOG_INFO("Handling GET request ... "); //? commented due to many prints
     _add_header("Server", cfg.serverName);
-    status = r.get_status();
+    status                   = r.get_status();
     const vector<char>& body = get_resource(r);
     return Response(status, responseHeaders, body);
 }
@@ -32,6 +32,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         // TODO handle redirection
     }
 
+    cout << resourcePath << endl;
     vector<char> body;
     struct stat  fileInfo;
     stat(resourcePath.c_str(), &fileInfo);
@@ -64,7 +65,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     _add_header("Content-Type", resource_type);
 
-    if (locationMatch == "/cgi-bin" && resource.find("/cgi-bin") != string::npos) {
+    if (!locationMatch.empty() && locationMatch == "/cgi-bin") {
         CGI cgi(r, cfg, *cp);
         body = cgi.execute(r.cgiStatus, r.cgiReadFd, r.cgiChild);
         _add_header("Content-Length", ws_itoa(body.size()));
