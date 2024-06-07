@@ -44,34 +44,14 @@ vector<char> PostRequestHandler::process_data(const Request& r)
     if (outputFile.fail()) // failed to open file
         return make_error_body(INTERNAL_SERVER_ERROR);
 
-    if (!send_request_body(requestBody))
-        return make_error_body(BAD_REQUEST);
-
+    outputFile << requestBody;
     outputFile.close();
 
     status = OK;
     return responseBody;
 }
 
-bool PostRequestHandler::send_request_body(const string& body)
-{
-    map<string, string> form;
-    istringstream       iss(body);
-    string              keyValuePair;
-    while (std::getline(iss, keyValuePair, '&')) {
-        istringstream keyValueStream(keyValuePair);
-        string        key, value;
-        if (std::getline(std::getline(keyValueStream, key, '='), value)) {
-            if (!key.empty() && !value.empty())
-                form.insert(make_pair(key, value));
-            else
-                return false;
-        }
-    }
-    return true;
-}
-
-vector<char> PostRequestHandler::handle_upload(const Request& r, const string& path)
+vector<char> PostRequestHandler::handle_upload(const Request& r, const string& dirPath)
 {
     HeaderMap::const_iterator itr = r.get_headers().find("content-type");
     if (itr == r.get_headers().end())
@@ -128,7 +108,17 @@ vector<char> PostRequestHandler::handle_upload(const Request& r, const string& p
     if (filenameEndPos == string::npos)
         return make_error_body(BAD_REQUEST);
     string fileName = bodyHeaders.substr(filenamePos, filenameEndPos - filenamePos);
-    fileName        = path + "/" + fileName;
+    fileName        = dirPath + "/" + fileName;
+
+    // Ensure the upload directory exists
+    struct stat st;
+    if (stat(dirPath.c_str(), &st) != 0) {
+        if (mkdir(dirPath.c_str(), 0700) != 0) {
+            return make_error_body(INTERNAL_SERVER_ERROR);
+        }
+    } else if (!S_ISDIR(st.st_mode)) {
+        return make_error_body(INTERNAL_SERVER_ERROR);
+    }
 
     ofstream outputFile(fileName.c_str(), std::ios_base::binary);
     if (outputFile.fail())

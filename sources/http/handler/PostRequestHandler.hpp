@@ -14,7 +14,6 @@ public:
 
 private:
     vector<char> process_data(const Request& r);
-    bool         send_request_body(const string& body);
     vector<char> handle_upload(const Request& r, const string& path);
 };
 
