@@ -3,8 +3,8 @@
 CGI::CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp)
     : _requestBody(request.get_body()), _cp(cp)
 {
-    string resource = request.get_resource();
-    _filePath       = resource;
+    string resourcePath = request.get_resource_path();
+    _filePath       = resourcePath;
     if (!request.get_query_string().empty())
         _queryString = request.get_query_string();
     _environment  = set_environment(request, cfg);

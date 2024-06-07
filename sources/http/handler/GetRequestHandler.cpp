@@ -32,8 +32,15 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         // TODO handle redirection
     }
 
-    cout << resourcePath << endl;
     vector<char> body;
+    if (!locationMatch.empty() && locationMatch == "/cgi-bin") {
+        CGI cgi(r, cfg, *cp);
+        body = cgi.execute(r.cgiStatus, r.cgiReadFd, r.cgiChild);
+        _add_header("Content-Length", ws_itoa(body.size()));
+        status = OK;
+        return body;
+    }
+
     struct stat  fileInfo;
     stat(resourcePath.c_str(), &fileInfo);
     if (S_ISDIR(fileInfo.st_mode)) {
@@ -65,13 +72,6 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
 
     _add_header("Content-Type", resource_type);
 
-    if (!locationMatch.empty() && locationMatch == "/cgi-bin") {
-        CGI cgi(r, cfg, *cp);
-        body = cgi.execute(r.cgiStatus, r.cgiReadFd, r.cgiChild);
-        _add_header("Content-Length", ws_itoa(body.size()));
-        status = OK;
-        return body;
-    }
 
     body = vector<char>((std::istreambuf_iterator<char>(resourceFile)),
         std::istreambuf_iterator<char>());
