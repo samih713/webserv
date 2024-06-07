@@ -3,14 +3,14 @@
 /* ------------------------------- Constructor ------------------------------ */
 
 TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP)
-    // : Socket(family, type, 0, SOCK_FLAG)
     : socketFD(invalidFD), isBound(false), isListening(false)
 {
 #if defined(__LINUX__)
     socketFD = socket(family, type | SOCK_FLAG, IPPROTO_TCP);
 #elif defined(__MAC__)
     socketFD = socket(family, type, IPPROTO_TCP);
-    int flag |= fcntl(socketFD, F_GETFL, 0);
+    int flag = SOCK_FLAG;
+    flag |= fcntl(socketFD, F_GETFL, 0);
     fcntl(socketFD, F_SETFL, flag);
 #endif // conditional
 

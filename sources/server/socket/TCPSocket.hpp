@@ -11,7 +11,6 @@
 #if defined(__LINUX__) // SOCK_FLAG
 static const int SOCK_FLAG = SOCK_NONBLOCK;
 #elif defined(__MAC__)
-#include <fcntl.h>
 static const int SOCK_FLAG = O_NONBLOCK;
 #else
 static const int SOCK_FLAG = 0;
