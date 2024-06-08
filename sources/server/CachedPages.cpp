@@ -124,7 +124,6 @@ Page& CachedPages::get_page(const string& pageName)
 
 void CachedPages::set_index_page(const string& indexPath)
 {
-    if (pages.find(indexPath) == pages.end()) {
+    if (pages.find(indexPath) == pages.end())
         load_page(indexPath);
-    }
 }

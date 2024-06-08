@@ -40,7 +40,7 @@ const vector<char> GetRequestHandler::get_resource(const Request& r)
         return body;
     }
 
-    struct stat  fileInfo;
+    struct stat fileInfo;
     stat(resourcePath.c_str(), &fileInfo);
     if (S_ISDIR(fileInfo.st_mode)) {
         ifstream indexFile(index.c_str(), std::ios_base::binary);

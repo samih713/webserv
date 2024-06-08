@@ -32,6 +32,6 @@ void ConnectionManager::check_connection(fd currentSocket)
     ConnectionMap::iterator it = connectionMap.find(currentSocket);
     if (it != connectionMap.end() && it->second.timer.is_timeout()) {
         it->second.set_status(REQUEST_TIMEOUT);
-		it->second.cgiStatus = COMPLETED;
-	}
+        it->second.cgiStatus = COMPLETED;
+    }
 }

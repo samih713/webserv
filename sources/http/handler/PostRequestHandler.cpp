@@ -113,17 +113,17 @@ vector<char> PostRequestHandler::handle_upload(const Request& r, const string& d
     // Ensure the upload directory exists
     struct stat st;
     if (stat(dirPath.c_str(), &st) != 0) {
-        if (mkdir(dirPath.c_str(), 0700) != 0) {
+        if (mkdir(dirPath.c_str(), 0700) != 0)
             return make_error_body(INTERNAL_SERVER_ERROR);
-        }
-    } else if (!S_ISDIR(st.st_mode)) {
+    }
+    else if (!S_ISDIR(st.st_mode)) {
         return make_error_body(INTERNAL_SERVER_ERROR);
     }
 
     ofstream outputFile(fileName.c_str(), std::ios_base::binary);
     if (outputFile.fail())
         return make_error_body(INTERNAL_SERVER_ERROR);
-    
+
     outputFile.write(fileContent.c_str(), fileContent.size());
     outputFile.close();
 

@@ -98,9 +98,8 @@ inline Request& ConnectionManager::add_connection(fd newConnection)
     Request& r = connectionMap.insert(make_pair(newConnection, Request())).first->second;
     LOG_DEBUG("ConnectionManager: Added connection [" + ws_itoa(newConnection) + "]");
     maxSD = std::max(maxSD, newConnection);
-	if (r.get_status() != REQUEST_TIMEOUT) {
-		r.timer.update_time();
-	}
+    if (r.get_status() != REQUEST_TIMEOUT)
+        r.timer.update_time();
     return (r);
 }
 

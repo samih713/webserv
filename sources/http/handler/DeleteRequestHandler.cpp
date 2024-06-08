@@ -7,7 +7,7 @@ Response DeleteRequestHandler::handle_request(const Request& r)
     LOG_DEBUG("Handling Delete request for resource: " + r.get_resource());
 
     _add_header("Server", cfg.serverName);
-    status = r.get_status();
+    status            = r.get_status();
     vector<char> body = get_resource(r);
     return Response(status, responseHeaders, body);
 }

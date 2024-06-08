@@ -32,7 +32,7 @@ struct ServerConfig {
     StatusCodeMap         errorPages;
     map<string, Location> locations;
     CachedPages*          cp;
-    RedirectionMap redirections;
+    RedirectionMap        redirections;
 
     bool redirect_to(string& uri) const
     {

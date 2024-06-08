@@ -34,8 +34,8 @@ public:
 
     void set_status(STATUS_CODE);
 
-    TimeOut timer;
-    mutable bool          sent;
+    TimeOut      timer;
+    mutable bool sent;
 
     friend ostream& operator<<(ostream& os, const Request& r);
 
