@@ -75,8 +75,8 @@ clean:
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)$(BOLD)[ DELETE ]$(RESET) Removed object files."; \
 	fi
-	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_HTTP) ] || [ -f $(TEST_SOCKET) ] || [ -f $(TEST_CGI) ] || [ -f client ]; then \
-		$(RM) $(TEST_PARSER) $(TEST_HTTP) $(TEST_SOCKET) $(TEST_CGI) client; \
+	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_SOCKET) ] [ -f client ]; then \
+		$(RM) $(TEST_PARSER) $(TEST_SOCKET) client; \
 		echo "$(RED)$(BOLD)[ DELETE ]$(RESET) Removed testers."; \
 	fi
 
@@ -92,22 +92,13 @@ re: fclean
 test_parser:
 	@cd ./$(PARSER_DIR)/$(TESTS_DIR) && ./run_tests.sh && cd -
 
-test_http:
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(CGI_SRCS) $(HTTP_SRCS) $(TEST_HTTP_SRC) -o $(TEST_HTTP)
-	@echo "$(BLUE)$(BOLD)[ TEST ]$(RESET) HTTP ready for testing."
-
-#! SOCKET_main.cpp has a compile error so this test has been commented out
-# test_socket:
-# 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client @$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
-# 	@echo "$(BLUE)$(BOLD)[ TEST ]$(RESET) SOCKET ready for testing."
+test_socket:
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_CLIENT_SRC) -o $(SERVER_DIR)/client @$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SOCKET_SRCS) $(TEST_SOCKET_SRC) -o $(TEST_SOCKET)
+	@echo "$(BLUE)$(BOLD)[ TEST ]$(RESET) SOCKET ready for testing."
 
 client: $(TEST_CLIENT_SRC)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(TEST_CLIENT_SRC) $(SERVER_DIR)/socket/Socket.cpp $(SERVER_DIR)/socket/TCPSocket.cpp -o $@
 	@echo "$(BLUE)$(BOLD)[ TEST ]$(RESET) Client is ready."
-
-test_cgi:
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(DEBUGFLAGS) $(SANITIZE) $(HTTP_SRCS) $(CGI_SRCS) $(TEST_CGI_SRC) -o $(TEST_CGI)
-	@echo "$(BLUE)$(BOLD)[ TEST ]$(RESET) CGI ready for testing."
 
 format:
 	@echo "$(BLUE)$(BOLD)[ FORMAT ]$(RESET) Formatting code..."
@@ -117,4 +108,4 @@ format:
 
 -include $(OBJS:.o=.d)
 
-.PHONY: all run log debug clean fclean re test_parser test_http test_socket client test_cgi format
+.PHONY: all run log debug clean fclean re test_parser test_socket client format

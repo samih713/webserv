@@ -10,7 +10,3 @@ HANDLER_DIR:=$(HTTP_DIR)/handler
 HANDLER_SRCS:= $(wildcard $(HANDLER_DIR)/*.cpp)
 
 SRCS += $(REQUEST_SRCS) $(RESPONSE_SRCS) $(HANDLER_SRCS) $(wildcard ./*cpp)
-
-# tester mains
-TEST_HTTP:= $(HTTP_DIR)/test_http
-TEST_HTTP_SRC:= $(HTTP_DIR)/$(TESTS_DIR)/test_http.cpp

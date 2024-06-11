@@ -4,9 +4,28 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-const string crlf("\r\n");
-const string request("GET /index.html " + HTTP_VER + crlf + crlf);
 #define BUFFER_SIZE 4096
+
+static const string sample_request =
+    "GET resource/resource HTTP/1.1\r\n" // request-line
+    "Host: Linode.com\r\n"               // headers fields
+    "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.8) "
+    "Gecko/20091102 Firefox/3.5.5 \r\n"
+    "Content-Length: 69\r\n"
+    "Transfer-Encoding: chunked\r\n"
+    "Accept-Charset: ISO-8859-1,utf-8\r\n"
+    "Cache-Control: no-cache\r\n"
+    "\r\n" //
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "17\r\n"
+    "Wiki aldkjflakdjf w kew\r\n"
+    "0\r\n"
+    "\r\n"
+    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit\r\n"
+    "\r\n";
 
 int main()
 {

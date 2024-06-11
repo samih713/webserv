@@ -1,6 +1,6 @@
 #include "GetRequestHandler.hpp"
-#include "CachedPages.hpp"
 #include "CGI.hpp"
+#include "CachedPages.hpp"
 #include "webserv.hpp"
 
 Response GetRequestHandler::handle_request(const Request& r)

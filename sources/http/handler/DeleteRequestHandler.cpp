@@ -1,6 +1,6 @@
 #include "DeleteRequestHandler.hpp"
-#include "CachedPages.hpp"
 #include "CGI.hpp"
+#include "CachedPages.hpp"
 
 Response DeleteRequestHandler::handle_request(const Request& r)
 {
