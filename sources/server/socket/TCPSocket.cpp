@@ -34,7 +34,7 @@ TCPSocket::TCPSocket(fd port, int backLog, in_addr_t serverIP)
     bind();
     listen(backLog);
 
-    LOG_DEBUG("TCPSocket: TCP socket " + ws_itoa(socketFD) + " created on port [" +
+    LOG_DEBUG("TCPSocket: TCP socket [" + ws_itoa(socketFD) + "] created on port [" +
               ws_itoa(ntohs(((struct sockaddr_in*) &address)->sin_port)) + "]");
 }
 
@@ -44,7 +44,7 @@ TCPSocket::~TCPSocket() throw()
 {
     if (socketFD != invalidFD) {
         close(socketFD);
-        LOG_DEBUG("TCPSocket: TCP socket " + ws_itoa(socketFD) + " closed");
+        LOG_DEBUG("TCPSocket: TCP socket [" + ws_itoa(socketFD) + "] closed");
         socketFD = invalidFD;
     }
 }
@@ -55,7 +55,7 @@ TCPSocket::TCPSocket(const TCPSocket& other)
     : address(other.address), socketFD(dup(other.socketFD)), isBound(other.isBound),
       isListening(other.isListening)
 {
-    LOG_DEBUG("TCPSocket: TCP socket " + ws_itoa(socketFD) + " copied");
+    LOG_DEBUG("TCPSocket: TCP socket [" + ws_itoa(socketFD) + "] copied");
 }
 
 TCPSocket& TCPSocket::operator=(const TCPSocket& other) //?

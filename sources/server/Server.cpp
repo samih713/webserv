@@ -118,14 +118,17 @@ void Server::select_strat()
     fd_set readytoRead;
 
     const TCPSocket* tcp;
-    while (true) {
+    while (g_stopServer == 0) {
         LOG_INFO("Server: Waiting for connections ...");
 
         ConnectionManager::remove_expired();
         readytoRead = ConnectionManager::get_active_sockets();
 
-        if (select(maxSD + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0)
-            THROW_EXCEPTION_WITH_INFO(strerror(errno));
+        if (select(maxSD + 1, &readytoRead, NULL, NULL, &selectTimeOut) < 0) {
+            if (errno == EINTR)
+                break;
+            THROW_EXCEPTION_WITH_INFO(string("Select: ") + strerror(errno));
+        }
 
         selectTimeOut.tv_sec = SELECTWAITTIME;
 
@@ -142,6 +145,7 @@ void Server::select_strat()
             }
         }
     }
+    LOG_INFO("Shutting down server...");
 }
 
 /* ---------------------------------- START --------------------------------- */

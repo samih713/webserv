@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -95,7 +96,6 @@ typedef int                 fd; // socket_descriptor type
         throw runtime_error(oss.str());                                                  \
     } while (0)
 
-static string ERR_NULL("Socket: null ptr error"); //* unused
 static string ERR_CREAT("Socket: creation failed");
 static string ERR_BIND("Socket: binding failed");
 static string ERR_NBIND("Socket: not bound to a port");
@@ -103,6 +103,7 @@ static string ERR_LIST("Socket: listen failed");
 static string ERR_NLIST("Socket: not listening");
 static string ERR_ACCP("Socket: accept failed");
 
-static string ERR_MEMORY_ALLOC("Memory: allocation failed"); //* unused
+/* ----------------------------- GLOBAL VARIABLE ---------------------------- */
+static volatile sig_atomic_t g_stopServer = 0;
 
 #endif // WEBSERV_HPP

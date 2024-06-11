@@ -4,12 +4,20 @@
 #include "ServerConfig.hpp"
 #include "webserv.hpp"
 
+void signal_handler(int signal)
+{
+    if (signal == SIGINT)
+        g_stopServer = 1;
+}
+
 int main(int argc, char** argv)
 {
     if (argc > 2) {
         cerr << "Usage: " << argv[0] << " [<config_file>]" << endl;
         exit(1);
     }
+
+    signal(SIGINT, signal_handler);
 
     try {
         string configFile = (argc == 2) ? argv[1] : "./configs/webserv.conf";

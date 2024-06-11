@@ -35,8 +35,6 @@ private:
 inline const TCPSocket* ConnectionManager::get_tcp(fd& socketFD)
 {
     TCPfdMap::iterator it = TCPMap.find(socketFD);
-    if (it == TCPMap.end())
-        LOG_ERROR("get_tcp: " + ws_itoa(socketFD));
     DEBUGASSERT(it != TCPMap.end() && "TCP socket not found");
     return it->second;
 }
@@ -62,7 +60,7 @@ inline fd_set ConnectionManager::add_listeners(const servers_t& servers)
         FD_SET(listenerFD, &listenerFDs);
         TCPMap.insert(make_pair(listenerFD, &(s->first)));
         maxSD = std::max(maxSD, listenerFD);
-        LOG_DEBUG("Server: Added listener " + ws_itoa(listenerFD));
+        LOG_DEBUG("Server: Added listener [" + ws_itoa(listenerFD) + "]");
     }
     return listenerFDs;
 }
