@@ -1,4 +1,4 @@
-#include "Cgi.hpp"
+#include "CGI.hpp"
 
 CGI::CGI(const Request& request, const ServerConfig& cfg, CachedPages& cp)
     : _requestBody(request.get_body()), _cp(cp)

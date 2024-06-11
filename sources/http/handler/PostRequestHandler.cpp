@@ -1,5 +1,5 @@
 #include "PostRequestHandler.hpp"
-#include "Cgi.hpp"
+#include "CGI.hpp"
 
 Response PostRequestHandler::handle_request(const Request& r)
 {

@@ -23,7 +23,6 @@ RM:= rm -rf
 ### DIRECTORIES ###
 SRCS_DIR:= sources
 OBJS_DIR:= objects
-DEPS_DIR:= deps
 TESTS_DIR:= .tests
 PARSER_DIR:= $(SRCS_DIR)/parser
 HTTP_DIR:= $(SRCS_DIR)/http
@@ -118,4 +117,4 @@ format:
 
 -include $(OBJS:.o=.d)
 
-.PHONY: clean fclean all re debug run test_http test_socket test_cgi format
+.PHONY: all run log debug clean fclean re test_parser test_http test_socket client test_cgi format

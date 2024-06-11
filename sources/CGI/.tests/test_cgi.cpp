@@ -7,7 +7,7 @@
 // # include <sys/stat.h>
 // # include <sys/wait.h>
 // # include <stdexcept>
-#include "Cgi.hpp"
+#include "CGI.hpp"
 
 
 // using namespace webserv::http;
