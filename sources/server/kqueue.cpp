@@ -14,6 +14,8 @@ void Server::kqueue_strat()
 #elif defined(__MAC__)
 void Server::kqueue_strat()
 {
+    (void) KQUEUEWAITTIME;
+    (void) MAX_EVENTS;
     //     const fd              listenerFD    = listener.get_fd();
     //     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0
     //     };
