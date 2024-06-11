@@ -19,11 +19,7 @@ int main(int argc, char** argv)
         LOG_INFO("Parsing " + configFile);
 
         Server& webserv = Server::get_instance(servers, 100);
-#if defined(__LINUX__)
         webserv.start(SELECT);
-#elif defined(__MAC__)
-        webserv.start(SELECT);
-#endif
     } catch (std::exception& error) {
         LOG_ERROR(error.what());
     }

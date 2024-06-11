@@ -75,7 +75,7 @@ clean:
 		$(RM) $(OBJS_DIR); \
 		echo "$(RED)$(BOLD)[ DELETE ]$(RESET) Removed object files."; \
 	fi
-	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_SOCKET) ] [ -f client ]; then \
+	@if [ -f $(TEST_PARSER) ] || [ -f $(TEST_SOCKET) ] || [ -f client ]; then \
 		$(RM) $(TEST_PARSER) $(TEST_SOCKET) client; \
 		echo "$(RED)$(BOLD)[ DELETE ]$(RESET) Removed testers."; \
 	fi

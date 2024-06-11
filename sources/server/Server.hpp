@@ -37,8 +37,8 @@ public:
 
     ~Server()
     {
-        for (vector<ServerConfig>::iterator sc = cfgs.begin(); sc != cfgs.end(); sc++)
-            delete sc->cp;
+        for (servers_t::iterator s = servers.begin(); s != servers.end(); s++)
+            delete s->second.cp;
     }
 
     void start(enum polling_strat);
