@@ -23,7 +23,6 @@
 
 // CGI
 // [ ] fix forking here for sleep
-// [ ] logging
 // [ ] split-up function implementations into their own files
 // [ ] different strategies
 // [ ] testing (with a testing framework)
@@ -92,7 +91,7 @@ typedef int                 fd; // socket_descriptor type
 #define THROW_EXCEPTION_WITH_INFO(msg)                                                   \
     do {                                                                                 \
         ostringstream oss;                                                               \
-        oss << __FILE__ << ":" << __LINE__ << ": " << R << "error: " << RE << (msg);     \
+        oss << __FILE__ << ":" << __LINE__ << ": " << (msg);                             \
         throw runtime_error(oss.str());                                                  \
     } while (0)
 

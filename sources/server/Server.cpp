@@ -9,7 +9,7 @@
  * This constructor initializes a Server object with the provided configuration and
  * backlog.
  *
- * @param cfgs The configuration settings for the server. //todo rewrite
+ * @param cfgs The configurations containing settings for the server.
  * @param backLog The maximum length of the queue of pending connections.
  *
  * @throws Socket::Exception if there is an issue with setting up the listener socket.
@@ -28,6 +28,32 @@ Server::Server(vector<ServerConfig>& cfgs, int backLog) : cfgs(cfgs)
 }
 
 /* ---------------------------- HANDLE CONNECTION --------------------------- */
+
+static IRequestHandler* make_request_handler(Request& r, ServerConfig& cfg)
+{
+    vector<string>& methods       = cfg.methods;
+    const string&   locationMatch = r.get_location_match();
+
+    if (!locationMatch.empty())
+        methods = cfg.locations.at(locationMatch).methods;
+
+    const string& method = r.get_method();
+    if (method != "GET" && method != "POST" && method != "DELETE")
+        r.set_status(NOT_IMPLEMENTED);
+    else if (std::find(methods.begin(), methods.end(), method) == methods.end())
+        r.set_status(METHOD_NOT_ALLOWED);
+
+    if (r.get_status() != OK)
+        return new ErrorHandler(cfg);
+    else if (method == "GET")
+        return new GetRequestHandler(cfg);
+    else if (method == "POST")
+        return new PostRequestHandler(cfg);
+    else if (method == "DELETE")
+        return new DeleteRequestHandler(cfg);
+    else
+        return NULL;
+}
 
 // TODO this function does not work with kqueue, only select
 void Server::handle_connection(fd incoming, ServerConfig& cfg)
@@ -117,104 +143,6 @@ void Server::select_strat()
         }
     }
 }
-
-/* --------------------------------- KQUEUE --------------------------------- */
-
-#if defined(__LINUX__)
-void Server::kqueue_strat()
-{
-    THROW_EXCEPTION_WITH_INFO("Kqueue does not work on Linux");
-}
-#elif defined(__MAC__)
-void Server::kqueue_strat()
-{
-    //     const fd              listenerFD    = listener.get_fd();
-    //     const struct timespec kqueueTimeOut = { .tv_sec = KQUEUEWAITTIME, .tv_nsec = 0
-    //     };
-
-    //     struct kevent changeList;            // list of events to monitor
-    //     struct kevent eventList[MAX_EVENTS]; // list of events that have occurred
-
-    //     // creating kqueue
-    //     const int kq = kqueue();
-    //     if (kq == -1)
-    //         THROW_EXCEPTION_WITH_INFO(strerror(errno));
-
-    //     // adding listenerFD to changeList to monitor for read events
-    //     EV_SET(&changeList, listenerFD, EVFILT_READ, EV_ADD, 0, 0, 0);
-
-    //     // adding changeList containing only listenerFD to kqueue
-    //     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
-    //         close(kq);
-    //         THROW_EXCEPTION_WITH_INFO(strerror(errno));
-    //     }
-
-    //     int numEvents = 0;
-    //     while (true) // event loop
-    //     {
-    //         DEBUG_MSG(WAIT_MESSAGE, L);
-
-    //         numEvents = kevent(kq, NULL, 0, eventList, MAX_EVENTS, &kqueueTimeOut);
-    //         if (numEvents == -1) {
-    //             close(kq);
-    //             THROW_EXCEPTION_WITH_INFO(strerror(errno));
-    //         }
-    //         else if (numEvents == 0) // timeout
-    //             continue;
-
-    //         for (int i = 0; i < numEvents; i++) {
-    //             if (eventList[i].ident == static_cast<uintptr_t>(listenerFD)) {
-    //                 // add new connection to kqueue
-    //                 fd newConnection = listener.accept();
-    //                 EV_SET(&changeList, newConnection, EVFILT_READ, EV_ADD, 0, 0, 0);
-    //                 if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
-    //                     close(kq);
-    //                     THROW_EXCEPTION_WITH_INFO(strerror(errno));
-    //                 }
-    //             }
-    //             else if (eventList[i].flags & EV_EOF) {
-    //                 // remove connection from kqueue
-    //                 EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE, 0,
-    //                 0, 0); if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
-    //                     close(kq);
-    //                     THROW_EXCEPTION_WITH_INFO(strerror(errno));
-    //                 }
-    //                 close(eventList[i].ident);
-    //                 // this should be done in handle_connection
-    //             }
-    //             else if (eventList[i].flags & EVFILT_READ) {
-    //                 DEBUG_MSG("reading from connection", M);
-    //                 //! this is not a good fix at all and is very hard-cody
-    //                 try {
-    //                     Request req;
-    //                     req.recv(eventList[i].ident);
-    //                     if (!req.process(cfg))
-    //                         continue;
-
-    //                     IRequestHandler* handler  =
-    //                     make_request_handler(req.get_method()); Response response =
-    //                     handler->handle_request(req);
-    //                     response.send_response(eventList[i].ident);
-    //                     delete handler;
-    //                 } catch (std::ios_base::failure& f) {
-    //                     DEBUG_MSG(ERR_PARSE, R);
-    //                 } catch (std::exception& error) {
-    //                     EV_SET(&changeList, eventList[i].ident, EVFILT_READ, EV_DELETE,
-    //                     0, 0,
-    //                         0);
-    //                     if (kevent(kq, &changeList, 1, NULL, 0, NULL) == -1) {
-    //                         close(kq);
-    //                         THROW_EXCEPTION_WITH_INFO(strerror(errno));
-    //                     }
-    //                     DEBUG_MSG(error.what(), R);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    // close(kq);
-}
-#endif
 
 /* ---------------------------------- START --------------------------------- */
 
