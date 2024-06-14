@@ -5,8 +5,8 @@
 #include <limits>
 #include <set>
 
-#ifndef CONFIG_PARSER_HPP
-#define CONFIG_PARSER_HPP
+#ifndef PARSE_CONFIG_HPP
+#define PARSE_CONFIG_HPP
 
 using std::set;
 
@@ -80,4 +80,4 @@ using std::set;
 
 vector<ServerConfig> parse_config_file(const string& filePath);
 
-#endif // CONFIG_PARSER_HPP
+#endif // PARSE_CONFIG_HPP

@@ -1,6 +1,6 @@
 # parser makefile
 
-PARSER_SRCS:= $(addprefix $(PARSER_DIR)/, ConfigParser.cpp)
+PARSER_SRCS:= $(addprefix $(PARSER_DIR)/, parse_config.cpp)
 SRCS += $(PARSER_SRCS)
 
 # tester mains

@@ -1,4 +1,4 @@
-#include "ConfigParser.hpp"
+#include "parse_config.hpp"
 
 /* ---------------------------- UTILITY FUNCTIONS --------------------------- */
 

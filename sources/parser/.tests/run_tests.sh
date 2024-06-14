@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Compiling test_parser
-c++ -Wall -Werror -Wextra -std=c++98 -ggdb3 -D__DEBUG__ -I../ -I../../../includes/ -I../../server/ -I../../http/ ../ConfigParser.cpp ./test_parser.cpp -o test_parser
+c++ -Wall -Werror -Wextra -std=c++98 -ggdb3 -D__DEBUG__ -I../ -I../../../includes/ -I../../server/ -I../../http/ ../parse_config.cpp ./test_parser.cpp -o test_parser
 echo "`tput setaf 4``tput bold`[ TEST ]`tput sgr0` Parser ready for testing."
 
 # Check if compilation was successful
