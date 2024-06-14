@@ -1,26 +1,65 @@
 #include "ConfigParser.hpp"
 
-ConfigParser::ConfigParser(const string& configFile)
+/* ---------------------------- UTILITY FUNCTIONS --------------------------- */
+
+static inline bool is_number(const string& str)
+{
+    if (str.find_first_not_of("0123456789") != string::npos)
+        return false;
+    return true;
+}
+
+static inline bool is_keyword(const string& str)
+{
+    const string keywords[11] = { "server", "listen", "server_name", "location", "root",
+        "index", "error_page", "client_max_body_size", "autoindex", "allow_methods",
+        "redirect" };
+    for (int i = 0; i < 11; i++)
+        if (keywords[i] == str)
+            return true;
+    return false;
+}
+
+static inline void check_semicolon(vector<string>::const_iterator& token)
+{
+    if (*(token + 1) != ";")
+        THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SEMICOLON + *token);
+    ++token; // move to semicolon
+}
+
+static inline void check_duplicate_element(set<string>& container, const string& element,
+    const string& context)
+{
+    if (container.find(element) != container.end())
+        THROW_EXCEPTION_WITH_INFO(
+            "Config: duplicate " + element + " found in " + context + " context");
+
+    container.insert(element);
+}
+
+/* ---------------------------- PARSING FUNCTIONS --------------------------- */
+
+static string read_file(const string& filePath)
 {
     // checking file extension
-    if (configFile.find('.') == string::npos ||
-        configFile.substr(configFile.find_last_of('.')) != ".conf")
+    if (filePath.find('.') == string::npos ||
+        filePath.substr(filePath.find_last_of('.')) != ".conf")
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_EXTENSION);
 
     // check if file exists and is a regular file
     struct stat fileInfo;
-    if (stat(configFile.c_str(), &fileInfo) == -1)
-        THROW_EXCEPTION_WITH_INFO(ERR_FILE + configFile);
+    if (stat(filePath.c_str(), &fileInfo) == -1)
+        THROW_EXCEPTION_WITH_INFO(ERR_FILE + filePath);
 
     if (S_ISDIR(fileInfo.st_mode))
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_TYPE);
 
     // check file permissions
-    if (access(configFile.c_str(), R_OK | W_OK) == -1)
+    if (access(filePath.c_str(), R_OK | W_OK) == -1)
         THROW_EXCEPTION_WITH_INFO(ERR_FILE_PERM);
 
     // open file
-    ifstream file(configFile.c_str());
+    ifstream file(filePath.c_str());
     if (!file.is_open())
         THROW_EXCEPTION_WITH_INFO(ERR_OPEN);
     if (file.peek() == ifstream::traits_type::eof()) // check if file is empty
@@ -44,42 +83,50 @@ ConfigParser::ConfigParser(const string& configFile)
 
         content.append(line);
     }
-
     file.close();
 
-    string currentToken;
+    return content;
+}
+
+static vector<string> tokenize_content(const string& content)
+{
+    vector<string> tokens;
+    string         currentToken;
     for (string::const_iterator itr = content.begin(); itr != content.end(); ++itr) {
         if (*itr == '{' || *itr == '}' || *itr == ';') { // delimiters
             if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
+                tokens.push_back(currentToken);
                 currentToken.clear();
             }
-            _tokens.push_back(string(1, *itr));
+            tokens.push_back(string(1, *itr));
         }
         else if (std::isspace(*itr)) { // whitespace
             if (!currentToken.empty()) {
-                _tokens.push_back(currentToken);
+                tokens.push_back(currentToken);
                 currentToken.clear();
             }
         }
         else
             currentToken.push_back(*itr); // add character to current token
     }
+    return tokens;
+}
 
+static void validate_braces(vector<string>& tokens)
+{
     // check braces
     stack<string> braces;
-    for (vector<string>::const_iterator vecItr = _tokens.begin(); vecItr != _tokens.end();
-         ++vecItr)
+    for (vector<string>::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
     {
-        if (*vecItr == "{") {
-            if (vecItr - 1 >= _tokens.begin() && *(vecItr - 1) != "server" &&
-                vecItr - 2 >= _tokens.begin() && *(vecItr - 2) != "location")
+        if (*itr == "{") {
+            if (itr - 1 >= tokens.begin() && *(itr - 1) != "server" &&
+                itr - 2 >= tokens.begin() && *(itr - 2) != "location")
             {
                 THROW_EXCEPTION_WITH_INFO(ERR_MISSING_CONTEXT);
             }
             braces.push("{");
         }
-        else if (*vecItr == "}") {
+        else if (*itr == "}") {
             if (braces.empty()) // missing opening brace
                 THROW_EXCEPTION_WITH_INFO(ERR_OPENING_BRACE);
             braces.pop();
@@ -89,19 +136,22 @@ ConfigParser::ConfigParser(const string& configFile)
         THROW_EXCEPTION_WITH_INFO(ERR_CLOSING_BRACE);
 }
 
-void ConfigParser::parse_error_page(StatusCodeMap& errorPages, const string& root)
+/* ----------------------- PARSING DIRECTIVE FUNCTIONS ---------------------- */
+
+static void parse_error_page(vector<string>::const_iterator& token,
+    StatusCodeMap& errorPages, const string& root)
 {
     if (root.empty()) // root can be empty if not set
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
-    ++_itr; // move to error code
+    ++token; // move to error code
     vector<STATUS_CODE> codes;
-    while (is_number(*_itr)) {
-        codes.push_back(static_cast<STATUS_CODE>(std::atoi(_itr->c_str())));
-        ++_itr; // move to next error code
+    while (is_number(*token)) {
+        codes.push_back(static_cast<STATUS_CODE>(std::atoi(token->c_str())));
+        ++token; // move to next error code
     }
 
-    string errorFile = *_itr;
+    string errorFile = *token;
     if (errorFile.find(".html") == string::npos && errorFile.find(".htm") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_ERROR_PATH);
     if (errorFile.find("/") == string::npos)
@@ -125,41 +175,43 @@ void ConfigParser::parse_error_page(StatusCodeMap& errorPages, const string& roo
         errorPages[*itr] = page;
     }
 
-    check_semicolon();
+    check_semicolon(token);
 }
 
-void ConfigParser::parse_index(string& indexFile, const string& root)
+static void parse_index(vector<string>::const_iterator& token, string& indexFile,
+    const string& root)
 {
     if (root.empty()) // root can be empty if not set
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_ROOT);
 
-    ++_itr; // move to index file
-    if (is_keyword(*_itr) || _itr->find("/") != string::npos)
+    ++token; // move to index file
+    if (is_keyword(*token) || token->find("/") != string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INDEX);
 
-    indexFile = *_itr;
+    indexFile = *token;
 
-    check_semicolon();
+    check_semicolon(token);
 }
 
-fd ConfigParser::parse_listen(in_addr_t& host, bool& defaultServer)
+static fd parse_listen(vector<string>::const_iterator& token, in_addr_t& host,
+    bool& defaultServer)
 {
-    ++_itr; // move to host:port
+    ++token; // move to host:port
 
     string portStr;
     string hostStr;
-    size_t colonPos = _itr->find(":");
+    size_t colonPos = token->find(":");
     if (colonPos != string::npos) { // host:port
         if (colonPos == 0)
             THROW_EXCEPTION_WITH_INFO(ERR_HOST);
-        hostStr = _itr->substr(0, colonPos);
-        portStr = _itr->substr(colonPos + 1);
+        hostStr = token->substr(0, colonPos);
+        portStr = token->substr(colonPos + 1);
     }
-    else if (_itr->find(".") != string::npos)
-        hostStr = *_itr;
-    else if (is_number(*_itr))
-        portStr = *_itr;
-    else if (_itr->find_first_of(":") != _itr->find_last_of(":"))
+    else if (token->find(".") != string::npos)
+        hostStr = *token;
+    else if (is_number(*token))
+        portStr = *token;
+    else if (token->find_first_of(":") != token->find_last_of(":"))
         THROW_EXCEPTION_WITH_INFO(ERR_MULTIPLE_COLON);
     else
         THROW_EXCEPTION_WITH_INFO(ERR_LISTEN);
@@ -185,46 +237,46 @@ fd ConfigParser::parse_listen(in_addr_t& host, bool& defaultServer)
             THROW_EXCEPTION_WITH_INFO(ERR_PORT);
     }
 
-    if (*(_itr + 1) == "default_server") {
+    if (*(token + 1) == "default_server") {
         defaultServer = true;
-        ++_itr; // move to default_server
+        ++token; // move to default_server
     }
 
-    check_semicolon();
+    check_semicolon(token);
 
     return port;
 }
 
-void ConfigParser::parse_server_name(string& serverName)
+static void parse_server_name(vector<string>::const_iterator& token, string& serverName)
 {
-    ++_itr; // move to server name
-    serverName = *_itr;
+    ++token; // move to server name
+    serverName = *token;
     if (is_keyword(serverName))
         THROW_EXCEPTION_WITH_INFO(ERR_SERVER_NAME);
-    check_semicolon();
+    check_semicolon(token);
 }
 
-void ConfigParser::parse_root(string& root)
+static void parse_root(vector<string>::const_iterator& token, string& root)
 {
-    ++_itr; // move to root path
-    root = *_itr;
+    ++token; // move to root path
+    root = *token;
     if (root[root.size() - 1] == '/') // remove trailing slash
         root.erase(root.size() - 1);
-    check_semicolon();
+    check_semicolon(token);
 }
 
-size_t ConfigParser::parse_client_max_body_size(void)
+static size_t parse_client_max_body_size(vector<string>::const_iterator& token)
 {
-    ++_itr; // move to max body size
+    ++token; // move to max body size
 
-    string maxBodySize = *_itr;
+    string maxBodySize = *token;
     if (maxBodySize.find_first_not_of("0123456789kKmMgG.") != string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_INVALID_CHAR);
     else if (maxBodySize.find_first_of("0123456789") == string::npos)
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SIZE);
     else if (maxBodySize.find_first_of("kKmMgG") == string::npos) {
         if (maxBodySize == "0") {
-            check_semicolon();
+            check_semicolon(token);
             return 0; // disable body size checking
         }
         THROW_EXCEPTION_WITH_INFO(ERR_MISSING_SUFFIX);
@@ -250,54 +302,55 @@ size_t ConfigParser::parse_client_max_body_size(void)
     if (size >= std::numeric_limits<int>::max())
         THROW_EXCEPTION_WITH_INFO(ERR_BODY_SIZE_OVERFLOW);
 
-    check_semicolon();
+    check_semicolon(token);
 
     return size * multiplier;
 }
 
-bool ConfigParser::parse_autoindex(void)
+static bool parse_autoindex(vector<string>::const_iterator& token)
 {
-    ++_itr; // move to on/off
-    string autoindex = *_itr;
+    ++token; // move to on/off
+    string autoindex = *token;
     if (autoindex != "on" && autoindex != "off")
         THROW_EXCEPTION_WITH_INFO(ERR_AUTOINDEX);
-    check_semicolon();
+    check_semicolon(token);
     return autoindex == "on";
 }
 
-vector<string> ConfigParser::parse_allow_methods(void)
+static vector<string> parse_allow_methods(vector<string>::const_iterator& token)
 {
-    ++_itr; // move to methods
+    ++token; // move to methods
 
     vector<string> methods;
-    while (*_itr != ";") {
-        if (*_itr == "GET" || *_itr == "POST" || *_itr == "DELETE")
-            methods.push_back(*_itr);
+    while (*token != ";") {
+        if (*token == "GET" || *token == "POST" || *token == "DELETE")
+            methods.push_back(*token);
         else
             THROW_EXCEPTION_WITH_INFO(ERR_METHOD);
-        ++_itr;
+        ++token;
     }
 
     if (methods.empty())
         THROW_EXCEPTION_WITH_INFO(ERR_EMPTY_METHODS);
 
-    --_itr; // move back to last method
-    check_semicolon();
+    --token; // move back to last method
+    check_semicolon(token);
 
     return methods;
 }
 
-void ConfigParser::parse_http_redirection(RedirectionMap& redirMap)
+static void parse_http_redirection(vector<string>::const_iterator& token,
+    RedirectionMap&                                                redirMap)
 {
-    ++_itr; // move to the URI being redirected
-    string redirectFrom = *_itr;
+    ++token; // move to the URI being redirected
+    string redirectFrom = *token;
     if (redirectFrom[0] != '/') // uri should begin with /
         THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_SLASH);
     else if (redirectFrom.find_first_of("/") != redirectFrom.find_last_of("/"))
         THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_DUP_SLASH);
 
-    ++_itr; // move to the target URI
-    string redirectTo = *_itr;
+    ++token; // move to the target URI
+    string redirectTo = *token;
     if (redirectTo[0] != '/') // uri should begin with /
         THROW_EXCEPTION_WITH_INFO(ERR_REDIRECT_SLASH);
     else if (redirectTo.find_first_of("/") != redirectTo.find_last_of("/"))
@@ -305,15 +358,18 @@ void ConfigParser::parse_http_redirection(RedirectionMap& redirMap)
 
     redirMap[redirectFrom] = redirectTo;
 
-    check_semicolon();
+    check_semicolon(token);
 }
 
-void ConfigParser::parse_location_context(ServerConfig& server)
+/* ----------------------- PARSING CONTEXT FUNCTIONS ------------------------ */
+
+static void parse_location_context(vector<string>::const_iterator& token,
+    ServerConfig&                                                  server)
 {
-    ++_itr; // move to location uri
+    ++token; // move to location uri
 
     string uri;
-    uri = *_itr;
+    uri = *token;
     if (uri[0] != '/') // uri should begin with /
         THROW_EXCEPTION_WITH_INFO(ERR_URI_MISSING_SLASH);
     else if (uri.find_first_of("/") != uri.find_last_of("/"))
@@ -322,7 +378,7 @@ void ConfigParser::parse_location_context(ServerConfig& server)
     if (server.locations.find(uri) != server.locations.end())
         THROW_EXCEPTION_WITH_INFO(ERR_DUPLICATE_LOCATION);
 
-    ++_itr; // move to {
+    ++token; // move to {
 
     Location location;
     location.root        = server.root;
@@ -332,21 +388,21 @@ void ConfigParser::parse_location_context(ServerConfig& server)
     location.methods     = server.methods;
 
     set<string> parsedDirectives;
-    while (*_itr != "}") {
-        if (*_itr != ";" && *_itr != "}")
-            check_duplicate_element(parsedDirectives, *_itr, "location");
-        if (*_itr == "root")
-            parse_root(location.root);
-        else if (*_itr == "client_max_body_size")
-            location.maxBodySize = parse_client_max_body_size();
-        else if (*_itr == "allow_methods")
-            location.methods = parse_allow_methods();
-        else if (*_itr == "index")
-            parse_index(location.indexFile, location.root + uri);
-        else if (*_itr == "autoindex")
-            location.autoindex = parse_autoindex();
-        else if (*_itr == ";" || *_itr == "{")
-            ++_itr;
+    while (*token != "}") {
+        if (*token != ";" && *token != "}")
+            check_duplicate_element(parsedDirectives, *token, "location");
+        if (*token == "root")
+            parse_root(token, location.root);
+        else if (*token == "client_max_body_size")
+            location.maxBodySize = parse_client_max_body_size(token);
+        else if (*token == "allow_methods")
+            location.methods = parse_allow_methods(token);
+        else if (*token == "index")
+            parse_index(token, location.indexFile, location.root + uri);
+        else if (*token == "autoindex")
+            location.autoindex = parse_autoindex(token);
+        else if (*token == ";" || *token == "{")
+            ++token;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_LOCATION_TOKENS);
     }
@@ -358,40 +414,41 @@ void ConfigParser::parse_location_context(ServerConfig& server)
 
     server.locations[uri] = location;
 
-    ++_itr; // move to next directive
+    ++token; // move to next directive
 }
 
-ServerConfig ConfigParser::parse_server_context(void)
+static ServerConfig parse_server_context(vector<string>::const_iterator& token)
 {
-    ++_itr; // move to {
+    ++token; // move to {
 
     set<string>  parsedDirectives;
     ServerConfig server;
-    while (*_itr != "}") {
-        if (*_itr != ";" && *_itr != "}" && *_itr != "error_page" && *_itr != "location")
-            check_duplicate_element(parsedDirectives, *_itr, "server");
-        if (*_itr == "listen")
-            server.port = parse_listen(server.host, server.defaultServer);
-        else if (*_itr == "root")
-            parse_root(server.root);
-        else if (*_itr == "client_max_body_size")
-            server.maxBodySize = parse_client_max_body_size();
-        else if (*_itr == "autoindex")
-            server.autoindex = parse_autoindex();
-        else if (*_itr == "index")
-            parse_index(server.indexFile, server.root);
-        else if (*_itr == "server_name")
-            parse_server_name(server.serverName);
-        else if (*_itr == "allow_methods")
-            server.methods = parse_allow_methods();
-        else if (*_itr == "error_page")
-            parse_error_page(server.errorPages, server.root);
-        else if (*_itr == "redirect")
-            parse_http_redirection(server.redirections);
-        else if (*_itr == "location")
-            parse_location_context(server);
-        else if (*_itr == ";" || *_itr == "{")
-            ++_itr;
+    while (*token != "}") {
+        if (*token != ";" && *token != "}" && *token != "error_page" &&
+            *token != "location")
+            check_duplicate_element(parsedDirectives, *token, "server");
+        if (*token == "listen")
+            server.port = parse_listen(token, server.host, server.defaultServer);
+        else if (*token == "root")
+            parse_root(token, server.root);
+        else if (*token == "client_max_body_size")
+            server.maxBodySize = parse_client_max_body_size(token);
+        else if (*token == "autoindex")
+            server.autoindex = parse_autoindex(token);
+        else if (*token == "index")
+            parse_index(token, server.indexFile, server.root);
+        else if (*token == "server_name")
+            parse_server_name(token, server.serverName);
+        else if (*token == "allow_methods")
+            server.methods = parse_allow_methods(token);
+        else if (*token == "error_page")
+            parse_error_page(token, server.errorPages, server.root);
+        else if (*token == "redirect")
+            parse_http_redirection(token, server.redirections);
+        else if (*token == "location")
+            parse_location_context(token, server);
+        else if (*token == ";" || *token == "{")
+            ++token;
         else
             THROW_EXCEPTION_WITH_INFO(ERR_SERVER_TOKENS);
     }
@@ -403,20 +460,27 @@ ServerConfig ConfigParser::parse_server_context(void)
             THROW_EXCEPTION_WITH_INFO(ERR_MISSING_METHODS);
     }
 
-    ++_itr; // move to next context
+    ++token; // move to next context
 
     return server;
 }
 
-vector<ServerConfig> ConfigParser::parse(void)
+/* ---------------------------- PARSING FUNCTIONS --------------------------- */
+vector<ServerConfig> parse_config_file(const string& filePath)
 {
-    _itr = _tokens.begin(); // setting iterator to the first token
+    LOG_INFO("Parsing " + filePath);
+
+    string         fileContent = read_file(filePath);
+    vector<string> tokens      = tokenize_content(fileContent);
+    validate_braces(tokens);
 
     vector<ServerConfig> servers;
     bool                 foundDefaultServer = false;
-    while (_itr != _tokens.end()) {
-        if (*_itr == "server")
-            servers.push_back(parse_server_context());
+
+    vector<string>::const_iterator token = tokens.begin();
+    while (token != tokens.end()) {
+        if (*token == "server")
+            servers.push_back(parse_server_context(token));
         else
             THROW_EXCEPTION_WITH_INFO(ERR_TOKENS);
 

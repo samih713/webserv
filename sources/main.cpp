@@ -14,17 +14,14 @@ int main(int argc, char** argv)
 {
     if (argc > 2) {
         cerr << "Usage: " << argv[0] << " [<config_file>]" << endl;
-        exit(1);
+        return 1;
     }
 
     signal(SIGINT, signal_handler);
+    string configFile = (argc == 2) ? argv[1] : "./configs/webserv.conf";
 
     try {
-        string configFile = (argc == 2) ? argv[1] : "./configs/webserv.conf";
-
-        ConfigParser&        parser  = ConfigParser::get_instance(configFile);
-        vector<ServerConfig> servers = parser.parse();
-        LOG_INFO("Parsing " + configFile);
+        vector<ServerConfig> servers = parse_config_file(configFile);
 
         Server& webserv = Server::get_instance(servers, 100);
         webserv.start(SELECT);
